@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from 'react';
-import { Globe } from 'lucide-react';
 
 const GlobalImpactSection = () => {
   const [counts, setCounts] = useState({
@@ -33,109 +32,131 @@ const GlobalImpactSection = () => {
   return (
     <section id="global-network" className="py-16 bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          {/* World Map Visualization */}
-          <div className="w-full md:w-1/2 mb-8 md:mb-0">
-            <div className="relative aspect-[4/3] bg-slate-800 rounded-lg overflow-hidden">
+        <div className="flex flex-col md:flex-row items-start gap-8">
+          {/* Title on the left for larger screens, top for mobile */}
+          <div className="w-full md:w-1/3 text-left mb-8 md:mb-0">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+              An Expansive<br />Global Network
+            </h2>
+            
+            <div className="grid grid-cols-2 gap-6">
+              <div className="text-center">
+                <div className="text-4xl font-extrabold text-white mb-2">{counts.founders.toLocaleString()}+</div>
+                <div className="text-sm text-gray-300">Founders & Talents</div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-4xl font-extrabold text-white mb-2">{counts.countries}+</div>
+                <div className="text-sm text-gray-300">Countries Connected</div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-4xl font-extrabold text-white mb-2">{counts.startups}+</div>
+                <div className="text-sm text-gray-300">Startups Featured</div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-4xl font-extrabold text-white mb-2">{counts.connections.toLocaleString()}+</div>
+                <div className="text-sm text-gray-300">Connections Made</div>
+              </div>
+            </div>
+
+            {/* Legend for the map */}
+            <div className="mt-8 pl-4">
+              <div className="flex items-center space-y-2 flex-col items-start">
+                <div className="flex items-center">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-full bg-[#D94867] opacity-20 mr-1"></div>
+                    <div className="w-8 h-8 rounded-full bg-[#D94867] opacity-40 mr-1"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#D94867] opacity-60 mr-1"></div>
+                    <div className="w-4 h-4 rounded-full bg-[#D94867] opacity-80 mr-1"></div>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-400 mt-1">
+                  <div className="flex items-center space-x-4">
+                    <span>400</span>
+                    <span>1000</span>
+                    <span>2000</span>
+                    <span>4000</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Static World Map Visualization */}
+          <div className="w-full md:w-2/3">
+            <div className="relative aspect-[16/10] bg-transparent rounded-lg overflow-hidden">
+              {/* Static World Map with Hotspots */}
               <div className="absolute inset-0">
-                {/* World Map SVG */}
-                <svg viewBox="0 0 800 500" className="w-full h-full">
-                  {/* Base world map paths */}
-                  <g fill="#33415c" stroke="#8B5CF6" strokeWidth="0.5">
+                {/* Base world map - light gray */}
+                <svg viewBox="0 0 1200 600" className="w-full h-full">
+                  {/* World map base */}
+                  <rect x="0" y="0" width="1200" height="600" fill="transparent" />
+                  
+                  {/* World Map - Using simplified path for continents */}
+                  <g fill="#D1D5DB" opacity="0.5">
                     {/* North America */}
-                    <path d="M120,70 C150,60 180,50 210,55 C240,60 250,80 270,90 C290,100 300,130 280,150 C260,170 240,180 210,190 C180,200 150,190 120,180 C90,170 70,150 60,130 C50,110 50,90 70,80 C90,70 110,75 120,70 Z" />
+                    <path d="M180,80 C220,70 260,65 300,75 C340,85 370,120 390,160 C410,200 420,245 400,285 C380,325 350,350 310,370 C270,390 225,395 180,380 C135,365 100,330 80,290 C60,250 55,205 70,160 C85,120 120,90 180,80 Z" />
                     
                     {/* South America */}
-                    <path d="M220,200 C240,190 260,200 270,220 C280,240 290,270 280,300 C270,330 250,350 230,370 C210,390 190,380 180,350 C170,320 175,290 190,260 C205,230 210,205 220,200 Z" />
+                    <path d="M305,380 C330,370 355,375 375,390 C395,405 410,430 420,460 C430,490 435,525 430,560 C425,595 410,630 385,655 C360,680 330,690 300,685 C270,680 245,660 225,635 C205,610 195,580 190,545 C185,510 190,470 205,435 C220,400 245,385 305,380 Z" />
                     
                     {/* Europe */}
-                    <path d="M380,80 C400,70 420,65 440,70 C460,75 480,90 490,110 C500,130 490,150 470,160 C450,170 420,170 400,160 C380,150 360,140 350,120 C340,100 350,85 380,80 Z" />
+                    <path d="M500,100 C530,90 560,85 590,95 C620,105 645,125 660,150 C675,175 680,205 675,235 C670,265 655,290 630,310 C605,330 575,340 545,335 C515,330 490,315 470,290 C450,265 440,235 445,200 C450,170 470,140 500,100 Z" />
                     
                     {/* Africa */}
-                    <path d="M400,180 C420,170 450,175 470,185 C490,195 510,220 520,250 C530,280 530,310 510,335 C490,360 460,370 430,365 C400,360 380,340 370,310 C360,280 365,240 380,210 C390,190 395,185 400,180 Z" />
+                    <path d="M550,240 C580,230 610,235 635,250 C660,265 680,290 695,320 C710,350 720,385 720,420 C720,455 710,490 690,520 C670,550 640,570 610,580 C580,590 550,590 520,575 C490,560 465,535 450,505 C435,475 430,440 440,405 C450,370 470,340 500,315 C530,290 550,240 550,240 Z" />
                     
                     {/* Asia */}
-                    <path d="M500,60 C530,50 560,45 590,50 C620,55 650,70 670,100 C690,130 710,170 700,210 C690,250 670,280 640,300 C610,320 570,330 530,320 C490,310 480,280 470,250 C460,220 450,190 460,160 C470,130 485,75 500,60 Z" />
+                    <path d="M700,100 C740,85 780,80 820,85 C860,90 900,105 935,130 C970,155 1000,190 1020,230 C1040,270 1050,315 1045,360 C1040,405 1020,445 990,480 C960,515 920,540 880,555 C840,570 800,575 760,565 C720,555 685,535 655,505 C625,475 605,440 595,400 C585,360 585,315 600,275 C615,235 640,200 675,170 C710,140 700,100 700,100 Z" />
                     
                     {/* Australia */}
-                    <path d="M650,280 C670,270 690,275 710,290 C730,305 740,330 735,350 C730,370 715,385 695,390 C675,395 655,390 640,375 C625,360 620,335 630,315 C640,295 650,285 650,280 Z" />
+                    <path d="M970,460 C990,450 1015,445 1040,450 C1065,455 1090,470 1110,490 C1130,510 1145,535 1150,565 C1155,595 1150,625 1135,650 C1120,675 1095,695 1065,705 C1035,715 1005,715 975,705 C945,695 920,675 900,650 C880,625 870,595 870,565 C870,535 880,505 900,480 C920,455 945,440 970,460 Z" />
                   </g>
                   
-                  {/* Connection paths */}
-                  <g>
-                    {/* Major hub connections */}
-                    <path d="M330,120 C400,110 470,130 540,90" fill="none" stroke="#D946EF" strokeWidth="1" strokeDasharray="5,3">
-                      <animate attributeName="stroke-dashoffset" from="8" to="0" dur="5s" repeatCount="indefinite" />
-                    </path>
-                    <path d="M330,120 C320,200 400,230 480,210" fill="none" stroke="#D946EF" strokeWidth="1" strokeDasharray="5,3">
-                      <animate attributeName="stroke-dashoffset" from="8" to="0" dur="6s" repeatCount="indefinite" />
-                    </path>
-                    <path d="M540,90 C510,160 570,200 650,150" fill="none" stroke="#D946EF" strokeWidth="1" strokeDasharray="5,3">
-                      <animate attributeName="stroke-dashoffset" from="8" to="0" dur="7s" repeatCount="indefinite" />
-                    </path>
-                    <path d="M540,90 C410,40 270,100 180,70" fill="none" stroke="#D946EF" strokeWidth="1" strokeDasharray="5,3">
-                      <animate attributeName="stroke-dashoffset" from="8" to="0" dur="8s" repeatCount="indefinite" />
-                    </path>
-                  </g>
+                  {/* Major activity hotspots - red circles with varying sizes based on activity */}
+                  {/* North America - Silicon Valley */}
+                  <circle cx="220" cy="200" r="70" fill="#D94867" opacity="0.7" />
                   
-                  {/* Main activity hubs */}
-                  <g>
-                    {/* US - Silicon Valley */}
-                    <circle cx="140" cy="120" r="12" fill="#D946EF" opacity="0.8">
-                      <animate attributeName="r" values="12;14;12" dur="3s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.8;0.9;0.8" dur="3s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="140" cy="120" r="20" fill="#D946EF" opacity="0.2" />
-                    
-                    {/* Europe */}
-                    <circle cx="400" cy="110" r="10" fill="#D946EF" opacity="0.8">
-                      <animate attributeName="r" values="10;12;10" dur="3.5s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.8;0.9;0.8" dur="3.5s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="400" cy="110" r="18" fill="#D946EF" opacity="0.2" />
-                    
-                    {/* Tehran - Largest Hub */}
-                    <circle cx="540" cy="150" r="15" fill="#D946EF" opacity="0.8">
-                      <animate attributeName="r" values="15;17;15" dur="2.5s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.8;0.9;0.8" dur="2.5s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="540" cy="150" r="25" fill="#D946EF" opacity="0.2" />
-                    
-                    {/* Australia */}
-                    <circle cx="680" cy="330" r="8" fill="#D946EF" opacity="0.7">
-                      <animate attributeName="r" values="8;9;8" dur="4s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.7;0.8;0.7" dur="4s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="680" cy="330" r="14" fill="#D946EF" opacity="0.2" />
-                    
-                    {/* Canada */}
-                    <circle cx="180" cy="70" r="7" fill="#D946EF" opacity="0.7">
-                      <animate attributeName="r" values="7;8;7" dur="3.2s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.7;0.8;0.7" dur="3.2s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="180" cy="70" r="12" fill="#D946EF" opacity="0.2" />
-                    
-                    {/* Middle East - Dubai */}
-                    <circle cx="520" cy="180" r="8" fill="#D946EF" opacity="0.7">
-                      <animate attributeName="r" values="8;9;8" dur="3.7s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.7;0.8;0.7" dur="3.7s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="520" cy="180" r="14" fill="#D946EF" opacity="0.2" />
-                    
-                    {/* UK */}
-                    <circle cx="370" cy="100" r="7" fill="#D946EF" opacity="0.7">
-                      <animate attributeName="r" values="7;8;7" dur="3.4s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.7;0.8;0.7" dur="3.4s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="370" cy="100" r="12" fill="#D946EF" opacity="0.2" />
-                  </g>
+                  {/* Europe */}
+                  <circle cx="570" cy="180" r="60" fill="#D94867" opacity="0.7" />
+                  <circle cx="520" cy="170" r="25" fill="#D94867" opacity="0.8" />
+                  <circle cx="540" cy="150" r="15" fill="#D94867" opacity="0.8" />
+                  <circle cx="590" cy="190" r="20" fill="#D94867" opacity="0.8" />
+                  <circle cx="610" cy="210" r="12" fill="#D94867" opacity="0.8" />
+                  <circle cx="550" cy="200" r="18" fill="#D94867" opacity="0.8" />
+                  
+                  {/* Middle East and Iran */}
+                  <circle cx="720" cy="260" r="80" fill="#D94867" opacity="0.7" />
+                  <circle cx="680" cy="230" r="15" fill="#D94867" opacity="0.8" />
+                  <circle cx="700" cy="250" r="20" fill="#D94867" opacity="0.8" />
+                  
+                  {/* Asia */}
+                  <circle cx="950" cy="250" r="50" fill="#D94867" opacity="0.7" />
+                  <circle cx="920" cy="220" r="12" fill="#D94867" opacity="0.8" />
+                  <circle cx="940" cy="240" r="15" fill="#D94867" opacity="0.8" />
+                  <circle cx="970" cy="260" r="10" fill="#D94867" opacity="0.8" />
+                  
+                  {/* Australia */}
+                  <circle cx="980" cy="500" r="30" fill="#D94867" opacity="0.7" />
+                  
+                  {/* Africa */}
+                  <circle cx="600" cy="400" r="20" fill="#D94867" opacity="0.7" />
+                  <circle cx="580" cy="350" r="15" fill="#D94867" opacity="0.8" />
+                  <circle cx="550" cy="450" r="10" fill="#D94867" opacity="0.8" />
+                  <circle cx="620" cy="420" r="12" fill="#D94867" opacity="0.8" />
+                  
+                  {/* South America */}
+                  <circle cx="330" cy="480" r="25" fill="#D94867" opacity="0.7" />
+                  <circle cx="350" cy="450" r="10" fill="#D94867" opacity="0.8" />
+                  <circle cx="310" cy="510" r="12" fill="#D94867" opacity="0.8" />
                   
                   {/* Smaller activity points */}
-                  {Array.from({ length: 30 }).map((_, i) => {
-                    const x = 100 + Math.random() * 600;
-                    const y = 50 + Math.random() * 350;
-                    const size = 1 + Math.random() * 3;
-                    const opacity = 0.3 + Math.random() * 0.3;
+                  {Array.from({ length: 40 }).map((_, i) => {
+                    const x = 150 + Math.random() * 900;
+                    const y = 100 + Math.random() * 400;
+                    const size = 2 + Math.random() * 8;
                     
                     return (
                       <circle 
@@ -143,61 +164,12 @@ const GlobalImpactSection = () => {
                         cx={x} 
                         cy={y} 
                         r={size} 
-                        fill="#f9a8d4" 
-                        opacity={opacity}
-                      >
-                        <animate 
-                          attributeName="opacity" 
-                          values={`${opacity};${opacity + 0.2};${opacity}`} 
-                          dur={`${2 + Math.random() * 3}s`} 
-                          repeatCount="indefinite" 
-                        />
-                      </circle>
+                        fill="#D94867" 
+                        opacity={0.5 + Math.random() * 0.3}
+                      />
                     );
                   })}
                 </svg>
-                
-                {/* Overlay gradient for better text visibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent pointer-events-none"></div>
-              </div>
-              
-              {/* Map caption */}
-              <div className="absolute bottom-4 left-4 text-white/80 text-sm">
-                <span className="font-medium">Iranian Startup Ecosystem</span>
-                <p className="text-xs text-white/60">Global distribution and connection points</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Stats and Content */}
-          <div className="w-full md:w-1/2 text-left">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Iran's Global Innovation Network
-            </h2>
-            
-            <p className="text-lg text-gray-300 mb-8">
-              Connecting ambitious Iranian minds across continents, fueling collaboration and building world-class ventures together.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-6">
-              <div className="text-center">
-                <div className="text-5xl font-extrabold text-white mb-2">{counts.founders.toLocaleString()}+</div>
-                <div className="text-sm text-gray-300">Founders & Talents</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-5xl font-extrabold text-white mb-2">{counts.countries}+</div>
-                <div className="text-sm text-gray-300">Countries Connected</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-5xl font-extrabold text-white mb-2">{counts.startups}+</div>
-                <div className="text-sm text-gray-300">Startups Featured</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-5xl font-extrabold text-white mb-2">{counts.connections.toLocaleString()}+</div>
-                <div className="text-sm text-gray-300">Connections Made</div>
               </div>
             </div>
           </div>
