@@ -49,14 +49,14 @@ const HeroSection = () => {
         <div className="text-center md:text-left py-12 md:py-20">
           <h1 
             ref={headerRef}
-            className={`${isMobile ? 'text-4xl' : 'text-5xl md:text-6xl lg:text-7xl'} font-bold text-white mb-4 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2 leading-tight`}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2 leading-tight shadow-text"
           >
             Connect with Entrepreneurs.
           </h1>
           
           <h2 
             ref={subHeaderRef}
-            className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl lg:text-6xl'} font-bold text-white mb-8 md:mb-12 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-200 px-2 leading-tight`}
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8 md:mb-12 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-200 px-2 leading-tight shadow-text"
           >
             Find a Cofounder.
           </h2>
@@ -78,10 +78,10 @@ const HeroSection = () => {
             <p className="text-gray-400 mb-6">as featured in</p>
             
             <div className="flex flex-wrap justify-center md:justify-start gap-8 mb-16">
-              <div className="bg-gray-800/50 rounded-md px-4 py-2">
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2">
                 <span className="text-white">Product Hunt</span>
               </div>
-              <div className="bg-gray-800/50 rounded-md px-4 py-2">
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2">
                 <span className="text-white">TechCrunch</span>
               </div>
             </div>
