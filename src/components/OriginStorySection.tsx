@@ -9,31 +9,31 @@ const OriginStorySection = () => {
           {/* Story Content */}
           <div className="lg:w-1/2">
             <div className="mb-6 inline-block">
-              <span className="bg-blue-500/20 text-blue-400 py-1 px-4 rounded-full text-sm font-medium">Our Compass</span>
+              <span className="bg-blue-500/20 text-blue-400 py-1 px-4 rounded-full text-sm font-medium">چشم‌انداز ما</span>
             </div>
             
             <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-              From Shared Journeys, A United Future.
+              از سفرهای مشترک، به سوی آینده‌ای متحد
             </h2>
             
             <div className="prose prose-lg text-gray-300">
               <p className="mb-4">
-                Thousands of miles from home, driven by dreams, Iranian innovators worldwide face unique hurdles. Finding the right co-founder, navigating complex ecosystems, accessing global networks... it's a familiar struggle. We've lived it.
+                هزاران کیلومتر دور از خانه، با انگیزه رویاها، نوآوران ایرانی در سراسر جهان با چالش‌های منحصربه‌فردی روبرو هستند. یافتن هم‌بنیان‌گذار مناسب، هدایت در اکوسیستم‌های پیچیده، دسترسی به شبکه‌های جهانی... این مبارزه‌ای آشناست. ما آن را زندگی کرده‌ایم.
               </p>
               
               <p className="mb-4">
-                Hamfounder was born from this shared experience. We're building more than a platform; we're cultivating a global community rooted in mutual support, shared knowledge, and the relentless belief in Iranian potential.
+                همفاندر از این تجربه مشترک متولد شد. ما چیزی بیشتر از یک پلتفرم می‌سازیم؛ ما جامعه‌ای جهانی را پرورش می‌دهیم که ریشه در حمایت متقابل، دانش مشترک و باور خستگی‌ناپذیر به پتانسیل ایرانیان دارد.
               </p>
               
               <p>
-                Our mission is to empower your journey, connecting you to the people and resources needed to build ventures that don't just succeed, but inspire.
+                ماموریت ما توانمندسازی مسیر شماست، متصل کردن شما به افراد و منابع مورد نیاز برای ساختن کسب‌وکارهایی که نه تنها موفق می‌شوند، بلکه الهام‌بخش هستند.
               </p>
             </div>
           </div>
           
           {/* Core Pillars */}
           <div className="lg:w-1/2 bg-slate-800/10 rounded-xl border border-slate-700 p-8">
-            <h3 className="text-xl font-semibold text-white mb-6">Core Pillars:</h3>
+            <h3 className="text-xl font-semibold text-white mb-6">چرا همفاندر برای کارآفرینان ایرانی؟</h3>
             
             <div className="space-y-5">
               <div className="flex items-start">
@@ -42,7 +42,9 @@ const OriginStorySection = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="text-gray-300">Connect global talent & bridge the diaspora gap.</p>
+                <p className="text-gray-300">
+                  <strong>درک عمیق چالش‌های مشترک:</strong> از موانع ویزا و تحریم‌ها گرفته تا تفاوت‌های فرهنگی، ما چالش‌های منحصربه‌فردی را که کارآفرینان ایرانی با آن روبرو هستند، می‌فهمیم.
+                </p>
               </div>
               
               <div className="flex items-start">
@@ -51,7 +53,9 @@ const OriginStorySection = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="text-gray-300">Foster growth through shared knowledge & mentorship.</p>
+                <p className="text-gray-300">
+                  <strong>شبکه‌سازی هدفمند:</strong> ارتباطات را با افرادی برقرار کنید که نه تنها مهارت‌های مکمل دارند، بلکه زمینه فرهنگی و چشم‌انداز مشترک را نیز درک می‌کنند.
+                </p>
               </div>
               
               <div className="flex items-start">
@@ -60,7 +64,20 @@ const OriginStorySection = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="text-gray-300">Empower the creation of world-class, impactful ventures.</p>
+                <p className="text-gray-300">
+                  <strong>پشتیبانی منطبق با فرهنگ:</strong> منابع، راهنمایی و ابزارهایی که برای چالش‌های منحصربه‌فرد کارآفرینان ایرانی در صحنه جهانی طراحی شده‌اند.
+                </p>
+              </div>
+              
+              <div className="flex items-start">
+                <div className="w-6 h-6 rounded-full bg-green-500/20 flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                  <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-gray-300">
+                  <strong>از دیاسپورا به اثرگذاری جهانی:</strong> پراکندگی جهانی ایرانیان را به مزیتی قدرتمند تبدیل کنید، با شبکه‌ای که از محدودیت‌های جغرافیایی فراتر می‌رود.
+                </p>
               </div>
             </div>
           </div>
