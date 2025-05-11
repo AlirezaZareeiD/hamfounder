@@ -36,11 +36,12 @@ const HeroSection = () => {
 
   return (
     <section className="relative pt-12 pb-16 md:pt-24 md:pb-28 overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background to-slate-900 -z-10">
-        {/* Decorative elements */}
-        <div className="absolute right-[10%] top-1/3 w-44 md:w-64 h-44 md:h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute left-[15%] bottom-1/4 w-52 md:w-72 h-52 md:h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
+      {/* Enhanced background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-800 -z-10">
+        {/* Enhanced decorative elements with improved opacity and positioning */}
+        <div className="absolute right-[10%] top-1/3 w-44 md:w-72 h-44 md:h-72 bg-blue-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute left-[15%] bottom-1/4 w-52 md:w-80 h-52 md:h-80 bg-purple-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute left-[40%] top-[10%] w-40 md:w-64 h-40 md:h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -66,7 +67,7 @@ const HeroSection = () => {
             <Button 
               variant="default" 
               size={isMobile ? "default" : "lg"} 
-              className="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 transform transition-transform duration-300 hover:scale-105 w-full sm:w-auto"
+              className="bg-gradient-to-r from-blue-600 to-purple-500 hover:from-blue-700 hover:to-purple-600 transform transition-transform duration-300 hover:scale-105 w-full sm:w-auto"
             >
               Explore Ecosystem
             </Button>
