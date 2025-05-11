@@ -15,6 +15,7 @@ import OriginStorySection from '@/components/OriginStorySection';
 import TrustBuildingSection from '@/components/TrustBuildingSection';
 import PartnersIntegrationsSection from '@/components/PartnersIntegrationsSection';
 import FounderRoadmapSection from '@/components/FounderRoadmapSection';
+import ScrollToTopButton from '@/components/ScrollToTopButton';
 
 const Index = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -44,6 +45,7 @@ const Index = () => {
         <StartupSpotlightSection />
         <FinalCTASection onSubmit={handleEmailSubmit} submitted={submitted} />
       </main>
+      <ScrollToTopButton />
       <Footer />
     </div>
   );

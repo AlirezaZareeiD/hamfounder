@@ -1,7 +1,37 @@
 
+import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
+  const headerRef = useRef<HTMLHeadingElement>(null);
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const btnContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('opacity-100', 'translate-y-0');
+            entry.target.classList.remove('opacity-0', 'translate-y-8');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (headerRef.current) observer.observe(headerRef.current);
+    if (descRef.current) observer.observe(descRef.current);
+    if (btnContainerRef.current) observer.observe(btnContainerRef.current);
+
+    return () => {
+      if (headerRef.current) observer.unobserve(headerRef.current);
+      if (descRef.current) observer.unobserve(descRef.current);
+      if (btnContainerRef.current) observer.unobserve(btnContainerRef.current);
+    };
+  }, []);
+
   return (
     <section className="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
       {/* Background gradient */}
@@ -13,26 +43,35 @@ const HeroSection = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 mb-6">
+          <h1 
+            ref={headerRef}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 mb-6 opacity-0 translate-y-8 transition-all duration-700 ease-out"
+          >
             Hamfounder: Connecting Iranian Innovators Worldwide
           </h1>
           
-          <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto">
+          <p 
+            ref={descRef}
+            className="text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto opacity-0 translate-y-8 transition-all duration-700 ease-out delay-300"
+          >
             A powerful network connecting co-founders, mentors, and investors across the Iranian diaspora. Great ideas become reality with the right partners.
           </p>
           
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <div 
+            ref={btnContainerRef}
+            className="flex flex-col sm:flex-row justify-center gap-4 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-500"
+          >
             <Button 
               variant="default" 
               size="lg" 
-              className="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500"
+              className="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 transform transition-transform duration-300 hover:scale-105"
             >
               Explore Ecosystem
             </Button>
             <Button 
               variant="outline" 
               size="lg"
-              className="border-gray-400 text-gray-300 hover:bg-gray-800/50"
+              className="border-gray-400 text-gray-300 hover:bg-gray-800/50 transform transition-transform duration-300 hover:scale-105"
             >
               Early Access
             </Button>
