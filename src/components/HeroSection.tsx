@@ -7,8 +7,8 @@ import { ChevronDown } from 'lucide-react';
 const HeroSection = () => {
   const headerRef = useRef<HTMLHeadingElement>(null);
   const subHeaderRef = useRef<HTMLHeadingElement>(null);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
   const btnContainerRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -27,19 +27,19 @@ const HeroSection = () => {
 
     if (headerRef.current) observer.observe(headerRef.current);
     if (subHeaderRef.current) observer.observe(subHeaderRef.current);
+    if (descriptionRef.current) observer.observe(descriptionRef.current);
     if (btnContainerRef.current) observer.observe(btnContainerRef.current);
-    if (statsRef.current) observer.observe(statsRef.current);
 
     return () => {
       if (headerRef.current) observer.unobserve(headerRef.current);
       if (subHeaderRef.current) observer.unobserve(subHeaderRef.current);
+      if (descriptionRef.current) observer.unobserve(descriptionRef.current);
       if (btnContainerRef.current) observer.unobserve(btnContainerRef.current);
-      if (statsRef.current) observer.unobserve(statsRef.current);
     };
   }, []);
 
   return (
-    <section className="relative min-h-screen pt-16 pb-16 flex items-center">
+    <section className="relative min-h-[80vh] pt-16 pb-16 flex items-center">
       {/* Dark background overlay */}
       <div className="absolute inset-0 bg-slate-900 z-0">
         <div 
@@ -48,7 +48,7 @@ const HeroSection = () => {
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 relative">
-        <div className="text-center md:text-left py-12 md:py-20">
+        <div className="text-center py-12 md:py-20">
           <h1 
             ref={headerRef}
             className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2 leading-tight"
@@ -58,14 +58,21 @@ const HeroSection = () => {
           
           <h2 
             ref={subHeaderRef}
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8 md:mb-12 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-200 px-2 leading-tight"
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-200 px-2 leading-tight"
           >
             Find a Cofounder.
           </h2>
           
+          <p
+            ref={descriptionRef}
+            className="text-xl text-gray-300 max-w-2xl mx-auto mb-10 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-300 px-2"
+          >
+            Join our exclusive network of ambitious entrepreneurs and technical talents looking to build the next big thing together. Find your perfect match and start your journey today.
+          </p>
+          
           <div 
             ref={btnContainerRef}
-            className="opacity-0 translate-y-8 transition-all duration-700 ease-out delay-400 mb-16"
+            className="opacity-0 translate-y-8 transition-all duration-700 ease-out delay-400"
           >
             <Button 
               variant="default" 
@@ -74,40 +81,6 @@ const HeroSection = () => {
             >
               Join early access — it's free
             </Button>
-          </div>
-
-          <div ref={statsRef} className="opacity-0 translate-y-8 transition-all duration-700 ease-out delay-600">
-            <p className="text-gray-400 mb-6">as featured in</p>
-            
-            <div className="flex flex-wrap justify-center md:justify-start gap-8 mb-16">
-              <div className="bg-gray-600/50 backdrop-blur-sm rounded-md px-5 py-2.5">
-                <span className="text-white">Product Hunt</span>
-              </div>
-              <div className="bg-gray-600/50 backdrop-blur-sm rounded-md px-5 py-2.5">
-                <span className="text-white">TechCrunch</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
-              <div className="border-t border-gray-700 pt-6">
-                <h3 className="text-white text-4xl font-bold mb-2">10,000+</h3>
-                <p className="text-gray-400">Registered Innovators</p>
-              </div>
-              <div className="border-t border-gray-700 pt-6">
-                <h3 className="text-white text-4xl font-bold mb-2">40 : 60</h3>
-                <div className="flex justify-center md:justify-start text-gray-400">
-                  <span className="w-1/2">Technical</span>
-                  <span className="w-1/2">Non-Tech</span>
-                </div>
-              </div>
-              <div className="border-t border-gray-700 pt-6">
-                <h3 className="text-white text-4xl font-bold mb-2">45 : 55</h3>
-                <div className="flex justify-center md:justify-start text-gray-400">
-                  <span className="w-1/2">Exploring</span>
-                  <span className="w-1/2">Committed</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
