@@ -1,12 +1,41 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import Navbar from '@/components/Navbar';
+import HeroSection from '@/components/HeroSection';
+import GlobalImpactSection from '@/components/GlobalImpactSection';
+import OurMissionSection from '@/components/OurMissionSection';
+import PathToPartnershipSection from '@/components/PathToPartnershipSection';
+import FounderWisdomSection from '@/components/FounderWisdomSection';
+import EcosystemAdvantageSection from '@/components/EcosystemAdvantageSection';
+import StartupSpotlightSection from '@/components/StartupSpotlightSection';
+import FinalCTASection from '@/components/FinalCTASection';
+import Footer from '@/components/Footer';
 
 const Index = () => {
+  const [submitted, setSubmitted] = useState(false);
+  
+  const handleEmailSubmit = (email: string) => {
+    // Here we'll handle email submission in the future
+    console.log("Email submitted:", email);
+    setSubmitted(true);
+    // Reset submission status after 3 seconds
+    setTimeout(() => setSubmitted(false), 3000);
+  };
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main>
+        <HeroSection />
+        <GlobalImpactSection />
+        <OurMissionSection />
+        <PathToPartnershipSection />
+        <FounderWisdomSection />
+        <EcosystemAdvantageSection />
+        <StartupSpotlightSection />
+        <FinalCTASection onSubmit={handleEmailSubmit} submitted={submitted} />
+      </main>
+      <Footer />
     </div>
   );
 };
