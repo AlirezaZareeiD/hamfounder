@@ -14,6 +14,7 @@ import EcosystemPillarsSection from '@/components/EcosystemPillarsSection';
 import OriginStorySection from '@/components/OriginStorySection';
 import TrustBuildingSection from '@/components/TrustBuildingSection';
 import PartnersIntegrationsSection from '@/components/PartnersIntegrationsSection';
+import FounderRoadmapSection from '@/components/FounderRoadmapSection';
 
 const Index = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -34,6 +35,7 @@ const Index = () => {
         <EcosystemPillarsSection />
         <GlobalImpactSection />
         <OriginStorySection />
+        <FounderRoadmapSection />
         <PathToPartnershipSection />
         <TrustBuildingSection />
         <EcosystemAdvantageSection />
