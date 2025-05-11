@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import useEmblaCarousel from "embla-carousel-react";
 
 interface Startup {
   id: number;
@@ -84,7 +86,10 @@ const getBackgroundColor = (category: string) => {
 
 const StartupSpotlightSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    loop: true,
+  });
   
   return (
     <section className="py-24 bg-gradient-to-br from-slate-900 to-slate-800">
@@ -99,55 +104,47 @@ const StartupSpotlightSection = () => {
           represent the boundless potential within our community.
         </p>
         
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full"
-          onSelect={(api) => {
-            const selectedIndex = api?.selectedScrollSnap() || 0;
-            setActiveIndex(selectedIndex);
-          }}
-        >
-          <CarouselContent>
-            {startups.map((startup) => (
-              <CarouselItem key={startup.id} className="md:basis-1/2 lg:basis-1/3">
-                <Card className="h-full bg-slate-800/50 border-slate-700">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col items-center space-y-4">
-                      <div className="overflow-hidden rounded-full h-32 w-32 border-4 border-slate-700">
-                        <img
-                          src={startup.founderImage}
-                          alt={`${startup.founderName}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      
-                      <div className="text-center">
-                        <h3 className="text-xl font-semibold text-white">
-                          {startup.founderName}
-                        </h3>
-                        <p className="text-slate-400 mb-2">Founder of {startup.name}</p>
-                        
-                        <div 
-                          className="text-sm p-1 px-3 rounded-full inline-block mb-3"
-                          style={{ backgroundColor: getBackgroundColor(startup.category) }}
-                        >
-                          {startup.category}
+        <div className="relative">
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex">
+              {startups.map((startup) => (
+                <div key={startup.id} className="min-w-0 flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%] pl-4">
+                  <Card className="h-full bg-slate-800/50 border-slate-700">
+                    <CardContent className="p-6">
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="overflow-hidden rounded-full h-32 w-32 border-4 border-slate-700">
+                          <img
+                            src={startup.founderImage}
+                            alt={`${startup.founderName}`}
+                            className="h-full w-full object-cover"
+                          />
                         </div>
                         
-                        <p className="text-slate-300 mt-3">
-                          {startup.description}
-                        </p>
+                        <div className="text-center">
+                          <h3 className="text-xl font-semibold text-white">
+                            {startup.founderName}
+                          </h3>
+                          <p className="text-slate-400 mb-2">Founder of {startup.name}</p>
+                          
+                          <div 
+                            className="text-sm p-1 px-3 rounded-full inline-block mb-3"
+                            style={{ backgroundColor: getBackgroundColor(startup.category) }}
+                          >
+                            {startup.category}
+                          </div>
+                          
+                          <p className="text-slate-300 mt-3">
+                            {startup.description}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
         
         <div className="flex justify-center gap-2 mt-8">
           {startups.map((_, index) => (
@@ -161,19 +158,9 @@ const StartupSpotlightSection = () => {
                   : 'bg-transparent border-white/30'
               }`}
               onClick={() => {
-                const carouselElement = document.querySelector('[role="region"]');
-                if (carouselElement) {
-                  const scrollSnapElement = carouselElement.querySelector(
-                    `[data-carousel-item]:nth-child(${index + 1})`
-                  );
-                  if (scrollSnapElement) {
-                    scrollSnapElement.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'nearest',
-                      inline: 'center',
-                    });
-                    setActiveIndex(index);
-                  }
+                if (emblaApi) {
+                  emblaApi.scrollTo(index);
+                  setActiveIndex(index);
                 }
               }}
               aria-label={`Go to slide ${index + 1}`}
