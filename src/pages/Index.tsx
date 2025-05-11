@@ -46,11 +46,11 @@ const Index = () => {
         <PathToPartnershipSection />
         <EcosystemPillarsSection />
         <FounderRoadmapSection />
+        <StartupSpotlightSection />
         <TrustBuildingSection />
         <EcosystemAdvantageSection />
         <FounderWisdomSection />
         <PartnersIntegrationsSection />
-        <StartupSpotlightSection />
         <FinalCTASection onSubmit={handleEmailSubmit} submitted={submitted} />
       </main>
       <ScrollToTopButton />
