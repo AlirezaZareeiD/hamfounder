@@ -1,75 +1,123 @@
 
+import { useEffect, useRef } from 'react';
+
 const OurMissionSection = () => {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const pillarsRef = useRef<HTMLDivElement>(null);
+  const checkItemsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (entry.target === headingRef.current || entry.target === contentRef.current) {
+              entry.target.classList.add('opacity-100', 'translate-x-0');
+              entry.target.classList.remove('opacity-0', 'translate-x-[-50px]');
+            } else if (entry.target === pillarsRef.current) {
+              entry.target.classList.add('opacity-100', 'translate-x-0');
+              entry.target.classList.remove('opacity-0', 'translate-x-[50px]');
+            } else {
+              entry.target.classList.add('opacity-100', 'translate-y-0');
+              entry.target.classList.remove('opacity-0', 'translate-y-8');
+            }
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (headingRef.current) observer.observe(headingRef.current);
+    if (contentRef.current) observer.observe(contentRef.current);
+    if (pillarsRef.current) observer.observe(pillarsRef.current);
+    
+    checkItemsRef.current.forEach((item) => {
+      if (item) observer.observe(item);
+    });
+
+    return () => {
+      if (headingRef.current) observer.unobserve(headingRef.current);
+      if (contentRef.current) observer.unobserve(contentRef.current);
+      if (pillarsRef.current) observer.unobserve(pillarsRef.current);
+      
+      checkItemsRef.current.forEach((item) => {
+        if (item) observer.unobserve(item);
+      });
+    };
+  }, []);
+
   return (
-    <section id="mission" className="py-16 bg-gradient-to-b from-slate-900 to-background">
+    <section id="mission" className="py-16 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-12 items-center">
-          {/* Narrative Block */}
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          {/* Left Side - Vision Content */}
           <div className="lg:w-1/2">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-              From Shared Journeys, A United Future.
-            </h2>
+            <div ref={headingRef} className="opacity-0 translate-x-[-50px] transition-all duration-700 ease-out">
+              <div className="mb-6 inline-block">
+                <span className="bg-blue-100 text-blue-600 py-1 px-4 rounded-full text-sm font-medium">Our Vision</span>
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-blue-500">
+                From Shared Journeys to United Future
+              </h2>
+            </div>
             
-            <div className="prose prose-lg text-gray-300">
+            <div ref={contentRef} className="prose prose-lg text-gray-600 opacity-0 translate-x-[-50px] transition-all duration-700 ease-out delay-200">
               <p className="mb-4">
-                Hamfounder was born from a personal struggle—the challenge of finding the right co-founder 
-                when building a venture as an Iranian entrepreneur in a global landscape.
+                Thousands of miles from home, motivated by dreams, Iranian innovators around the world face unique challenges. Finding the right co-founder, navigating complex ecosystems, accessing global networks... these problems are familiar to us. We've lived them.
               </p>
               
               <p className="mb-4">
-                We recognized that across the world, Iranian innovators face unique challenges yet possess 
-                extraordinary potential. The missing piece was a dedicated ecosystem that could bring these 
-                brilliant minds together, regardless of geography.
+                Hamfounder was born from this shared experience. We're more than a platform; we're nurturing a global community rooted in mutual support, shared knowledge, and a firm belief in Iranian potential.
               </p>
               
               <p>
-                Our mission is to connect Iranian founders, technologists, and visionaries worldwide, 
-                creating a powerful network where ideas flourish, teams form naturally, and world-class 
-                ventures emerge with the support of a community that truly understands your journey.
+                Our mission is to empower your journey by connecting you with the people and resources needed to build businesses that not only succeed but inspire.
               </p>
             </div>
           </div>
           
-          {/* Core Pillars Block */}
-          <div className="lg:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-slate-800/30 p-6 rounded-lg border border-slate-700">
-              <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-4">
-                <svg className="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Connect & Discover</h3>
-              <p className="text-gray-300">Find complementary co-founders and team members across borders.</p>
-            </div>
+          {/* Right Side - Benefits for Iranian Entrepreneurs */}
+          <div ref={pillarsRef} className="lg:w-1/2 bg-gray-100 rounded-xl p-8 opacity-0 translate-x-[50px] transition-all duration-700 ease-out delay-300">
+            <h3 className="text-xl font-semibold text-gray-800 mb-6">Why Hamfounder for Iranian Entrepreneurs?</h3>
             
-            <div className="bg-slate-800/30 p-6 rounded-lg border border-slate-700">
-              <div className="h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-4">
-                <svg className="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Learn & Grow</h3>
-              <p className="text-gray-300">Access knowledge and mentorship from those who've walked your path.</p>
-            </div>
-            
-            <div className="bg-slate-800/30 p-6 rounded-lg border border-slate-700">
-              <div className="h-12 w-12 rounded-full bg-green-500/20 flex items-center justify-center mb-4">
-                <svg className="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Build & Scale</h3>
-              <p className="text-gray-300">Leverage the collective experience to overcome common challenges.</p>
-            </div>
-            
-            <div className="bg-slate-800/30 p-6 rounded-lg border border-slate-700">
-              <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center mb-4">
-                <svg className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Global Impact</h3>
-              <p className="text-gray-300">Create ventures that showcase Iranian talent on the world stage.</p>
+            <div className="space-y-5">
+              {[
+                {
+                  title: "Deep understanding of shared challenges:",
+                  content: "From visa obstacles and sanctions to cultural differences, we recognize the unique challenges Iranian entrepreneurs face."
+                },
+                {
+                  title: "Targeted networking:",
+                  content: "Connect with individuals who not only have complementary skills but understand shared cultural background and perspective."
+                },
+                {
+                  title: "Cultural support:",
+                  content: "Resources, guidance, and tools designed for the unique challenges Iranian entrepreneurs face in the global arena."
+                },
+                {
+                  title: "From diaspora to global impact:",
+                  content: "Turn the worldwide dispersion of Iranians into a powerful advantage, with a network that transcends geographical limitations."
+                }
+              ].map((item, index) => (
+                <div 
+                  key={index} 
+                  ref={el => checkItemsRef.current[index] = el}
+                  className={`flex items-start opacity-0 translate-y-8 transition-all duration-500 ease-out`}
+                  style={{ transitionDelay: `${400 + index * 150}ms` }}
+                >
+                  <div className="w-6 h-6 rounded-full bg-green-100 flex-shrink-0 flex items-center justify-center mr-4 mt-1">
+                    <svg className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div className="text-gray-700">
+                    <span className="font-medium">{item.title}</span> {item.content}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

@@ -41,9 +41,9 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
+        <OurMissionSection />
         <EcosystemPillarsSection />
         <GlobalImpactSection />
-        <OriginStorySection />
         <FounderRoadmapSection />
         <PathToPartnershipSection />
         <TrustBuildingSection />
