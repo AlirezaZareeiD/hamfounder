@@ -112,22 +112,22 @@ const TrustBuildingSection = () => {
     <section className="py-16 bg-gradient-to-b from-background to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
             Trusted by Leaders in the Iranian Founder Community
           </h2>
-          <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg text-white/90 max-w-3xl mx-auto">
             Join a network supported by experienced advisors and trusted by successful Iranian entrepreneurs worldwide.
           </p>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex justify-center mb-8 border-b border-gray-700">
+        <div className="flex justify-center mb-8 border-b border-white/20">
           <button 
             onClick={() => setActiveTab('advisors')}
             className={`px-6 py-3 font-medium text-sm ${
               activeTab === 'advisors' 
-                ? 'text-blue-400 border-b-2 border-blue-400' 
-                : 'text-gray-400 hover:text-gray-300'
+                ? 'text-white border-b-2 border-white' 
+                : 'text-white/70 hover:text-white hover:border-b-2 hover:border-white/50'
             }`}
           >
             Advisors & Mentors
@@ -136,8 +136,8 @@ const TrustBuildingSection = () => {
             onClick={() => setActiveTab('testimonials')}
             className={`px-6 py-3 font-medium text-sm ${
               activeTab === 'testimonials' 
-                ? 'text-blue-400 border-b-2 border-blue-400' 
-                : 'text-gray-400 hover:text-gray-300'
+                ? 'text-white border-b-2 border-white' 
+                : 'text-white/70 hover:text-white hover:border-b-2 hover:border-white/50'
             }`}
           >
             Success Stories
@@ -146,8 +146,8 @@ const TrustBuildingSection = () => {
             onClick={() => setActiveTab('security')}
             className={`px-6 py-3 font-medium text-sm ${
               activeTab === 'security' 
-                ? 'text-blue-400 border-b-2 border-blue-400' 
-                : 'text-gray-400 hover:text-gray-300'
+                ? 'text-white border-b-2 border-white' 
+                : 'text-white/70 hover:text-white hover:border-b-2 hover:border-white/50'
             }`}
           >
             Privacy & Security
