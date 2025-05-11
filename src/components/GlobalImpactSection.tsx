@@ -29,7 +29,7 @@ const AnimatedCounter = ({ end, label }: { end: number, label: string }) => {
   return (
     <div className="text-center">
       <div className="text-5xl font-extrabold mb-2">
-        {count >= 1000 ? `${count/1000}K+` : `${count}+`}
+        {count >= 1000 ? `${(count/1000).toFixed(0)}K+` : `${count}+`}
       </div>
       <div className="text-sm text-gray-300">{label}</div>
     </div>
