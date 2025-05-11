@@ -5,23 +5,23 @@ const EcosystemPillarsSection = () => {
   const pillars = [
     {
       icon: Globe,
-      title: "ارتباط",
-      description: "استعدادهای جهانی را به هم متصل کنید و شکاف پراکندگی دیاسپورا را پر کنید. هم‌بنیان‌گذاران، مربیان و اعضای تیمی پیدا کنید که درک فرهنگی و چشم‌انداز مشترک دارند."
+      title: "Connect",
+      description: "Connect global talent and bridge the diaspora gap. Find co-founders, mentors, and team members who share cultural understanding and vision."
     },
     {
       icon: BookOpen,
-      title: "یادگیری",
-      description: "به دانش مشترک و منابع مربیگری دسترسی پیدا کنید که به طور خاص برای کارآفرینان ایرانی که با چالش‌های منحصر به فرد جهانی مواجه هستند، طراحی شده‌اند."
+      title: "Learn",
+      description: "Access shared knowledge and mentoring resources specifically designed for Iranian entrepreneurs facing unique global challenges."
     },
     {
       icon: Rocket,
-      title: "ساختن",
-      description: "با بهره‌گیری از اکوسیستم حمایتی و تخصص جمعی ما، کسب‌وکارهای تاثیرگذار در سطح جهانی ایجاد کنید."
+      title: "Build",
+      description: "Create globally impactful businesses by leveraging our supportive ecosystem and collective expertise."
     },
     {
       icon: Award,
-      title: "رشد",
-      description: "کسب‌وکار خود را با منابع استراتژیک و ارتباطات طراحی شده برای بنیان‌گذاران ایرانی که در حال گسترش بین‌المللی هستند، توسعه دهید."
+      title: "Grow",
+      description: "Scale your business with strategic resources and connections designed for Iranian founders expanding internationally."
     }
   ];
 
@@ -30,10 +30,10 @@ const EcosystemPillarsSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-            چهار رکن اکوسیستم همفاندر
+            The Four Pillars of the Hamfounder Ecosystem
           </h2>
           <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-            پلتفرم یکپارچه ما فراتر از تطبیق هم‌بنیان‌گذار است و کل مسیر کارآفرینی شما را پشتیبانی می‌کند.
+            Our integrated platform goes beyond co-founder matching to support your entire entrepreneurial journey.
           </p>
         </div>
         

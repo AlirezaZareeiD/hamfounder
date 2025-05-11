@@ -34,10 +34,10 @@ const GlobalImpactSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            شبکه جهانی نوآوری ایرانیان
+            Global Iranian Innovation Network
           </h2>
           <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-            پیوند ذهن‌های بلندپرواز ایرانی در سراسر قاره‌ها، تقویت همکاری و ساخت کسب‌وکارهای برتر جهانی با یکدیگر.
+            Connecting ambitious Iranian minds across continents, fostering collaboration and building world-class businesses together.
           </p>
         </div>
         
@@ -91,16 +91,16 @@ const GlobalImpactSection = () => {
                 </svg>
                 
                 {/* Location labels */}
-                <div className="absolute text-xs text-blue-300" style={{ left: '21%', top: '26%' }}>آمریکای شمالی</div>
-                <div className="absolute text-xs text-blue-300" style={{ left: '46%', top: '21%' }}>اروپا</div>
-                <div className="absolute text-xs text-blue-300" style={{ left: '57%', top: '31%' }}>خاورمیانه</div>
-                <div className="absolute text-xs text-blue-300" style={{ left: '82%', top: '66%' }}>استرالیا</div>
-                <div className="absolute text-xs text-blue-300" style={{ left: '72%', top: '26%' }}>آسیا</div>
-                <div className="absolute text-xs text-blue-300" style={{ left: '32%', top: '56%' }}>آمریکای جنوبی</div>
+                <div className="absolute text-xs text-blue-300" style={{ left: '21%', top: '26%' }}>North America</div>
+                <div className="absolute text-xs text-blue-300" style={{ left: '46%', top: '21%' }}>Europe</div>
+                <div className="absolute text-xs text-blue-300" style={{ left: '57%', top: '31%' }}>Middle East</div>
+                <div className="absolute text-xs text-blue-300" style={{ left: '82%', top: '66%' }}>Australia</div>
+                <div className="absolute text-xs text-blue-300" style={{ left: '72%', top: '26%' }}>Asia</div>
+                <div className="absolute text-xs text-blue-300" style={{ left: '32%', top: '56%' }}>South America</div>
               </div>
             </div>
             <div className="relative z-10 bg-slate-800/70 px-4 py-2 rounded-md">
-              <p className="text-blue-300">نقشه تعاملی توزیع نوآوران ایرانی در جهان</p>
+              <p className="text-blue-300">Interactive Map of Iranian Innovators Worldwide</p>
             </div>
           </div>
         </div>
@@ -108,22 +108,22 @@ const GlobalImpactSection = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 text-center">
             <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">{counts.founders.toLocaleString()}+</div>
-            <div className="text-sm text-gray-300">بنیان‌گذاران و استعدادها</div>
+            <div className="text-sm text-gray-300">Founders & Talents</div>
           </div>
           
           <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 text-center">
             <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">{counts.countries}</div>
-            <div className="text-sm text-gray-300">کشورهای متصل شده</div>
+            <div className="text-sm text-gray-300">Connected Countries</div>
           </div>
           
           <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 text-center">
             <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">{counts.startups}</div>
-            <div className="text-sm text-gray-300">استارتاپ‌های برجسته</div>
+            <div className="text-sm text-gray-300">Featured Startups</div>
           </div>
           
           <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 text-center">
             <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">{counts.connections.toLocaleString()}+</div>
-            <div className="text-sm text-gray-300">ارتباطات ایجاد شده</div>
+            <div className="text-sm text-gray-300">Connections Made</div>
           </div>
         </div>
       </div>
