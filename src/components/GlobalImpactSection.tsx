@@ -33,185 +33,156 @@ const GlobalImpactSection = () => {
   return (
     <section id="global-network" className="py-16 bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            An Expansive Global Network
-          </h2>
-          <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-            Connecting ambitious Iranian minds across continents, fostering collaboration and building world-class businesses together.
-          </p>
-        </div>
-        
-        <div className="relative w-full aspect-[16/9] mb-12">
-          <div className="absolute inset-0 bg-slate-800/50 rounded-xl border border-slate-700 flex items-center justify-center overflow-hidden">
-            <div className="absolute inset-0 z-0">
-              {/* World map visualization with enhanced connection points */}
-              <div className="w-full h-full relative">
-                {/* World map background */}
-                <svg className="w-full h-full absolute inset-0" viewBox="0 0 1200 600">
-                  <path 
-                    d="M150,50 L1050,50 L1050,550 L150,550 Z" 
-                    fill="none" 
-                    stroke="#4a5568" 
-                    strokeWidth="0.5"
-                  />
-                  <path 
-                    d="M150,50 C250,130 450,170 550,190 C650,210 750,240 850,270 C950,300 1000,320 1050,350"
-                    fill="none" 
-                    stroke="#4a5568" 
-                    strokeWidth="0.5"
-                  />
+        <div className="flex flex-col md:flex-row items-center gap-8">
+          {/* World Map Visualization */}
+          <div className="w-full md:w-1/2 mb-8 md:mb-0">
+            <div className="relative aspect-[4/3] bg-indigo-900 rounded-lg overflow-hidden">
+              {/* World Map SVG with country shapes */}
+              <svg 
+                viewBox="0 0 1000 600" 
+                className="w-full h-full opacity-70"
+              >
+                <g className="countries">
+                  {/* North America */}
+                  <path d="M170,120 L250,120 L280,170 L210,240 L160,240 L140,200 Z" fill="#4338ca" stroke="#6366f1" strokeWidth="1"/>
                   
-                  {/* Simplified world map paths */}
-                  <path 
-                    d="M200,150 C240,140 280,145 320,160 C360,175 395,200 430,210 C470,220 510,215 550,200 C590,185 620,160 660,150 C700,140 740,145 780,160 C820,175 855,200 890,210 C930,220 970,215 1010,200" 
-                    fill="none" 
-                    stroke="#4a5568" 
-                    strokeWidth="0.5"
-                  />
+                  {/* South America */}
+                  <path d="M240,260 L270,260 L290,370 L240,420 L210,370 Z" fill="#4338ca" stroke="#6366f1" strokeWidth="1"/>
                   
-                  <path 
-                    d="M200,250 C240,240 280,245 320,260 C360,275 395,300 430,310 C470,320 510,315 550,300 C590,285 620,260 660,250 C700,240 740,245 780,260 C820,275 855,300 890,310 C930,320 970,315 1010,300" 
-                    fill="none" 
-                    stroke="#4a5568" 
-                    strokeWidth="0.5"
-                  />
+                  {/* Europe */}
+                  <path d="M420,140 L500,140 L510,190 L470,210 L420,190 Z" fill="#4338ca" stroke="#6366f1" strokeWidth="1"/>
                   
-                  <path 
-                    d="M200,350 C240,340 280,345 320,360 C360,375 395,400 430,410 C470,420 510,415 550,400 C590,385 620,360 660,350 C700,340 740,345 780,360 C820,375 855,400 890,410 C930,420 970,415 1010,400" 
-                    fill="none" 
-                    stroke="#4a5568" 
-                    strokeWidth="0.5"
-                  />
-                </svg>
+                  {/* Africa */}
+                  <path d="M430,230 L510,230 L540,340 L460,380 L410,330 Z" fill="#4338ca" stroke="#6366f1" strokeWidth="1"/>
+                  
+                  {/* Asia */}
+                  <path d="M530,150 L700,150 L720,230 L660,300 L580,320 L530,260 L520,210 Z" fill="#4338ca" stroke="#6366f1" strokeWidth="1"/>
+                  
+                  {/* Australia */}
+                  <path d="M700,320 L780,320 L790,380 L730,410 L690,380 Z" fill="#4338ca" stroke="#6366f1" strokeWidth="1"/>
+                </g>
                 
-                {/* Map overlay with network points */}
-                {/* North America */}
-                <div className="absolute w-24 h-24 bg-rose-500/20 rounded-full animate-pulse" style={{ left: '20%', top: '30%' }}>
-                  <div className="absolute w-16 h-16 bg-rose-500/30 rounded-full" style={{ left: '4px', top: '4px' }}></div>
-                  <div className="absolute w-8 h-8 bg-rose-500/40 rounded-full" style={{ left: '8px', top: '8px' }}></div>
-                  <div className="absolute w-4 h-4 bg-rose-600 rounded-full" style={{ left: '10px', top: '10px' }}></div>
-                </div>
-
-                {/* Europe */}
-                <div className="absolute w-36 h-36 bg-rose-500/20 rounded-full animate-pulse" style={{ left: '48%', top: '25%' }}>
-                  <div className="absolute w-28 h-28 bg-rose-500/30 rounded-full" style={{ left: '4px', top: '4px' }}></div>
-                  <div className="absolute w-16 h-16 bg-rose-500/40 rounded-full" style={{ left: '10px', top: '10px' }}></div>
-                  <div className="absolute w-8 h-8 bg-rose-600 rounded-full" style={{ left: '14px', top: '14px' }}></div>
-                </div>
+                {/* Connection lines between continents */}
+                <g className="connections">
+                  <line x1="200" y1="180" x2="450" y2="160" stroke="#f472b6" strokeWidth="1.5" strokeDasharray="5,5">
+                    <animate attributeName="stroke-dashoffset" from="10" to="0" dur="3s" repeatCount="indefinite"/>
+                  </line>
+                  <line x1="600" y1="200" x2="450" y2="160" stroke="#f472b6" strokeWidth="1.5" strokeDasharray="5,5">
+                    <animate attributeName="stroke-dashoffset" from="10" to="0" dur="2.5s" repeatCount="indefinite"/>
+                  </line>
+                  <line x1="250" y1="340" x2="450" y2="160" stroke="#f472b6" strokeWidth="1.5" strokeDasharray="5,5">
+                    <animate attributeName="stroke-dashoffset" from="10" to="0" dur="4s" repeatCount="indefinite"/>
+                  </line>
+                  <line x1="740" y1="350" x2="600" y2="200" stroke="#f472b6" strokeWidth="1.5" strokeDasharray="5,5">
+                    <animate attributeName="stroke-dashoffset" from="10" to="0" dur="3.5s" repeatCount="indefinite"/>
+                  </line>
+                </g>
                 
-                {/* Middle East */}
-                <div className="absolute w-48 h-48 bg-rose-500/20 rounded-full animate-pulse" style={{ left: '55%', top: '35%' }}>
-                  <div className="absolute w-36 h-36 bg-rose-500/30 rounded-full" style={{ left: '6px', top: '6px' }}></div>
-                  <div className="absolute w-24 h-24 bg-rose-500/40 rounded-full" style={{ left: '12px', top: '12px' }}></div>
-                  <div className="absolute w-12 h-12 bg-rose-600 rounded-full" style={{ left: '18px', top: '18px' }}></div>
-                </div>
+                {/* Population hotspots as circles */}
+                <g className="hotspots">
+                  {/* North America - Large Hub */}
+                  <circle cx="200" cy="180" r="12" fill="#ec4899" opacity="0.7">
+                    <animate attributeName="r" values="12;14;12" dur="3s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.7;0.9;0.7" dur="3s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="200" cy="180" r="20" fill="#ec4899" opacity="0.2" />
+                  
+                  {/* Europe - Medium Hub */}
+                  <circle cx="450" cy="160" r="15" fill="#ec4899" opacity="0.7">
+                    <animate attributeName="r" values="15;17;15" dur="2.5s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.7;0.9;0.7" dur="2.5s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="450" cy="160" r="25" fill="#ec4899" opacity="0.2" />
+                  
+                  {/* Asia - Largest Hub (Iran) */}
+                  <circle cx="600" cy="200" r="18" fill="#ec4899" opacity="0.7">
+                    <animate attributeName="r" values="18;20;18" dur="2s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.7;0.9;0.7" dur="2s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="600" cy="200" r="30" fill="#ec4899" opacity="0.2" />
+                  
+                  {/* South America - Small Hub */}
+                  <circle cx="250" cy="340" r="8" fill="#ec4899" opacity="0.7">
+                    <animate attributeName="r" values="8;10;8" dur="3.5s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.7;0.9;0.7" dur="3.5s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="250" cy="340" r="16" fill="#ec4899" opacity="0.2" />
+                  
+                  {/* Australia - Small Hub */}
+                  <circle cx="740" cy="350" r="8" fill="#ec4899" opacity="0.7">
+                    <animate attributeName="r" values="8;10;8" dur="4s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.7;0.9;0.7" dur="4s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="740" cy="350" r="16" fill="#ec4899" opacity="0.2" />
+                  
+                  {/* Africa - Small Hub */}
+                  <circle cx="470" cy="280" r="6" fill="#ec4899" opacity="0.7">
+                    <animate attributeName="r" values="6;8;6" dur="3.8s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.7;0.9;0.7" dur="3.8s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="470" cy="280" r="12" fill="#ec4899" opacity="0.2" />
+                </g>
                 
-                {/* Australia */}
-                <div className="absolute w-16 h-16 bg-rose-500/20 rounded-full animate-pulse" style={{ left: '80%', top: '70%' }}>
-                  <div className="absolute w-12 h-12 bg-rose-500/30 rounded-full" style={{ left: '2px', top: '2px' }}></div>
-                  <div className="absolute w-8 h-8 bg-rose-500/40 rounded-full" style={{ left: '4px', top: '4px' }}></div>
-                  <div className="absolute w-4 h-4 bg-rose-600 rounded-full" style={{ left: '6px', top: '6px' }}></div>
-                </div>
-                
-                {/* Asia */}
-                <div className="absolute w-20 h-20 bg-rose-500/20 rounded-full animate-pulse" style={{ left: '70%', top: '30%' }}>
-                  <div className="absolute w-16 h-16 bg-rose-500/30 rounded-full" style={{ left: '2px', top: '2px' }}></div>
-                  <div className="absolute w-10 h-10 bg-rose-500/40 rounded-full" style={{ left: '5px', top: '5px' }}></div>
-                  <div className="absolute w-6 h-6 bg-rose-600 rounded-full" style={{ left: '7px', top: '7px' }}></div>
-                </div>
-                
-                {/* South America */}
-                <div className="absolute w-20 h-20 bg-rose-500/20 rounded-full animate-pulse" style={{ left: '30%', top: '60%' }}>
-                  <div className="absolute w-16 h-16 bg-rose-500/30 rounded-full" style={{ left: '2px', top: '2px' }}></div>
-                  <div className="absolute w-10 h-10 bg-rose-500/40 rounded-full" style={{ left: '5px', top: '5px' }}></div>
-                  <div className="absolute w-6 h-6 bg-rose-600 rounded-full" style={{ left: '7px', top: '7px' }}></div>
-                </div>
-                
-                {/* Small network points scattered around */}
-                {Array.from({ length: 30 }).map((_, i) => {
-                  const size = Math.floor(Math.random() * 8) + 4;
-                  const left = `${Math.floor(Math.random() * 80) + 10}%`;
-                  const top = `${Math.floor(Math.random() * 70) + 15}%`;
+                {/* Small dots representing individual connections */}
+                {Array.from({ length: 20 }).map((_, i) => {
+                  const x = 150 + Math.random() * 600;
+                  const y = 100 + Math.random() * 400;
                   return (
-                    <div 
-                      key={i}
-                      className="absolute bg-rose-500/60 rounded-full"
-                      style={{ 
-                        width: `${size}px`, 
-                        height: `${size}px`, 
-                        left, 
-                        top,
-                        animationDelay: `${i * 0.2}s`,
-                        animationDuration: `${Math.random() * 3 + 2}s`
-                      }}
+                    <circle 
+                      key={i} 
+                      cx={x} 
+                      cy={y} 
+                      r="2" 
+                      fill="#f9a8d4" 
+                      opacity={Math.random() * 0.5 + 0.3}
                     />
                   );
                 })}
-                
-                {/* Legend */}
-                <div className="absolute left-8 bottom-8 bg-slate-800/80 p-4 rounded-lg border border-slate-700">
-                  <div className="text-white text-sm font-medium mb-2">Network Size</div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-12 h-12 relative">
-                      <svg viewBox="0 0 100 100" width="48" height="48">
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(225, 29, 72, 0.2)" strokeWidth="1" />
-                        <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(225, 29, 72, 0.2)" strokeWidth="1" />
-                        <circle cx="50" cy="50" r="20" fill="none" stroke="rgba(225, 29, 72, 0.2)" strokeWidth="1" />
-                        <circle cx="50" cy="50" r="10" fill="none" stroke="rgba(225, 29, 72, 0.2)" strokeWidth="1" />
-                      </svg>
-                    </div>
-                    <div className="flex flex-col text-xs text-gray-400">
-                      <span>4000</span>
-                      <span>2000</span>
-                      <span>1000</span>
-                      <span>400</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Connection lines with animation */}
-                <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
-                  <line x1="20%" y1="30%" x2="55%" y2="35%" stroke="rgba(225, 29, 72, 0.4)" strokeWidth="1" strokeDasharray="5,5">
-                    <animate attributeName="stroke-dashoffset" from="10" to="0" dur="3s" repeatCount="indefinite" />
-                  </line>
-                  <line x1="48%" y1="25%" x2="55%" y2="35%" stroke="rgba(225, 29, 72, 0.4)" strokeWidth="1" strokeDasharray="5,5">
-                    <animate attributeName="stroke-dashoffset" from="10" to="0" dur="2s" repeatCount="indefinite" />
-                  </line>
-                  <line x1="70%" y1="30%" x2="55%" y2="35%" stroke="rgba(225, 29, 72, 0.4)" strokeWidth="1" strokeDasharray="5,5">
-                    <animate attributeName="stroke-dashoffset" from="10" to="0" dur="2.5s" repeatCount="indefinite" />
-                  </line>
-                  <line x1="80%" y1="70%" x2="55%" y2="35%" stroke="rgba(225, 29, 72, 0.4)" strokeWidth="1" strokeDasharray="5,5">
-                    <animate attributeName="stroke-dashoffset" from="10" to="0" dur="3.5s" repeatCount="indefinite" />
-                  </line>
-                  <line x1="30%" y1="60%" x2="55%" y2="35%" stroke="rgba(225, 29, 72, 0.4)" strokeWidth="1" strokeDasharray="5,5">
-                    <animate attributeName="stroke-dashoffset" from="10" to="0" dur="3s" repeatCount="indefinite" />
-                  </line>
-                </svg>
+              </svg>
+              
+              {/* Overlay text */}
+              <div className="absolute top-4 right-4 text-white bg-indigo-900/80 p-2 rounded">
+                <p className="text-sm font-medium">Global Network Visualization</p>
+              </div>
+              
+              {/* Interactive caption */}
+              <div className="absolute bottom-0 left-0 right-0 text-center text-xs text-white/70 py-1">
+                (Interactive map feature coming soon)
               </div>
             </div>
           </div>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 text-center">
-            <div className="text-3xl md:text-4xl font-bold text-rose-400 mb-2">{counts.founders.toLocaleString()}+</div>
-            <div className="text-sm text-gray-300">Founders & Talents</div>
-          </div>
           
-          <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 text-center">
-            <div className="text-3xl md:text-4xl font-bold text-rose-400 mb-2">{counts.countries}</div>
-            <div className="text-sm text-gray-300">Connected Countries</div>
-          </div>
-          
-          <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 text-center">
-            <div className="text-3xl md:text-4xl font-bold text-rose-400 mb-2">{counts.startups}</div>
-            <div className="text-sm text-gray-300">Featured Startups</div>
-          </div>
-          
-          <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 text-center">
-            <div className="text-3xl md:text-4xl font-bold text-rose-400 mb-2">{counts.connections.toLocaleString()}+</div>
-            <div className="text-sm text-gray-300">Connections Made</div>
+          {/* Stats and Content */}
+          <div className="w-full md:w-1/2 text-left">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Iran's Global Innovation Network
+            </h2>
+            
+            <p className="text-lg text-gray-300 mb-8">
+              Connecting ambitious Iranian minds across continents, fueling collaboration and building world-class ventures together.
+            </p>
+            
+            <div className="grid grid-cols-2 gap-6">
+              <div className="text-center">
+                <div className="text-5xl font-extrabold text-white mb-2">{counts.founders.toLocaleString()}+</div>
+                <div className="text-sm text-gray-300">Founders & Talents</div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-5xl font-extrabold text-white mb-2">{counts.countries}+</div>
+                <div className="text-sm text-gray-300">Countries Connected</div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-5xl font-extrabold text-white mb-2">{counts.startups}+</div>
+                <div className="text-sm text-gray-300">Startups Featured</div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-5xl font-extrabold text-white mb-2">{counts.connections.toLocaleString()}+</div>
+                <div className="text-sm text-gray-300">Connections Made</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
