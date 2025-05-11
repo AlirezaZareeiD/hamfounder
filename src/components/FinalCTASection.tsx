@@ -31,8 +31,8 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
   
   return (
     <section className="py-16 relative">
-      {/* Background gradient matching the image */}
-      <div className="absolute inset-0 bg-gradient-to-b from-indigo-900 via-blue-800 to-blue-700 -z-10"></div>
+      {/* Background color changed to dark blue */}
+      <div className="absolute inset-0 bg-[#2d3db7] -z-10"></div>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
