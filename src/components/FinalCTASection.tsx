@@ -31,7 +31,7 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
   
   return (
     <section className="py-16 relative">
-      {/* Background color changed to dark blue */}
+      {/* Background color set to dark blue */}
       <div className="absolute inset-0 bg-[#2d3db7] -z-10"></div>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -45,8 +45,9 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
           today.
         </p>
         
-        <div className="max-w-2xl mx-auto bg-blue-800/50 backdrop-blur-sm rounded-xl p-8 border border-blue-500/30 shadow-lg">
-          <h3 className="text-white text-xl mb-4 font-medium">Enter your email for early access:</h3>
+        {/* Updated form container to match the image reference */}
+        <div className="max-w-2xl mx-auto bg-[#7984d1]/60 backdrop-blur-sm rounded-xl p-8 shadow-lg">
+          <h3 className="text-white text-xl mb-6 font-medium">Enter your email for early access:</h3>
           
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
             <Input
@@ -66,7 +67,7 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
             </Button>
           </form>
           
-          <p className="text-sm text-blue-100 mt-4">
+          <p className="text-sm text-white/90 mt-4">
             Get notified when we launch. No spam, guaranteed.
           </p>
         </div>
