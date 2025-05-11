@@ -10,6 +10,8 @@ import EcosystemAdvantageSection from '@/components/EcosystemAdvantageSection';
 import StartupSpotlightSection from '@/components/StartupSpotlightSection';
 import FinalCTASection from '@/components/FinalCTASection';
 import Footer from '@/components/Footer';
+import EcosystemPillarsSection from '@/components/EcosystemPillarsSection';
+import OriginStorySection from '@/components/OriginStorySection';
 
 const Index = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -27,11 +29,12 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
+        <EcosystemPillarsSection />
         <GlobalImpactSection />
-        <OurMissionSection />
+        <OriginStorySection />
         <PathToPartnershipSection />
-        <FounderWisdomSection />
         <EcosystemAdvantageSection />
+        <FounderWisdomSection />
         <StartupSpotlightSection />
         <FinalCTASection onSubmit={handleEmailSubmit} submitted={submitted} />
       </main>

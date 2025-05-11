@@ -18,8 +18,7 @@ const HeroSection = () => {
           </h1>
           
           <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto">
-            Connecting Iranian founders, innovators, and talents worldwide to build impactful ventures. 
-            Find your ideal co-founder, access expertise, and join a supportive community shaping the future.
+            More than co-founder matching. Join a dynamic community supporting your entire journey—from idea to global impact. Learn, grow, and succeed with the power of the worldwide Iranian network.
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
