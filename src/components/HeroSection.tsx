@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -48,14 +47,14 @@ const HeroSection = () => {
         <div className="text-center max-w-4xl mx-auto">
           <h1 
             ref={headerRef}
-            className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl lg:text-6xl'} font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 mb-6 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2`}
+            className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl lg:text-6xl'} font-bold tracking-tight text-white mb-6 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]`}
           >
             Hamfounder: Connecting Iranian Innovators Worldwide
           </h1>
           
           <p 
             ref={descRef}
-            className="text-base md:text-lg lg:text-xl text-gray-300 mb-8 md:mb-10 max-w-3xl mx-auto opacity-0 translate-y-8 transition-all duration-700 ease-out delay-300 px-3"
+            className="text-base md:text-lg lg:text-xl text-gray-200 mb-8 md:mb-10 max-w-3xl mx-auto opacity-0 translate-y-8 transition-all duration-700 ease-out delay-300 px-3 drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
           >
             A powerful network connecting co-founders, mentors, and investors across the Iranian diaspora. Great ideas become reality with the right partners.
           </p>
@@ -74,7 +73,7 @@ const HeroSection = () => {
             <Button 
               variant="outline" 
               size={isMobile ? "default" : "lg"}
-              className="border-gray-400 text-gray-300 hover:bg-gray-800/50 transform transition-transform duration-300 hover:scale-105 w-full sm:w-auto"
+              className="border-gray-400 text-white hover:bg-gray-800/50 transform transition-transform duration-300 hover:scale-105 w-full sm:w-auto"
             >
               Early Access
             </Button>
