@@ -43,9 +43,9 @@ const Index = () => {
         <HeroSection />
         <OurMissionSection />
         <GlobalImpactSection />
+        <PathToPartnershipSection />
         <EcosystemPillarsSection />
         <FounderRoadmapSection />
-        <PathToPartnershipSection />
         <TrustBuildingSection />
         <EcosystemAdvantageSection />
         <FounderWisdomSection />
