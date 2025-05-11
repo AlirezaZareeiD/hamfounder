@@ -81,10 +81,7 @@ const StartupSpotlightSection = () => {
             loop: true,
           }}
           className="w-full"
-          onSelect={(api) => {
-            const selectedIndex = api?.selectedScrollSnap() || 0;
-            setActiveIndex(selectedIndex);
-          }}
+          onScrollSnapChange={(index) => setActiveIndex(index)}
         >
           <CarouselContent>
             {startups.map((startup) => (

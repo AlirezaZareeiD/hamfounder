@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
+import { ArrowRight } from 'lucide-react';
 
 interface FinalCTASectionProps {
   onSubmit: (email: string) => void;
@@ -25,54 +26,50 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
     }
     
     onSubmit(email);
-    toast({
-      title: "Success!",
-      description: "Thank you for joining our early access list.",
-      variant: "default"
-    });
     setEmail('');
   };
   
   return (
     <section className="py-16 relative">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-background -z-10">
-        {/* Decorative elements */}
-        <div className="absolute right-[10%] top-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute left-[15%] bottom-1/4 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
-      </div>
+      {/* Background gradient matching the image */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-700 via-blue-600 to-blue-500 -z-10"></div>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">
+        <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
           Ready to Build Your Legacy?
         </h2>
         
-        <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-          Join our early access list and be the first to connect with your ideal co-founder when we launch.
-          Together, we'll build the next generation of leading Iranian businesses that change the world.
+        <p className="text-lg text-white mb-12 max-w-3xl mx-auto leading-relaxed">
+          The Hamfounder community awaits. Join fellow Iranian innovators, access 
+          exclusive resources, find your ideal partners, and start shaping the future 
+          today.
         </p>
         
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-          <Input
-            type="email"
-            placeholder="Enter your email address"
-            className="flex-grow border-gray-700 bg-slate-800/80 text-white"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+        <div className="max-w-2xl mx-auto bg-blue-600/50 backdrop-blur-sm rounded-xl p-8 border border-blue-400/30">
+          <h3 className="text-white text-xl mb-4 font-medium">Enter your email for early access:</h3>
           
-          <Button 
-            type="submit" 
-            className="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white px-6"
-          >
-            Early Access
-          </Button>
-        </form>
-        
-        <p className="text-sm text-gray-400 mt-4">
-          We respect your privacy. No spam, just updates about our launch and community.
-        </p>
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+            <Input
+              type="email"
+              placeholder="you@example.com"
+              className="flex-grow border-none bg-white/90 text-slate-800 placeholder:text-slate-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            
+            <Button 
+              type="submit" 
+              className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-8"
+            >
+              Get Early Access
+            </Button>
+          </form>
+          
+          <p className="text-sm text-blue-100 mt-4">
+            Get notified when we launch. No spam, guaranteed.
+          </p>
+        </div>
       </div>
     </section>
   );
