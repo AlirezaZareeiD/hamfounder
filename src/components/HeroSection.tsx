@@ -35,8 +35,21 @@ const HeroSection = () => {
     };
   }, []);
 
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const navbarHeight = document.querySelector('nav')?.offsetHeight || 0;
+      const sectionTop = section.offsetTop - navbarHeight;
+      
+      window.scrollTo({
+        top: sectionTop,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
-    <section className="relative min-h-[70vh] flex items-center justify-center text-center">
+    <section id="top" className="relative min-h-[90vh] sm:min-h-[70vh] flex items-center justify-center text-center">
       {/* Dark background overlay with image */}
       <div className="absolute inset-0 bg-slate-900 z-0">
         <div 
@@ -45,36 +58,36 @@ const HeroSection = () => {
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 relative">
-        <div className="text-center py-12 md:py-16">
+        <div className="text-center py-8 md:py-12 lg:py-16">
           <h1 
             ref={headerRef}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2 leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2 leading-tight"
           >
-            Global Innovators Converge<br />to Build the Future.
+            Global Innovators Converge<br className="hidden sm:block" />to Build the Future.
           </h1>
           
           <p
             ref={descriptionRef}
-            className="text-xl text-white max-w-3xl mx-auto mb-10 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-300 px-2"
+            className="text-lg sm:text-xl text-white max-w-3xl mx-auto mb-6 sm:mb-10 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-300 px-4"
           >
             More than co-founder matching. Join a dynamic community supporting your entire journey—from idea to global impact. Learn, grow, and succeed with the power of the worldwide Iranian network.
           </p>
           
           <div 
             ref={btnContainerRef}
-            className="opacity-0 translate-y-8 transition-all duration-700 ease-out delay-400 flex flex-col sm:flex-row justify-center gap-4"
+            className="opacity-0 translate-y-8 transition-all duration-700 ease-out delay-400 flex flex-col sm:flex-row justify-center gap-4 px-6"
           >
             <Button 
               variant="outline" 
-              size="lg"
-              className="bg-white text-[#2954E8] hover:bg-gray-100 text-lg py-6 px-8 rounded-md transform transition-transform duration-300 hover:scale-105"
+              onClick={() => scrollToSection('how-it-works')}
+              className="bg-white text-[#2954E8] hover:bg-gray-100 text-base sm:text-lg py-5 sm:py-6 px-6 sm:px-8 rounded-md transform transition-transform duration-300 hover:scale-105 h-auto"
             >
               Discover How
             </Button>
             <Button 
               variant="default" 
-              size="lg"
-              className="bg-[#18CDAC] hover:bg-[#16b89a] text-white text-lg py-6 px-8 rounded-md transform transition-transform duration-300 hover:scale-105"
+              onClick={() => scrollToSection('join')}
+              className="bg-[#18CDAC] hover:bg-[#16b89a] text-white text-base sm:text-lg py-5 sm:py-6 px-6 sm:px-8 rounded-md transform transition-transform duration-300 hover:scale-105 h-auto"
             >
               Join Early Access
             </Button>
@@ -82,8 +95,12 @@ const HeroSection = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
-        <ChevronDown className="text-white w-8 h-8" />
+      <div 
+        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10 cursor-pointer"
+        onClick={() => scrollToSection('mission')}
+        aria-label="Scroll to next section"
+      >
+        <ChevronDown className="text-white w-6 h-6 sm:w-8 sm:h-8" />
       </div>
     </section>
   );

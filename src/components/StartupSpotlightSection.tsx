@@ -1,9 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Startup {
   id: number;
@@ -86,19 +88,38 @@ const getBackgroundColor = (category: string) => {
 
 const StartupSpotlightSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const isMobile = useIsMobile();
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     loop: true,
+    dragFree: true,
   });
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    
+    const onSelect = () => {
+      setActiveIndex(emblaApi.selectedScrollSnap());
+    };
+    
+    emblaApi.on('select', onSelect);
+    
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
+  }, [emblaApi]);
+  
+  const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
+  const scrollNext = () => emblaApi && emblaApi.scrollNext();
   
   return (
-    <section className="py-24 bg-gradient-to-br from-slate-900 to-slate-800">
+    <section id="startups" className="py-16 md:py-24 bg-gradient-to-br from-slate-900 to-slate-800">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold mb-12 text-center text-white">
+        <h2 className="text-3xl md:text-4xl font-bold mb-6 md:mb-12 text-center text-white">
           Spotlight on Iranian-Led Ventures
         </h2>
         
-        <p className="text-center text-slate-300 mb-12 max-w-3xl mx-auto">
+        <p className="text-center text-slate-300 mb-8 md:mb-12 max-w-3xl mx-auto px-4">
           Discover the success stories of innovative Iranian founders who are making 
           an impact globally across various industries. These entrepreneurs 
           represent the boundless potential within our community.
@@ -108,11 +129,11 @@ const StartupSpotlightSection = () => {
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex">
               {startups.map((startup) => (
-                <div key={startup.id} className="min-w-0 flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%] pl-4">
-                  <Card className="h-full bg-slate-800/50 border-slate-700">
-                    <CardContent className="p-6">
+                <div key={startup.id} className="min-w-0 flex-[0_0_90%] sm:flex-[0_0_80%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%] pl-4">
+                  <Card className="h-full bg-slate-800/50 border-slate-700 transform transition-transform hover:scale-[1.01]">
+                    <CardContent className="p-4 sm:p-6">
                       <div className="flex flex-col items-center space-y-4">
-                        <div className="overflow-hidden rounded-full h-32 w-32 border-4 border-slate-700">
+                        <div className="overflow-hidden rounded-full h-24 w-24 md:h-32 md:w-32 border-4 border-slate-700">
                           <img
                             src={startup.founderImage}
                             alt={`${startup.founderName}`}
@@ -121,19 +142,19 @@ const StartupSpotlightSection = () => {
                         </div>
                         
                         <div className="text-center">
-                          <h3 className="text-xl font-semibold text-white">
+                          <h3 className="text-lg md:text-xl font-semibold text-white">
                             {startup.founderName}
                           </h3>
                           <p className="text-slate-400 mb-2">Founder of {startup.name}</p>
                           
                           <div 
-                            className="text-sm p-1 px-3 rounded-full inline-block mb-3"
+                            className="text-xs md:text-sm p-1 px-2 md:px-3 rounded-full inline-block mb-3"
                             style={{ backgroundColor: getBackgroundColor(startup.category) }}
                           >
                             {startup.category}
                           </div>
                           
-                          <p className="text-slate-300 mt-3">
+                          <p className="text-slate-300 mt-3 text-sm md:text-base">
                             {startup.description}
                           </p>
                         </div>
@@ -144,15 +165,32 @@ const StartupSpotlightSection = () => {
               ))}
             </div>
           </div>
+          
+          {/* Navigation arrows */}
+          <button 
+            onClick={scrollPrev} 
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-slate-800/60 hover:bg-slate-700 text-white p-2 rounded-r-lg shadow-lg hidden md:flex"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button 
+            onClick={scrollNext} 
+            className="absolute right-0 top-1/2 -translate-y-1/2 bg-slate-800/60 hover:bg-slate-700 text-white p-2 rounded-l-lg shadow-lg hidden md:flex"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
         </div>
         
-        <div className="flex justify-center gap-2 mt-8">
+        {/* Dots navigation - better for mobile */}
+        <div className="flex justify-center gap-2 mt-6 md:mt-8">
           {startups.map((_, index) => (
             <Button
               key={index}
               variant="outline"
               size="icon"
-              className={`w-3 h-3 rounded-full p-0 ${
+              className={`w-2 h-2 md:w-3 md:h-3 rounded-full p-0 ${
                 activeIndex === index 
                   ? 'bg-white border-white' 
                   : 'bg-transparent border-white/30'
