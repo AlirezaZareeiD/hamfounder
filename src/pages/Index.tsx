@@ -12,6 +12,7 @@ import FinalCTASection from '@/components/FinalCTASection';
 import Footer from '@/components/Footer';
 import EcosystemPillarsSection from '@/components/EcosystemPillarsSection';
 import OriginStorySection from '@/components/OriginStorySection';
+import TrustBuildingSection from '@/components/TrustBuildingSection';
 
 const Index = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -33,6 +34,7 @@ const Index = () => {
         <GlobalImpactSection />
         <OriginStorySection />
         <PathToPartnershipSection />
+        <TrustBuildingSection />
         <EcosystemAdvantageSection />
         <FounderWisdomSection />
         <StartupSpotlightSection />
