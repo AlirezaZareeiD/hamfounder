@@ -1,8 +1,6 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Card,
   CardContent
@@ -11,8 +9,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 
 interface Startup {
@@ -34,7 +30,7 @@ const StartupSpotlightSection = () => {
       id: 1,
       name: "TechNova",
       description: "AI-powered educational platform making personalized learning accessible across language barriers.",
-      logo: "/placeholder.svg",
+      logo: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
       industry: "EdTech",
       founderNames: "Parisa Ahmadi & Sohrab Karimi",
       location: "Tehran & San Francisco"
@@ -43,7 +39,7 @@ const StartupSpotlightSection = () => {
       id: 2,
       name: "MedScan",
       description: "Revolutionizing medical imaging with affordable AI diagnostics for underserved regions.",
-      logo: "/placeholder.svg",
+      logo: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
       industry: "HealthTech",
       founderNames: "Dr. Amir Mohseni & Sara Tabesh",
       location: "Toronto & Mashhad"
@@ -52,7 +48,7 @@ const StartupSpotlightSection = () => {
       id: 3,
       name: "EcoMobility",
       description: "Sustainable transportation solutions adapting renewable technologies for urban environments.",
-      logo: "/placeholder.svg",
+      logo: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
       industry: "CleanTech",
       founderNames: "Kaveh Rahnama",
       location: "Berlin & Isfahan"
@@ -61,7 +57,7 @@ const StartupSpotlightSection = () => {
       id: 4,
       name: "FinEdge",
       description: "Cross-border payment platform overcoming financial barriers for Iranian businesses globally.",
-      logo: "/placeholder.svg",
+      logo: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
       industry: "FinTech",
       founderNames: "Mina Zahedi & Behzad Kiani",
       location: "Dubai & Tehran"
@@ -75,7 +71,7 @@ const StartupSpotlightSection = () => {
   return (
     <section id="startups" className="py-16 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12 md:mb-16 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-600">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12 md:mb-16 text-[#161d30]">
           Spotlight on Iranian-Led Ventures
         </h2>
         
@@ -85,19 +81,22 @@ const StartupSpotlightSection = () => {
             loop: true,
           }}
           className="w-full"
-          onSelect={(index) => setActiveIndex(index)}
+          onSelect={(api) => {
+            const selectedIndex = api?.selectedScrollSnap() || 0;
+            setActiveIndex(selectedIndex);
+          }}
         >
           <CarouselContent>
             {startups.map((startup) => (
               <CarouselItem key={startup.id} className={`${isMobile ? 'basis-full' : 'md:basis-1/2 lg:basis-1/3'} pl-4`}>
-                <Card className="bg-slate-200 border-0 h-full">
+                <Card className="bg-slate-200 border-0 h-full shadow-md hover:shadow-lg transition-shadow">
                   <CardContent className="flex flex-col p-6 h-full">
                     <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-slate-300 flex items-center justify-center rounded mr-4 border-2 border-slate-400">
+                      <div className="w-16 h-16 bg-white flex items-center justify-center rounded-full mr-4 border-2 border-slate-400 overflow-hidden">
                         <img 
                           src={startup.logo} 
                           alt={`${startup.name} logo`} 
-                          className="w-10 h-10 object-contain"
+                          className="w-full h-full object-cover"
                         />
                       </div>
                       <div>
@@ -105,6 +104,8 @@ const StartupSpotlightSection = () => {
                         <p className="text-blue-500 font-medium">{startup.industry}</p>
                       </div>
                     </div>
+                    
+                    <p className="text-gray-600 mb-4">{startup.description}</p>
                     
                     <div className="mt-auto">
                       <div className="text-sm text-slate-600">
@@ -117,13 +118,6 @@ const StartupSpotlightSection = () => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          
-          {!isMobile && (
-            <>
-              <CarouselPrevious className="hidden md:flex -left-4 md:-left-6" />
-              <CarouselNext className="hidden md:flex -right-4 md:-right-6" />
-            </>
-          )}
         </Carousel>
         
         <div className="flex justify-center mt-6 space-x-2">
