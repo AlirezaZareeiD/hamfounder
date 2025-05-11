@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { ChevronDown } from 'lucide-react';
 
 const HeroSection = () => {
   const headerRef = useRef<HTMLHeadingElement>(null);
@@ -35,7 +36,14 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-[70vh] flex items-center justify-center bg-[#2954E8] text-center">
+    <section className="relative min-h-[70vh] flex items-center justify-center text-center">
+      {/* Dark background overlay with image */}
+      <div className="absolute inset-0 bg-slate-900 z-0">
+        <div 
+          className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1742&q=80')] bg-cover bg-center opacity-30"
+        ></div>
+      </div>
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 relative">
         <div className="text-center py-12 md:py-16">
           <h1 
@@ -72,6 +80,10 @@ const HeroSection = () => {
             </Button>
           </div>
         </div>
+      </div>
+
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
+        <ChevronDown className="text-white w-8 h-8" />
       </div>
     </section>
   );
