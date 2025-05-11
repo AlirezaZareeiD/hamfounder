@@ -9,31 +9,31 @@ const OriginStorySection = () => {
           {/* Story Content */}
           <div className="lg:w-1/2">
             <div className="mb-6 inline-block">
-              <span className="bg-blue-500/20 text-blue-400 py-1 px-4 rounded-full text-sm font-medium">Our Vision</span>
+              <span className="bg-blue-500/20 text-blue-400 py-1 px-4 rounded-full text-sm font-medium">بینش ما</span>
             </div>
             
             <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-              From Shared Journeys to a United Future
+              از سفرهای مشترک تا آینده‌ای متحد
             </h2>
             
             <div className="prose prose-lg text-gray-300">
               <p className="mb-4">
-                Thousands of miles from home, driven by dreams, Iranian innovators worldwide face unique challenges. Finding the right co-founder, navigating complex ecosystems, accessing global networks... this struggle is familiar. We've lived it.
+                هزاران کیلومتر دور از خانه، با انگیزه رویاها، نوآوران ایرانی در سراسر جهان با چالش‌های منحصر به فردی روبرو هستند. یافتن هم‌بنیان‌گذار مناسب، هدایت در اکوسیستم‌های پیچیده، دسترسی به شبکه‌های جهانی... این مشکلات برای ما آشناست. ما آن را تجربه کرده‌ایم.
               </p>
               
               <p className="mb-4">
-                Hamfounder was born from this shared experience. We're building more than a platform; we're nurturing a global community rooted in mutual support, shared knowledge, and an unwavering belief in Iranian potential.
+                هم‌فاندر از این تجربه مشترک متولد شد. ما فراتر از یک پلتفرم هستیم؛ ما یک جامعه جهانی را پرورش می‌دهیم که ریشه در حمایت متقابل، دانش مشترک و اعتقاد راسخ به پتانسیل ایرانیان دارد.
               </p>
               
               <p>
-                Our mission is to empower your journey, connecting you with the people and resources needed to build businesses that don't just succeed—they inspire.
+                ماموریت ما توانمندسازی مسیر شماست، با اتصال شما به افراد و منابع مورد نیاز برای ساختن کسب‌وکارهایی که نه تنها موفق می‌شوند، بلکه الهام‌بخش هستند.
               </p>
             </div>
           </div>
           
           {/* Core Pillars */}
           <div className="lg:w-1/2 bg-slate-800/10 rounded-xl border border-slate-700 p-8">
-            <h3 className="text-xl font-semibold text-white mb-6">Why Hamfounder for Iranian Entrepreneurs?</h3>
+            <h3 className="text-xl font-semibold text-white mb-6">چرا هم‌فاندر برای کارآفرینان ایرانی؟</h3>
             
             <div className="space-y-5">
               <div className="flex items-start">
@@ -43,7 +43,7 @@ const OriginStorySection = () => {
                   </svg>
                 </div>
                 <p className="text-gray-300">
-                  <strong>Deep Understanding of Shared Challenges:</strong> From visa barriers and sanctions to cultural differences, we understand the unique challenges Iranian entrepreneurs face.
+                  <strong>درک عمیق چالش‌های مشترک:</strong> از موانع ویزا و تحریم‌ها تا تفاوت‌های فرهنگی، ما چالش‌های منحصر به فردی که کارآفرینان ایرانی با آن مواجه هستند را می‌شناسیم.
                 </p>
               </div>
               
@@ -54,7 +54,7 @@ const OriginStorySection = () => {
                   </svg>
                 </div>
                 <p className="text-gray-300">
-                  <strong>Targeted Networking:</strong> Connect with individuals who not only have complementary skills but understand cultural context and shared vision.
+                  <strong>شبکه‌سازی هدفمند:</strong> با افرادی ارتباط برقرار کنید که نه تنها مهارت‌های مکمل دارند، بلکه زمینه فرهنگی و دیدگاه مشترک را درک می‌کنند.
                 </p>
               </div>
               
@@ -65,7 +65,7 @@ const OriginStorySection = () => {
                   </svg>
                 </div>
                 <p className="text-gray-300">
-                  <strong>Culturally-Aligned Support:</strong> Resources, guidance, and tools designed for the unique challenges Iranian entrepreneurs face on the global stage.
+                  <strong>پشتیبانی فرهنگی:</strong> منابع، راهنمایی و ابزارهای طراحی شده برای چالش‌های منحصر به فردی که کارآفرینان ایرانی در عرصه جهانی با آن روبرو هستند.
                 </p>
               </div>
               
@@ -76,7 +76,7 @@ const OriginStorySection = () => {
                   </svg>
                 </div>
                 <p className="text-gray-300">
-                  <strong>From Diaspora to Global Impact:</strong> Turn the global dispersion of Iranians into a powerful advantage, with a network that transcends geographical limitations.
+                  <strong>از دیاسپورا تا تأثیر جهانی:</strong> پراکندگی جهانی ایرانیان را به یک مزیت قدرتمند تبدیل کنید، با شبکه‌ای که از محدودیت‌های جغرافیایی فراتر می‌رود.
                 </p>
               </div>
             </div>

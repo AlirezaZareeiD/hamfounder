@@ -14,11 +14,11 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 mb-6">
-            The Global Ecosystem for Iranian Innovators Building the Future, Together
+            هم‌فاندر: اتصال نوآوران ایرانی در سراسر جهان
           </h1>
           
           <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto">
-            Beyond just a platform for finding co-founders. Join a dynamic community supporting your entire entrepreneurial journey—from idea to global impact. Learn, grow, and succeed powered by the global Iranian network.
+            شبکه‌ای قدرتمند برای اتصال هم‌بنیان‌گذاران، مربیان و سرمایه‌گذاران ایرانی در سراسر جهان. ایده‌های بزرگ با شرکای مناسب به واقعیت تبدیل می‌شوند.
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -27,14 +27,14 @@ const HeroSection = () => {
               size="lg" 
               className="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500"
             >
-              Explore Ecosystem
+              کشف اکوسیستم
             </Button>
             <Button 
               variant="outline" 
               size="lg"
               className="border-gray-400 text-gray-300 hover:bg-gray-800/50"
             >
-              Join Early Access
+              عضویت زودهنگام
             </Button>
           </div>
         </div>
