@@ -14,11 +14,11 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 mb-6">
-            هم‌فاندر: اتصال نوآوران ایرانی در سراسر جهان
+            Hamfounder: Connecting Iranian Innovators Worldwide
           </h1>
           
           <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto">
-            شبکه‌ای قدرتمند برای اتصال هم‌بنیان‌گذاران، مربیان و سرمایه‌گذاران ایرانی در سراسر جهان. ایده‌های بزرگ با شرکای مناسب به واقعیت تبدیل می‌شوند.
+            A powerful network connecting co-founders, mentors, and investors across the Iranian diaspora. Great ideas become reality with the right partners.
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -27,14 +27,14 @@ const HeroSection = () => {
               size="lg" 
               className="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500"
             >
-              کشف اکوسیستم
+              Explore Ecosystem
             </Button>
             <Button 
               variant="outline" 
               size="lg"
               className="border-gray-400 text-gray-300 hover:bg-gray-800/50"
             >
-              عضویت زودهنگام
+              Early Access
             </Button>
           </div>
         </div>

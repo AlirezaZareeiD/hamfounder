@@ -5,23 +5,23 @@ const EcosystemPillarsSection = () => {
   const pillars = [
     {
       icon: Globe,
-      title: "ارتباط",
-      description: "اتصال استعدادهای جهانی و پر کردن شکاف دیاسپورا. یافتن هم‌بنیان‌گذاران، مربیان، و اعضای تیم که درک فرهنگی و چشم‌انداز مشترک دارند."
+      title: "Connect",
+      description: "Bridge the diaspora gap by connecting global talent. Find co-founders, mentors, and team members who share cultural understanding and vision."
     },
     {
       icon: BookOpen,
-      title: "یادگیری",
-      description: "دسترسی به دانش مشترک و منابع مربیگری که به طور خاص برای کارآفرینان ایرانی مواجه با چالش‌های منحصر به فرد جهانی طراحی شده است."
+      title: "Learn",
+      description: "Access shared knowledge and mentorship resources specifically designed for Iranian entrepreneurs facing unique global challenges."
     },
     {
       icon: Rocket,
-      title: "ساخت",
-      description: "ایجاد کسب‌وکارهای با تأثیر جهانی با بهره‌گیری از اکوسیستم حمایتی و تخصص جمعی ما."
+      title: "Build",
+      description: "Create globally impactful businesses by leveraging our supportive ecosystem and collective expertise."
     },
     {
       icon: Award,
-      title: "رشد",
-      description: "مقیاس‌پذیری کسب‌وکارتان با منابع استراتژیک و ارتباطاتی که برای بنیان‌گذاران ایرانی در حال گسترش بین‌المللی طراحی شده است."
+      title: "Grow",
+      description: "Scale your business with strategic resources and connections designed for Iranian founders expanding internationally."
     }
   ];
 
@@ -30,10 +30,10 @@ const EcosystemPillarsSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-            چهار رکن اساسی اکوسیستم هم‌فاندر
+            The Four Pillars of Hamfounder Ecosystem
           </h2>
           <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-            پلتفرم یکپارچه ما فراتر از همسان‌سازی بنیان‌گذاران، از کل سفر کارآفرینی شما پشتیبانی می‌کند.
+            Our integrated platform goes beyond founder matching to support your entire entrepreneurial journey.
           </p>
         </div>
         
