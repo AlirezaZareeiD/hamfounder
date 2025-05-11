@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
-import { ArrowRight } from 'lucide-react';
 
 interface FinalCTASectionProps {
   onSubmit: (email: string) => void;
@@ -30,10 +29,7 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
   };
   
   return (
-    <section className="py-16 relative">
-      {/* Background color set to dark blue */}
-      <div className="absolute inset-0 bg-[#2d3db7] -z-10"></div>
-      
+    <section className="py-16 relative bg-[#2d3db7]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
           Ready to Build Your Legacy?
@@ -45,8 +41,7 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
           today.
         </p>
         
-        {/* Updated form container to match the image reference */}
-        <div className="max-w-2xl mx-auto bg-[#7984d1]/60 backdrop-blur-sm rounded-xl p-8 shadow-lg">
+        <div className="max-w-2xl mx-auto bg-blue-600/40 backdrop-blur-sm rounded-xl p-8 shadow-lg">
           <h3 className="text-white text-xl mb-6 font-medium">Enter your email for early access:</h3>
           
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
@@ -67,7 +62,7 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
             </Button>
           </form>
           
-          <p className="text-sm text-white/90 mt-4">
+          <p className="text-sm text-white/80 mt-4">
             Get notified when we launch. No spam, guaranteed.
           </p>
         </div>
