@@ -1,79 +1,103 @@
-
-import { useState } from 'react';
-import { useIsMobile } from '@/hooks/use-mobile';
-import {
-  Card,
-  CardContent
-} from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
+import React, { useState } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 interface Startup {
   id: number;
   name: string;
+  founderName: string;
+  founderImage: string;
+  category: string;
   description: string;
-  logo: string;
-  industry: string;
-  founderNames: string;
-  location: string;
 }
+
+const startups: Startup[] = [
+  {
+    id: 1,
+    name: "InnovateTech",
+    founderName: "Arash Javan",
+    founderImage: "/images/founders/arash_javan.jpg",
+    category: "AI & Machine Learning",
+    description: "Revolutionizing industries with cutting-edge AI solutions."
+  },
+  {
+    id: 2,
+    name: "GreenSolutions",
+    founderName: "Leila Hosseini",
+    founderImage: "/images/founders/leila_hosseini.jpg",
+    category: "Renewable Energy",
+    description: "Leading the way in sustainable energy innovations for a greener future."
+  },
+  {
+    id: 3,
+    name: "HealthFirst",
+    founderName: "Babak Tehrani",
+    founderImage: "/images/founders/babak_tehrani.jpg",
+    category: "Healthcare Technology",
+    description: "Transforming healthcare with advanced technology for better patient outcomes."
+  },
+  {
+    id: 4,
+    name: "EduGlobal",
+    founderName: "Sara Ahmadi",
+    founderImage: "/images/founders/sara_ahmadi.jpg",
+    category: "EdTech",
+    description: "Making education accessible worldwide through innovative online platforms."
+  },
+  {
+    id: 5,
+    name: "AgriSmart",
+    founderName: "Khosro Farmani",
+    founderImage: "/images/founders/khosro_farmani.jpg",
+    category: "Agricultural Technology",
+    description: "Enhancing farming practices with smart technology for increased efficiency."
+  },
+  {
+    id: 6,
+    name: "FinSecure",
+    founderName: "Mina Alavi",
+    founderImage: "/images/founders/mina_alavi.jpg",
+    category: "FinTech",
+    description: "Providing secure and innovative financial solutions for a digital world."
+  }
+];
+
+const getBackgroundColor = (category: string) => {
+  switch (category) {
+    case "AI & Machine Learning":
+      return "#1e3a8a"; // Deep Blue
+    case "Renewable Energy":
+      return "#166534"; // Green
+    case "Healthcare Technology":
+      return "#7c3a31"; // Red
+    case "EdTech":
+      return "#78350f"; // Orange
+    case "Agricultural Technology":
+      return "#365314"; // Dark Green
+    case "FinTech":
+      return "#3730a3"; // Purple
+    default:
+      return "#4a5568"; // Slate
+  }
+};
 
 const StartupSpotlightSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const isMobile = useIsMobile();
   
-  const startups: Startup[] = [
-    {
-      id: 1,
-      name: "TechNova",
-      description: "AI-powered educational platform making personalized learning accessible across language barriers.",
-      logo: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      industry: "EdTech",
-      founderNames: "Parisa Ahmadi & Sohrab Karimi",
-      location: "Tehran & San Francisco"
-    },
-    {
-      id: 2,
-      name: "MedScan",
-      description: "Revolutionizing medical imaging with affordable AI diagnostics for underserved regions.",
-      logo: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      industry: "HealthTech",
-      founderNames: "Dr. Amir Mohseni & Sara Tabesh",
-      location: "Toronto & Mashhad"
-    },
-    {
-      id: 3,
-      name: "EcoMobility",
-      description: "Sustainable transportation solutions adapting renewable technologies for urban environments.",
-      logo: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      industry: "CleanTech",
-      founderNames: "Kaveh Rahnama",
-      location: "Berlin & Isfahan"
-    },
-    {
-      id: 4,
-      name: "FinEdge",
-      description: "Cross-border payment platform overcoming financial barriers for Iranian businesses globally.",
-      logo: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      industry: "FinTech",
-      founderNames: "Mina Zahedi & Behzad Kiani",
-      location: "Dubai & Tehran"
-    }
-  ];
-
-  const handleDotClick = (index: number) => {
-    setActiveIndex(index);
-  };
   
   return (
-    <section id="startups" className="py-16 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12 md:mb-16 text-[#161d30]">
+    <section className="py-24 bg-gradient-to-br from-slate-900 to-slate-800">
+      <div className="container mx-auto px-4">
+        <h2 className="text-4xl font-bold mb-12 text-center text-white">
           Spotlight on Iranian-Led Ventures
         </h2>
+        
+        <p className="text-center text-slate-300 mb-12 max-w-3xl mx-auto">
+          Discover the success stories of innovative Iranian founders who are making 
+          an impact globally across various industries. These entrepreneurs 
+          represent the boundless potential within our community.
+        </p>
         
         <Carousel
           opts={{
@@ -81,33 +105,41 @@ const StartupSpotlightSection = () => {
             loop: true,
           }}
           className="w-full"
-          onScrollSnapChange={(index) => setActiveIndex(index)}
+          onSelect={(api) => {
+            const selectedIndex = api?.selectedScrollSnap() || 0;
+            setActiveIndex(selectedIndex);
+          }}
         >
           <CarouselContent>
             {startups.map((startup) => (
-              <CarouselItem key={startup.id} className={`${isMobile ? 'basis-full' : 'md:basis-1/2 lg:basis-1/3'} pl-4`}>
-                <Card className="bg-slate-200 border-0 h-full shadow-md hover:shadow-lg transition-shadow">
-                  <CardContent className="flex flex-col p-6 h-full">
-                    <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-white flex items-center justify-center rounded-full mr-4 border-2 border-slate-400 overflow-hidden">
-                        <img 
-                          src={startup.logo} 
-                          alt={`${startup.name} logo`} 
-                          className="w-full h-full object-cover"
+              <CarouselItem key={startup.id} className="md:basis-1/2 lg:basis-1/3">
+                <Card className="h-full bg-slate-800/50 border-slate-700">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col items-center space-y-4">
+                      <div className="overflow-hidden rounded-full h-32 w-32 border-4 border-slate-700">
+                        <img
+                          src={startup.founderImage}
+                          alt={`${startup.founderName}`}
+                          className="h-full w-full object-cover"
                         />
                       </div>
-                      <div>
-                        <h3 className="text-2xl font-semibold text-slate-700">{startup.name}</h3>
-                        <p className="text-blue-500 font-medium">{startup.industry}</p>
-                      </div>
-                    </div>
-                    
-                    <p className="text-gray-600 mb-4">{startup.description}</p>
-                    
-                    <div className="mt-auto">
-                      <div className="text-sm text-slate-600">
-                        <div className="mb-1"><span className="font-medium">Founders:</span> {startup.founderNames}</div>
-                        <div><span className="font-medium">Locations:</span> {startup.location}</div>
+                      
+                      <div className="text-center">
+                        <h3 className="text-xl font-semibold text-white">
+                          {startup.founderName}
+                        </h3>
+                        <p className="text-slate-400 mb-2">Founder of {startup.name}</p>
+                        
+                        <div 
+                          className="text-sm p-1 px-3 rounded-full inline-block mb-3"
+                          style={{ backgroundColor: getBackgroundColor(startup.category) }}
+                        >
+                          {startup.category}
+                        </div>
+                        
+                        <p className="text-slate-300 mt-3">
+                          {startup.description}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -117,14 +149,33 @@ const StartupSpotlightSection = () => {
           </CarouselContent>
         </Carousel>
         
-        <div className="flex justify-center mt-6 space-x-2">
+        <div className="flex justify-center gap-2 mt-8">
           {startups.map((_, index) => (
-            <button
+            <Button
               key={index}
-              onClick={() => handleDotClick(index)}
-              className={`w-3 h-3 rounded-full mx-1 focus:outline-none ${
-                index === activeIndex ? 'bg-blue-500' : 'bg-gray-400'
+              variant="outline"
+              size="icon"
+              className={`w-3 h-3 rounded-full p-0 ${
+                activeIndex === index 
+                  ? 'bg-white border-white' 
+                  : 'bg-transparent border-white/30'
               }`}
+              onClick={() => {
+                const carouselElement = document.querySelector('[role="region"]');
+                if (carouselElement) {
+                  const scrollSnapElement = carouselElement.querySelector(
+                    `[data-carousel-item]:nth-child(${index + 1})`
+                  );
+                  if (scrollSnapElement) {
+                    scrollSnapElement.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'nearest',
+                      inline: 'center',
+                    });
+                    setActiveIndex(index);
+                  }
+                }
+              }}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}

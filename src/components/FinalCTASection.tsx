@@ -32,7 +32,7 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
   return (
     <section className="py-16 relative">
       {/* Background gradient matching the image */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-700 via-blue-600 to-blue-500 -z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-indigo-900 via-blue-800 to-blue-700 -z-10"></div>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
@@ -45,7 +45,7 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
           today.
         </p>
         
-        <div className="max-w-2xl mx-auto bg-blue-600/50 backdrop-blur-sm rounded-xl p-8 border border-blue-400/30">
+        <div className="max-w-2xl mx-auto bg-blue-800/50 backdrop-blur-sm rounded-xl p-8 border border-blue-500/30 shadow-lg">
           <h3 className="text-white text-xl mb-4 font-medium">Enter your email for early access:</h3>
           
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
