@@ -1,6 +1,40 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Globe } from 'lucide-react';
+
+// Counter component that animates from 0 to target value
+const AnimatedCounter = ({ end, label }: { end: number, label: string }) => {
+  const [count, setCount] = useState(0);
+  const duration = 2000; // Animation duration in ms
+  const frameRate = 60;
+  const totalFrames = Math.floor(duration / (1000 / frameRate));
+  
+  useEffect(() => {
+    let currentFrame = 0;
+    const increment = end / totalFrames;
+    
+    const timer = setInterval(() => {
+      currentFrame++;
+      const newValue = Math.min(Math.ceil(increment * currentFrame), end);
+      setCount(newValue);
+      
+      if (currentFrame >= totalFrames) {
+        clearInterval(timer);
+      }
+    }, 1000 / frameRate);
+    
+    return () => clearInterval(timer);
+  }, [end]);
+  
+  return (
+    <div className="text-center">
+      <div className="text-5xl font-extrabold mb-2">
+        {count >= 1000 ? `${count/1000}K+` : `${count}+`}
+      </div>
+      <div className="text-sm text-gray-300">{label}</div>
+    </div>
+  );
+};
 
 const GlobalImpactSection = () => {
   return (
@@ -24,7 +58,7 @@ const GlobalImpactSection = () => {
 
           {/* Right side - Content and stats */}
           <div className="w-full lg:w-1/2 text-white">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
               Iran's Global Innovation Network
             </h2>
             <p className="text-lg text-white/80 mb-12">
@@ -32,27 +66,12 @@ const GlobalImpactSection = () => {
               collaboration and building world-class ventures together.
             </p>
 
-            {/* Stats in a grid */}
+            {/* Stats in a grid with animated counters */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-12">
-              <div className="text-center">
-                <div className="text-5xl font-extrabold mb-2">10K+</div>
-                <div className="text-sm text-gray-300">Founders & Talents</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-5xl font-extrabold mb-2">50+</div>
-                <div className="text-sm text-gray-300">Countries Connected</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-5xl font-extrabold mb-2">100+</div>
-                <div className="text-sm text-gray-300">Startups Featured</div>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-5xl font-extrabold mb-2">5K+</div>
-                <div className="text-sm text-gray-300">Connections Made</div>
-              </div>
+              <AnimatedCounter end={10000} label="Founders & Talents" />
+              <AnimatedCounter end={50} label="Countries Connected" />
+              <AnimatedCounter end={100} label="Startups Featured" />
+              <AnimatedCounter end={5000} label="Connections Made" />
             </div>
           </div>
         </div>
