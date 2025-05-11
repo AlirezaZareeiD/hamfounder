@@ -39,24 +39,26 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen pt-16 pb-16 flex items-center overflow-hidden">
-      {/* Dark overlay background with image */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/95 via-slate-900 to-slate-900/90 -z-10">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1742&q=80')] bg-cover bg-center mix-blend-overlay opacity-60"></div>
+    <section className="relative min-h-screen pt-16 pb-16 flex items-center">
+      {/* Dark background overlay */}
+      <div className="absolute inset-0 bg-slate-900 z-0">
+        <div 
+          className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1742&q=80')] bg-cover bg-center opacity-30"
+        ></div>
       </div>
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 relative">
         <div className="text-center md:text-left py-12 md:py-20">
           <h1 
             ref={headerRef}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2 leading-tight shadow-text"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2 leading-tight"
           >
             Connect with Entrepreneurs.
           </h1>
           
           <h2 
             ref={subHeaderRef}
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8 md:mb-12 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-200 px-2 leading-tight shadow-text"
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8 md:mb-12 opacity-0 translate-y-8 transition-all duration-700 ease-out delay-200 px-2 leading-tight"
           >
             Find a Cofounder.
           </h2>
@@ -78,10 +80,10 @@ const HeroSection = () => {
             <p className="text-gray-400 mb-6">as featured in</p>
             
             <div className="flex flex-wrap justify-center md:justify-start gap-8 mb-16">
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2">
+              <div className="bg-gray-600/50 backdrop-blur-sm rounded-md px-5 py-2.5">
                 <span className="text-white">Product Hunt</span>
               </div>
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2">
+              <div className="bg-gray-600/50 backdrop-blur-sm rounded-md px-5 py-2.5">
                 <span className="text-white">TechCrunch</span>
               </div>
             </div>
@@ -110,7 +112,7 @@ const HeroSection = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
         <ChevronDown className="text-white w-8 h-8" />
       </div>
     </section>
