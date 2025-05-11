@@ -1,5 +1,8 @@
 
 import { useState, useEffect, useRef } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Startup {
   id: number;
@@ -13,7 +16,10 @@ interface Startup {
 
 const StartupSpotlightSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   
   const startups: Startup[] = [
     {
@@ -54,6 +60,35 @@ const StartupSpotlightSection = () => {
     }
   ];
   
+  // Touch swipe functionality
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+  
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+  
+  const handleTouchEnd = () => {
+    if (touchStart - touchEnd > 100) {
+      // Swipe left - next slide
+      handleNextSlide();
+    }
+    
+    if (touchStart - touchEnd < -100) {
+      // Swipe right - previous slide
+      handlePrevSlide();
+    }
+  };
+  
+  const handlePrevSlide = () => {
+    setActiveIndex((prevIndex) => (prevIndex === 0 ? startups.length - 1 : prevIndex - 1));
+  };
+  
+  const handleNextSlide = () => {
+    setActiveIndex((prevIndex) => (prevIndex + 1) % startups.length);
+  };
+  
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex((prevIndex) => (prevIndex + 1) % startups.length);
@@ -75,7 +110,7 @@ const StartupSpotlightSection = () => {
   return (
     <section id="startups" className="py-16 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-8 md:mb-12 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
           Spotlight on Iranian-Led Ventures
         </h2>
         
@@ -84,11 +119,14 @@ const StartupSpotlightSection = () => {
           <div 
             ref={sliderRef}
             className="overflow-x-hidden whitespace-nowrap scroll-smooth" 
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {startups.map((startup) => (
               <div 
                 key={startup.id} 
-                className="inline-block w-full md:w-1/2 lg:w-1/3 p-4 whitespace-normal"
+                className={`inline-block w-full ${isMobile ? '' : 'md:w-1/2 lg:w-1/3'} p-4 whitespace-normal`}
                 style={{display: 'inline-block', verticalAlign: 'top'}}
               >
                 <div className="h-full bg-slate-800/20 rounded-lg border border-slate-700 p-6">
@@ -119,19 +157,56 @@ const StartupSpotlightSection = () => {
             ))}
           </div>
           
-          {/* Navigation dots */}
-          <div className="flex justify-center mt-6">
-            {startups.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveIndex(index)}
-                className={`w-3 h-3 rounded-full mx-1 ${
-                  index === activeIndex ? 'bg-blue-500' : 'bg-gray-500'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
+          {/* Navigation controls - Touch optimized */}
+          {isMobile ? (
+            <div className="flex justify-center mt-6 space-x-2">
+              {startups.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveIndex(index)}
+                  className={`w-3 h-3 rounded-full mx-1 focus:outline-none ${
+                    index === activeIndex ? 'bg-blue-500' : 'bg-gray-500'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-between mt-6">
+              <div className="flex justify-center space-x-2">
+                {startups.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveIndex(index)}
+                    className={`w-3 h-3 rounded-full mx-1 focus:outline-none ${
+                      index === activeIndex ? 'bg-blue-500' : 'bg-gray-500'
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+              <div className="flex space-x-2">
+                <Button 
+                  onClick={handlePrevSlide} 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-full"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+                <Button 
+                  onClick={handleNextSlide} 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-full"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

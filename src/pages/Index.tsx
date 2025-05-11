@@ -16,20 +16,28 @@ import TrustBuildingSection from '@/components/TrustBuildingSection';
 import PartnersIntegrationsSection from '@/components/PartnersIntegrationsSection';
 import FounderRoadmapSection from '@/components/FounderRoadmapSection';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
+import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [submitted, setSubmitted] = useState(false);
   
   const handleEmailSubmit = (email: string) => {
-    // Here we'll handle email submission in the future
+    // Handle email submission
     console.log("Email submitted:", email);
     setSubmitted(true);
+    
+    // Show success toast notification
+    toast({
+      title: "Success!",
+      description: "Thank you for joining our early access list.",
+    });
+    
     // Reset submission status after 3 seconds
     setTimeout(() => setSubmitted(false), 3000);
   };
   
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
       <main>
         <HeroSection />

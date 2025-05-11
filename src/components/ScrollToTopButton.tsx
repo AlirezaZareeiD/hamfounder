@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const isMobile = useIsMobile();
 
   // Show button when page is scrolled down
   useEffect(() => {
@@ -36,11 +38,11 @@ const ScrollToTopButton = () => {
           onClick={scrollToTop}
           className={`bg-blue-500 hover:bg-blue-600 rounded-full p-3 shadow-lg transform transition-all duration-300 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
+          } ${isMobile ? 'w-12 h-12' : ''}`}
           size="icon"
           aria-label="Scroll to top"
         >
-          <ArrowUp className="h-4 w-4" />
+          <ArrowUp className={`${isMobile ? 'h-6 w-6' : 'h-4 w-4'}`} />
         </Button>
       )}
     </div>
