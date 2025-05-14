@@ -4,7 +4,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "@/hooks/use-toast";
 
-// توجه: این کلیدها باید با کلیدهای واقعی شما جایگزین شوند
+// Note: Replace these keys with your actual Firebase configuration
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_AUTH_DOMAIN",
@@ -20,6 +20,9 @@ export const auth = getAuth(app);
 
 // Provider instances
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
 const appleProvider = new OAuthProvider('apple.com');
 const linkedInProvider = new OAuthProvider('linkedin.com');
 
@@ -28,24 +31,24 @@ export const registerWithEmailPassword = async (email: string, password: string)
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     toast({
-      title: "ثبت نام موفق!",
-      description: "به هم‌فاندر خوش آمدید. اکنون می‌توانید وارد شوید.",
+      title: "Registration successful!",
+      description: "Welcome to Hamfounder. You can now log in.",
     });
     return userCredential.user;
   } catch (error: any) {
-    let errorMessage = "خطا در ایجاد حساب کاربری. لطفاً دوباره تلاش کنید.";
+    let errorMessage = "Error creating account. Please try again.";
     
-    // ارائه پیام‌های خطای دقیق‌تر بدون افشای جزئیات فنی
+    // More descriptive error messages
     if (error.code === 'auth/email-already-in-use') {
-      errorMessage = "این ایمیل قبلاً ثبت شده است.";
+      errorMessage = "This email is already registered.";
     } else if (error.code === 'auth/invalid-email') {
-      errorMessage = "لطفاً یک ایمیل معتبر وارد کنید.";
+      errorMessage = "Please enter a valid email address.";
     } else if (error.code === 'auth/weak-password') {
-      errorMessage = "رمز عبور باید حداقل ۸ کاراکتر باشد.";
+      errorMessage = "Password must be at least 8 characters long.";
     }
     
     toast({
-      title: "خطا",
+      title: "Error",
       description: errorMessage,
       variant: "destructive",
     });
@@ -60,8 +63,8 @@ export const signInWithGoogle = async () => {
     return result.user;
   } catch (error: any) {
     toast({
-      title: "خطا در ورود با گوگل",
-      description: "ورود با گوگل با مشکل مواجه شد. لطفاً دوباره تلاش کنید.",
+      title: "Google Sign-in Error",
+      description: "Failed to sign in with Google. Please try again.",
       variant: "destructive",
     });
     throw error;
@@ -74,8 +77,8 @@ export const signInWithApple = async () => {
     return result.user;
   } catch (error: any) {
     toast({
-      title: "خطا در ورود با اپل",
-      description: "ورود با اپل با مشکل مواجه شد. لطفاً دوباره تلاش کنید.",
+      title: "Apple Sign-in Error",
+      description: "Failed to sign in with Apple. Please try again.",
       variant: "destructive",
     });
     throw error;
@@ -84,13 +87,13 @@ export const signInWithApple = async () => {
 
 export const signInWithLinkedIn = async () => {
   try {
-    // توجه: برای کارکرد LinkedIn نیاز به تنظیمات اضافی در کنسول Firebase دارید
+    // Note: LinkedIn login requires additional setup in the Firebase console
     const result = await signInWithPopup(auth, linkedInProvider);
     return result.user;
   } catch (error: any) {
     toast({
-      title: "خطا در ورود با لینکدین",
-      description: "ورود با لینکدین با مشکل مواجه شد. لطفاً دوباره تلاش کنید.",
+      title: "LinkedIn Sign-in Error",
+      description: "Failed to sign in with LinkedIn. Please try again.",
       variant: "destructive",
     });
     throw error;

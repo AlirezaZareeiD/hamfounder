@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -155,20 +156,18 @@ const Navbar = () => {
           {/* User Navigation */}
           <div className="hidden md:block">
             <div className="ml-4 flex items-center space-x-3">
-              <a 
-                href="#login" 
-                onClick={(e) => { e.preventDefault(); }}
+              <Link 
+                to="/login" 
                 className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium transition"
               >
                 Login
-              </a>
-              <a
-                href="#sign-up"
-                onClick={(e) => { e.preventDefault(); }}
+              </Link>
+              <Link
+                to="/signup"
                 className="bg-[#0ea5e9] hover:bg-[#0891d2] text-white px-4 py-2 rounded-md text-sm font-medium transition"
               >
                 Sign Up
-              </a>
+              </Link>
             </div>
           </div>
           
@@ -243,20 +242,20 @@ const Navbar = () => {
           </div>
           <div className="pt-4 pb-16 border-t border-border/40">
             <div className="px-2 space-y-3">
-              <a
-                href="#login"
-                onClick={(e) => { e.preventDefault(); }}
+              <Link
+                to="/login"
+                onClick={(e) => { setIsMenuOpen(false); }}
                 className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium"
               >
                 Login
-              </a>
-              <a
-                href="#sign-up"
-                onClick={(e) => { e.preventDefault(); }}
+              </Link>
+              <Link
+                to="/signup"
+                onClick={(e) => { setIsMenuOpen(false); }}
                 className="bg-[#0ea5e9] text-white block px-3 py-4 rounded-md text-base font-medium my-2 mx-3 text-center"
               >
                 Sign Up
-              </a>
+              </Link>
             </div>
           </div>
         </div>
