@@ -31,13 +31,13 @@ export const SignUpSocialButtons = () => {
           break;
         default:
           toast({
-            title: "خطا",
-            description: `ورود با ${provider} پشتیبانی نمی‌شود.`,
+            title: "Error",
+            description: `Sign in with ${provider} is not supported.`,
           });
       }
       
-      // در مورد موفقیت، کاربر به صفحه داشبورد هدایت می‌شود
-      // این در کامپوننت SignUp.tsx پیاده‌سازی می‌شود
+      // On success, user is redirected to Dashboard
+      // This is handled in the SignUp.tsx component
     } catch (error) {
       console.error(`${provider} login error:`, error);
     } finally {
@@ -72,7 +72,7 @@ export const SignUpSocialButtons = () => {
             fill="#34A853"
           />
         </svg>
-        {isLoading.google ? "در حال ورود..." : "ورود با گوگل"}
+        {isLoading.google ? "Signing in..." : "Sign in with Google"}
       </Button>
 
       <Button
@@ -88,7 +88,7 @@ export const SignUpSocialButtons = () => {
             fill="currentColor"
           />
         </svg>
-        {isLoading.apple ? "در حال ورود..." : "ورود با اپل"}
+        {isLoading.apple ? "Signing in..." : "Sign in with Apple"}
       </Button>
 
       <Button
@@ -104,7 +104,7 @@ export const SignUpSocialButtons = () => {
             fill="#0077B5"
           />
         </svg>
-        {isLoading.linkedin ? "در حال ورود..." : "ورود با لینکدین"}
+        {isLoading.linkedin ? "Signing in..." : "Sign in with LinkedIn"}
       </Button>
     </div>
   );

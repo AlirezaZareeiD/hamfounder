@@ -12,7 +12,7 @@ const Dashboard = () => {
   const user = auth.currentUser;
 
   useEffect(() => {
-    // اگر کاربر وارد نشده باشد، به صفحه ورود هدایت شود
+    // Redirect to login page if user is not authenticated
     if (!user) {
       navigate('/');
       return;
@@ -23,21 +23,21 @@ const Dashboard = () => {
     try {
       await signOut(auth);
       toast({
-        title: "خروج موفق",
-        description: "شما با موفقیت از حساب کاربری خود خارج شدید.",
+        title: "Sign Out Successful",
+        description: "You have been successfully signed out of your account.",
       });
       navigate('/');
     } catch (error) {
       toast({
-        title: "خطا در خروج",
-        description: "مشکلی در خروج از حساب کاربری رخ داده است. لطفا دوباره تلاش کنید.",
+        title: "Sign Out Error",
+        description: "There was a problem signing out. Please try again.",
         variant: "destructive",
       });
     }
   };
 
   if (!user) {
-    return null; // صفحه بارگذاری یا در حال انتقال
+    return null; // Loading or redirecting state
   }
 
   return (
@@ -50,7 +50,7 @@ const Dashboard = () => {
             <span className="text-slate-700">
               {user.email}
             </span>
-            <Button variant="outline" onClick={handleSignOut}>خروج</Button>
+            <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
           </div>
         </div>
       </header>
@@ -59,9 +59,9 @@ const Dashboard = () => {
       <main className="py-8 px-4 sm:px-6">
         <div className="container max-w-7xl mx-auto">
           <div className="bg-white shadow rounded-lg p-6">
-            <h1 className="text-2xl font-bold text-slate-900 mb-6">داشبورد هم‌فاندر</h1>
+            <h1 className="text-2xl font-bold text-slate-900 mb-6">Hamfounder Dashboard</h1>
             <p className="text-slate-600">
-              خوش آمدید! این صفحه داشبورد شماست. در نسخه نهایی، اینجا می‌توانید اطلاعات پروفایل خود را تکمیل کنید و به شبکه نوآوران ایرانی در سراسر جهان متصل شوید.
+              Welcome! This is your dashboard. In the final version, here you'll be able to complete your profile information and connect with the Iranian innovator network worldwide.
             </p>
           </div>
         </div>
