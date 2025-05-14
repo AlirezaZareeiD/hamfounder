@@ -1,3 +1,9 @@
+
+# Allow all search engines to index the site
+User-agent: *
+Allow: /
+
+# Special treatment for specific bots
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +16,10 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# Block access to sensitive areas (none currently defined)
+# Disallow: /admin/
+# Disallow: /private/
+
+# Sitemap declaration (add your actual sitemap when deployed)
+# Sitemap: https://hamfounder.com/sitemap.xml
+

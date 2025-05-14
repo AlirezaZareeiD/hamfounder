@@ -10,55 +10,51 @@ interface MobileMenuProps {
 const MobileMenu = ({ isOpen, onClose, scrollToSection }: MobileMenuProps) => {
   if (!isOpen) return null;
 
+  // Handler to prevent event bubbling
+  const handleClick = (e: React.MouseEvent, sectionId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    scrollToSection(sectionId);
+    onClose();
+  };
+
   return (
-    <div className="md:hidden fixed inset-0 top-16 bg-background/95 backdrop-blur-md z-50 animate-fade-in overflow-auto">
+    <div 
+      className="md:hidden fixed inset-0 top-16 bg-background/95 backdrop-blur-md z-50 animate-fade-in overflow-auto"
+      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+    >
       <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
         <a
           href="#mission"
-          onClick={(e) => { 
-            e.preventDefault(); 
-            scrollToSection('mission'); 
-          }}
+          onClick={(e) => handleClick(e, 'mission')}
           className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium"
         >
           Our Mission
         </a>
         <a
           href="#how-it-works"
-          onClick={(e) => { 
-            e.preventDefault(); 
-            scrollToSection('how-it-works'); 
-          }}
+          onClick={(e) => handleClick(e, 'how-it-works')}
           className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium"
         >
           How It Works
         </a>
         <a
           href="#global-network"
-          onClick={(e) => { 
-            e.preventDefault(); 
-            scrollToSection('global-network'); 
-          }}
+          onClick={(e) => handleClick(e, 'global-network')}
           className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium"
         >
           Global Network
         </a>
         <a
           href="#startups"
-          onClick={(e) => { 
-            e.preventDefault(); 
-            scrollToSection('startups'); 
-          }}
+          onClick={(e) => handleClick(e, 'startups')}
           className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium"
         >
           Startups
         </a>
         <a
           href="#join"
-          onClick={(e) => { 
-            e.preventDefault(); 
-            scrollToSection('join'); 
-          }}
+          onClick={(e) => handleClick(e, 'join')}
           className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium"
         >
           Join Us
