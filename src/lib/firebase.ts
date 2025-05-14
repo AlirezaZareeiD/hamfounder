@@ -16,8 +16,17 @@ const firebaseConfig = {
   appId: "1:123456789012:web:abc123def456"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase only once - use a singleton pattern
+let app;
+try {
+  // Check if Firebase is already initialized
+  if (!app) {
+    app = initializeApp(firebaseConfig);
+  }
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+}
+
 export const auth = getAuth(app);
 
 // Provider instances
@@ -58,16 +67,27 @@ export const registerWithEmailPassword = async (email: string, password: string)
   }
 };
 
-// Social Login Functions
+// Social Login Functions with improved error handling
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
   } catch (error: any) {
     console.error("Google login error:", error);
+    let errorMessage = "Failed to sign in with Google. Please try again.";
+    
+    // Specific error messages based on Firebase error codes
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = "Sign-in popup was closed before completing the sign-in process.";
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      errorMessage = "Multiple popup requests were triggered. Please try again.";
+    } else if (error.code === 'auth/unauthorized-domain') {
+      errorMessage = "This domain isn't authorized for OAuth operations. Please contact support.";
+    }
+    
     toast({
       title: "Google Sign-in Error",
-      description: "Failed to sign in with Google. Please try again.",
+      description: errorMessage,
       variant: "destructive",
     });
     throw error;
@@ -80,9 +100,18 @@ export const signInWithApple = async () => {
     return result.user;
   } catch (error: any) {
     console.error("Apple login error:", error);
+    let errorMessage = "Failed to sign in with Apple. Please try again.";
+    
+    // Specific error messages based on Firebase error codes
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = "Sign-in popup was closed before completing the sign-in process.";
+    } else if (error.code === 'auth/provider-already-linked') {
+      errorMessage = "This Apple account is already linked to another user.";
+    }
+    
     toast({
       title: "Apple Sign-in Error",
-      description: "Failed to sign in with Apple. Please try again.",
+      description: errorMessage,
       variant: "destructive",
     });
     throw error;
@@ -96,9 +125,18 @@ export const signInWithLinkedIn = async () => {
     return result.user;
   } catch (error: any) {
     console.error("LinkedIn login error:", error);
+    let errorMessage = "Failed to sign in with LinkedIn. Please try again.";
+    
+    // Specific error messages based on Firebase error codes
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = "Sign-in popup was closed before completing the sign-in process.";
+    } else if (error.code === 'auth/operation-not-allowed') {
+      errorMessage = "LinkedIn sign-in is not enabled in Firebase. Please contact support.";
+    }
+    
     toast({
       title: "LinkedIn Sign-in Error",
-      description: "Failed to sign in with LinkedIn. Please try again.",
+      description: errorMessage,
       variant: "destructive",
     });
     throw error;

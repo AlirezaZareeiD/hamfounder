@@ -19,7 +19,7 @@ const SignUp = () => {
       }
     });
 
-    // Clean up subscription
+    // Clean up subscription on unmount
     return () => unsubscribe();
   }, [navigate]);
 

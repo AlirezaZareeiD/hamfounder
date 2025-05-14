@@ -36,10 +36,17 @@ export const SignUpSocialButtons = () => {
           });
       }
       
+      // Success toast
+      toast({
+        title: "Success",
+        description: `Successfully signed in with ${provider}.`,
+      });
+      
       // On success, user is redirected to Dashboard
       // This is handled in the SignUp.tsx component
     } catch (error) {
       console.error(`${provider} login error:`, error);
+      // Error handling is now done in the individual sign-in functions
     } finally {
       setIsLoading(prev => ({ ...prev, [provider.toLowerCase()]: false }));
     }
