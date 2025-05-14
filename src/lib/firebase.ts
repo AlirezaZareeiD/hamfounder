@@ -4,14 +4,16 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "@/hooks/use-toast";
 
-// Note: Replace these keys with your actual Firebase configuration
+// Firebase configuration
+// NOTE: You need to replace these with your actual Firebase configuration values
+// from your Firebase console: https://console.firebase.google.com/
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDdefault_demo_key_replace_this",
+  authDomain: "your-project-id.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project-id.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abc123def456"
 };
 
 // Initialize Firebase
@@ -62,6 +64,7 @@ export const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
   } catch (error: any) {
+    console.error("Google login error:", error);
     toast({
       title: "Google Sign-in Error",
       description: "Failed to sign in with Google. Please try again.",
@@ -76,6 +79,7 @@ export const signInWithApple = async () => {
     const result = await signInWithPopup(auth, appleProvider);
     return result.user;
   } catch (error: any) {
+    console.error("Apple login error:", error);
     toast({
       title: "Apple Sign-in Error",
       description: "Failed to sign in with Apple. Please try again.",
@@ -91,6 +95,7 @@ export const signInWithLinkedIn = async () => {
     const result = await signInWithPopup(auth, linkedInProvider);
     return result.user;
   } catch (error: any) {
+    console.error("LinkedIn login error:", error);
     toast({
       title: "LinkedIn Sign-in Error",
       description: "Failed to sign in with LinkedIn. Please try again.",
