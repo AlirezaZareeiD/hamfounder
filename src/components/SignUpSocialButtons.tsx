@@ -1,14 +1,48 @@
 
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { signInWithGoogle, signInWithApple, signInWithLinkedIn } from "@/lib/firebase";
+import { useState } from "react";
 
 export const SignUpSocialButtons = () => {
-  const handleSocialLogin = (provider: string) => {
-    // This would connect to actual OAuth providers in a real application
-    toast({
-      title: "Social Login",
-      description: `${provider} login is not implemented in this demo.`,
-    });
+  const [isLoading, setIsLoading] = useState<{
+    google: boolean;
+    apple: boolean;
+    linkedin: boolean;
+  }>({
+    google: false,
+    apple: false,
+    linkedin: false
+  });
+
+  const handleSocialLogin = async (provider: string) => {
+    try {
+      setIsLoading(prev => ({ ...prev, [provider.toLowerCase()]: true }));
+      
+      switch(provider) {
+        case "Google":
+          await signInWithGoogle();
+          break;
+        case "Apple":
+          await signInWithApple();
+          break;
+        case "LinkedIn":
+          await signInWithLinkedIn();
+          break;
+        default:
+          toast({
+            title: "خطا",
+            description: `ورود با ${provider} پشتیبانی نمی‌شود.`,
+          });
+      }
+      
+      // در مورد موفقیت، کاربر به صفحه داشبورد هدایت می‌شود
+      // این در کامپوننت SignUp.tsx پیاده‌سازی می‌شود
+    } catch (error) {
+      console.error(`${provider} login error:`, error);
+    } finally {
+      setIsLoading(prev => ({ ...prev, [provider.toLowerCase()]: false }));
+    }
   };
 
   return (
@@ -18,6 +52,7 @@ export const SignUpSocialButtons = () => {
         variant="outline"
         className="h-12 border-slate-200 hover:bg-slate-50 text-slate-800 relative flex items-center justify-center"
         onClick={() => handleSocialLogin("Google")}
+        disabled={isLoading.google}
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2" aria-hidden="true">
           <path
@@ -37,7 +72,7 @@ export const SignUpSocialButtons = () => {
             fill="#34A853"
           />
         </svg>
-        Sign up with Google
+        {isLoading.google ? "در حال ورود..." : "ورود با گوگل"}
       </Button>
 
       <Button
@@ -45,6 +80,7 @@ export const SignUpSocialButtons = () => {
         variant="outline"
         className="h-12 border-slate-200 hover:bg-slate-50 text-slate-800 relative flex items-center justify-center"
         onClick={() => handleSocialLogin("Apple")}
+        disabled={isLoading.apple}
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2" aria-hidden="true">
           <path
@@ -52,7 +88,7 @@ export const SignUpSocialButtons = () => {
             fill="currentColor"
           />
         </svg>
-        Sign up with Apple
+        {isLoading.apple ? "در حال ورود..." : "ورود با اپل"}
       </Button>
 
       <Button
@@ -60,6 +96,7 @@ export const SignUpSocialButtons = () => {
         variant="outline"
         className="h-12 border-slate-200 hover:bg-slate-50 text-slate-800 relative flex items-center justify-center"
         onClick={() => handleSocialLogin("LinkedIn")}
+        disabled={isLoading.linkedin}
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2" aria-hidden="true">
           <path
@@ -67,7 +104,7 @@ export const SignUpSocialButtons = () => {
             fill="#0077B5"
           />
         </svg>
-        Sign up with LinkedIn
+        {isLoading.linkedin ? "در حال ورود..." : "ورود با لینکدین"}
       </Button>
     </div>
   );
