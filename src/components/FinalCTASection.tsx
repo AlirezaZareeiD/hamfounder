@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 interface FinalCTASectionProps {
   onSubmit: (email: string) => void;
@@ -63,9 +64,15 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
             </Button>
           </form>
           
-          <p className="text-sm text-white/80 mt-4">
-            Get notified when we launch. No spam, guaranteed.
-          </p>
+          <div className="text-sm text-white/80 mt-6 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4">
+            <p>
+              Get notified when we launch. No spam, guaranteed.
+            </p>
+            <div className="border-l border-white/20 h-4 hidden sm:block"></div>
+            <Link to="/signup" className="text-white hover:text-white/90 font-medium underline underline-offset-4">
+              View Sign-up Page Demo
+            </Link>
+          </div>
         </div>
       </div>
     </section>
