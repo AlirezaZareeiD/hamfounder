@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { signInWithGoogle, signInWithApple, signInWithLinkedIn } from "@/lib/firebase";
+import { signInWithGoogle, signInWithLinkedIn } from "@/lib/firebase";
 import { useState } from "react";
 
 export const SignUpSocialButtons = () => {
@@ -17,14 +16,19 @@ export const SignUpSocialButtons = () => {
 
   const handleSocialLogin = async (provider: string) => {
     try {
-      setIsLoading(prev => ({ ...prev, [provider.toLowerCase()]: true }));
+      if (provider === "Apple" || provider === "LinkedIn") {
+        toast({
+          title: "Feature coming soon",
+          description:
+            "We're currently in the MVP development phase, and this feature will be available soon. In the meantime, you can log in with your Google account or create a new profile using your email.\nThank you for your patience!",
+        });
+        return;
+      }
+
       
       switch(provider) {
         case "Google":
           await signInWithGoogle();
-          break;
-        case "Apple":
-          await signInWithApple();
           break;
         case "LinkedIn":
           await signInWithLinkedIn();
@@ -39,7 +43,7 @@ export const SignUpSocialButtons = () => {
       // Success toast
       toast({
         title: "Success",
-        description: `Successfully signed in with ${provider}.`,
+        description: `Successfully signed in with ${provider}.`
       });
       
       // On success, user is redirected to Dashboard

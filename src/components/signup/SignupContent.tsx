@@ -1,8 +1,8 @@
 
 import React from "react";
 import { ValueProposition } from "@/components/signup/ValueProposition";
-import { SignupForm } from "@/components/signup/SignupForm";
 import { FirebaseConfigAlert } from "@/components/firebase/FirebaseConfigAlert";
+import { SignUpForm } from "@/components/signup/SignUpForm";
 
 interface SignupContentProps {
   isSubmitting: boolean;
@@ -26,7 +26,7 @@ export const SignupContent: React.FC<SignupContentProps> = ({
 
         {/* Right Column - Sign-up Form */}
         <div className="order-1 lg:order-2">
-          <SignupForm
+          <SignUpForm
             isSubmitting={isSubmitting}
             setIsSubmitting={setIsSubmitting}
           />
