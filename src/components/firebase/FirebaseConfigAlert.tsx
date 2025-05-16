@@ -1,47 +1,55 @@
+// This file's content has been commented out as per user request to hide the firebase configuration alert on the sign-up page.
 
-import React, { useState } from "react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { FirebaseSetupDialog } from "./FirebaseSetupDialog";
+// import React, { useState } from "react";
+// import { Alert, AlertDescription } from "@/components/ui/alert";
+// import { AlertTriangle } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { FirebaseSetupDialog } from "./FirebaseSetupDialog";
 
 export const FirebaseConfigAlert = () => {
-  const [showSetupGuide, setShowSetupGuide] = useState(false);
-
-  // Check if we're using default Firebase config
-  const isUsingDefaultConfig = () => {
-    // This is a simple check to see if we're using the default config
-    // In a real app, you might want to check this server-side or in a more robust way
-    return typeof window !== "undefined" && 
-           window.location.hostname !== "your-project-id.firebaseapp.com" && 
-           window.location.hostname !== "your-project-id.web.app";
+    //   const [showSetupGuide, setShowSetupGuide] = useState(false);
+  
+    //   // Check if we're using default Firebase config
+    //   const isUsingDefaultConfig = () => {
+    //     // Replace with your actual check for default config
+    //     // This is a placeholder check
+    //     return (
+    //       !import.meta.env.VITE_FIREBASE_API_KEY ||
+    //       import.meta.env.VITE_FIREBASE_API_KEY === "YOUR_FIREBASE_API_KEY"
+    //     );
+    //   };
+  
+    //   if (!isUsingDefaultConfig()) {
+    //     return null; // Don't show the alert if not using default config
+    //   }
+  
+    //   return (
+    //     <>
+    //       <Alert variant="warning" className="mb-6">
+    //         <AlertTriangle className="h-4 w-4" />
+    //         <AlertDescription className="flex items-center justify-between">
+    //           <span>
+    //             Firebase authentication is not fully configured. Social logins may
+    //             not work properly.
+    //           </span>
+    //           <Button
+    //             variant="outline"
+    //             size="sm"
+    //             onClick={() => setShowSetupGuide(true)}
+    //           >
+    //             View Setup Guide
+    //           </Button>
+    //         </AlertDescription>
+    //       </Alert>
+  
+    //       <FirebaseSetupDialog
+    //         isOpen={showSetupGuide}
+    //         onClose={() => setShowSetupGuide(false)}
+    //       />
+    //     </>
+    //   );
   };
-
-  if (!isUsingDefaultConfig()) {
-    return null;
-  }
-
-  return (
-    <>
-      <Alert className="mb-4 border-amber-200 bg-amber-50">
-        <AlertTriangle className="h-5 w-5 text-amber-600" />
-        <AlertDescription className="text-amber-800 flex items-center justify-between">
-          <span>Firebase authentication is not fully configured. Social logins may not work properly.</span>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="ml-2 border-amber-200 text-amber-800 hover:bg-amber-100"
-            onClick={() => setShowSetupGuide(true)}
-          >
-            View Setup Guide
-          </Button>
-        </AlertDescription>
-      </Alert>
-      
-      <FirebaseSetupDialog 
-        open={showSetupGuide} 
-        onOpenChange={setShowSetupGuide} 
-      />
-    </>
-  );
-};
+  
+  // Export statement is now uncommented
+  // export default FirebaseConfigAlert; // If you were using default export
+  

@@ -1,22 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { signInWithGoogle, signInWithLinkedIn } from "@/lib/firebase";
+import { signInWithGoogle, signInWithGitHub, signInWithLinkedInPlaceholder } from "@/lib/firebase";
 import { useState } from "react";
 
 export const SignUpSocialButtons = () => {
   const [isLoading, setIsLoading] = useState<{
     google: boolean;
+    github: boolean;
     apple: boolean;
     linkedin: boolean;
   }>({
     google: false,
+    github: false,
     apple: false,
     linkedin: false
   });
 
   const handleSocialLogin = async (provider: string) => {
     try {
-      if (provider === "Apple" || provider === "LinkedIn") {
+      setIsLoading(prev => ({ ...prev, [provider.toLowerCase()]: true }));
+
+      if (provider === "Apple") {
         toast({
           title: "Feature coming soon",
           description:
@@ -25,32 +29,64 @@ export const SignUpSocialButtons = () => {
         return;
       }
 
-      
+      if (provider === "LinkedIn") {
+        toast({
+          title: "Feature coming soon",
+          description:
+            "We're currently in the MVP development phase, and this feature will be available soon. In the meantime, you can log in with your Google account or create a new profile using your email.\nThank you for your patience!",
+        });
+        await signInWithLinkedInPlaceholder();
+        return;
+      }
+
       switch(provider) {
         case "Google":
           await signInWithGoogle();
           break;
-        case "LinkedIn":
-          await signInWithLinkedIn();
+        case "GitHub":
+          await signInWithGitHub();
           break;
         default:
           toast({
             title: "Error",
             description: `Sign in with ${provider} is not supported.`,
           });
+          return; // Exit for unsupported providers
       }
-      
-      // Success toast
+
+      // Only show success toast for providers that actually perform login
       toast({
         title: "Success",
         description: `Successfully signed in with ${provider}.`
       });
-      
-      // On success, user is redirected to Dashboard
-      // This is handled in the SignUp.tsx component
-    } catch (error) {
+
+    } catch (error: any) {
       console.error(`${provider} login error:`, error);
-      // Error handling is now done in the individual sign-in functions
+
+      let errorMessage = `Failed to sign in with ${provider}. Please try again.`;
+
+      // More specific error handling for Firebase auth errors
+      if (error.code) {
+          switch (error.code) {
+              case 'auth/cancelled-popup-request':
+              case 'auth/popup-closed-by-user':
+                  errorMessage = `Sign in with ${provider} was cancelled.`;
+                  break;
+              // You might need to inspect the exact error code when the provider is not configured
+              // For example, it could be 'auth/unauthorized-domain' or similar if domain is not added in Firebase
+              // For now, a generic failed message will cover this.
+              default:
+                  errorMessage = error.message || errorMessage; // Use error message if available
+                  break;
+          }
+      }
+
+
+      toast({
+        title: "Login Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(prev => ({ ...prev, [provider.toLowerCase()]: false }));
     }
@@ -58,6 +94,7 @@ export const SignUpSocialButtons = () => {
 
   return (
     <div className="grid grid-cols-1 gap-3">
+      {/* Google Button */}
       <Button
         type="button"
         variant="outline"
@@ -86,6 +123,24 @@ export const SignUpSocialButtons = () => {
         {isLoading.google ? "Signing in..." : "Sign in with Google"}
       </Button>
 
+      {/* GitHub Button */}
+      <Button
+        type="button"
+        variant="outline"
+        className="h-12 border-slate-200 hover:bg-slate-50 text-slate-800 relative flex items-center justify-center"
+        onClick={() => handleSocialLogin("GitHub")}
+        disabled={isLoading.github}
+      >
+        <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2" aria-hidden="true">
+          <path
+            d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.542-1.36-1.32-1.725-1.32-1.725-1.087-.731.084-.716.084-.716 1.205.086 1.838 1.238 1.838 1.238 1.07 1.835 2.804 1.305 3.49.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1-.322 3.3-.123 1-.33 2.07-.5 3.17-.552 1.1.052 2.17.22 3.17.552 2.3-.2 3.3.123 3.3.123.645 1.653.24 2.873.105 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12z"
+            fill="currentColor" // Using currentColor to match button text color
+          />
+        </svg>
+        {isLoading.github ? "Signing in..." : "Sign in with GitHub"}
+      </Button>
+
+      {/* Apple Button */}
       <Button
         type="button"
         variant="outline"
@@ -102,6 +157,7 @@ export const SignUpSocialButtons = () => {
         {isLoading.apple ? "Signing in..." : "Sign in with Apple"}
       </Button>
 
+      {/* LinkedIn Button */}
       <Button
         type="button"
         variant="outline"

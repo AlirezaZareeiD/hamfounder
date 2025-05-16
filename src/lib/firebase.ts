@@ -1,5 +1,5 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { GoogleAuthProvider, signInWithPopup, Auth, getAuth } from "firebase/auth";
+import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, Auth, getAuth, OAuthProvider } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -28,16 +28,22 @@ export const signInWithGoogle = () => {
 //   return signInWithPopup(auth, appleProvider);
 // };
 
-
-// پیاده سازی Sign-in با لینکدین پیچیده تر است و به صورت پیش فرض در Firebase Auth نیست.
-// ممکن است نیاز به Firebase Functions و استفاده از OpenID Connect داشته باشد.
-// فعلاً تابع signInWithLinkedIn را به صورت موقت اضافه می کنیم و بعداً می توان آن را پیاده سازی کرد یا حذف کرد.
-export const signInWithLinkedIn = () => {
-  console.log("Sign in with LinkedIn not yet implemented");
-  // در آینده می توانید پیاده سازی Sign-in با لینکدین را در اینجا اضافه کنید.
-  // Firebase به صورت پیش فرض Provider برای لینکدین ندارد و نیاز به راه حل سفارشی دارد.
-  // ممکن است نیاز به استفاده از Firebase Functions و یک OAuth 2.0 flow داشته باشد.
-  throw new Error("Sign in with LinkedIn not yet implemented");
+// Added for Sign-in with GitHub
+const githubProvider = new GithubAuthProvider();
+export const signInWithGitHub = async () => {
+  try {
+    await signInWithPopup(auth, githubProvider);
+  } catch (error) {
+    console.error("GitHub login error:", error);
+    // Handle errors (e.g., show a user-friendly message)
+  }
 };
 
-
+// Placeholder for Sign-in with LinkedIn (Feature Coming Soon)
+// const linkedinProvider = new OAuthProvider('oidc.linkedin-oidc');
+// export const signInWithLinkedIn = () => {
+//   return signInWithPopup(auth, linkedinProvider);
+// };
+export const signInWithLinkedInPlaceholder = () => {
+  console.log("LinkedIn login feature coming soon.");
+};
