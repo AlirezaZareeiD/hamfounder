@@ -33,13 +33,13 @@ const IranEconomicPotentialSection = () => {
   return (
     <section id="economic-potential" className="py-20 md:py-28 bg-white overflow-visible" ref={sectionRef}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Restoring the original section title */}
-        <div className="mb-20">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-6 leading-tight">
-            Unleashing Iran's <span className="text-primary">Economic Potential</span>
+        {/* Title section styled to match the image */}
+        <div className="mb-20 text-center">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A3E7C] mb-4 leading-tight tracking-tight">
+            Unleashing Iran's Economic Potential
           </h2>
-          <p className="text-xl md:text-2xl text-center text-slate-600 max-w-3xl mx-auto">
-            From current GDP of $404 Billion to a vision of $3 Trillion through strategic economic transformation
+          <p className="text-xl md:text-2xl text-[#667085] max-w-3xl mx-auto">
+            From Startup Dreams to National Impact
           </p>
         </div>
         
