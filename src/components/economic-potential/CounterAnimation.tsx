@@ -16,11 +16,16 @@ const CounterAnimation = ({
   suffix = "", 
   duration = 2000,
   highlightColor = "text-primary",
-  fontSize = "text-4xl md:text-5xl lg:text-6xl"
+  fontSize = "text-4xl md:text-6xl lg:text-7xl" // Increased font size
 }: CounterAnimationProps) => {
   const [count, setCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const counterRef = useRef<HTMLDivElement | null>(null);
+
+  // Process suffix to capitalize words like "billion" and "trillion"
+  const processedSuffix = suffix.replace(/\b(billion|trillion)\b/gi, (match) => {
+    return match.charAt(0).toUpperCase() + match.slice(1);
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -71,7 +76,7 @@ const CounterAnimation = ({
   return (
     <div ref={counterRef} className="text-center">
       <div className={`${fontSize} font-bold ${highlightColor}`}>
-        {prefix}<span className="tabular-nums">{count.toLocaleString()}</span>{suffix}
+        {prefix}<span className="tabular-nums">{count.toLocaleString()}</span>{processedSuffix}
       </div>
     </div>
   );

@@ -39,28 +39,15 @@ const IranEconomicPotentialSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="text-center mb-10 md:mb-16 pb-2"
+          className="text-center mb-14 pb-5" // Increased bottom padding
         >
           <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600 mb-6 leading-tight">
             Unleashing Iran's Economic Potential
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            A Global Call to Action
+            From Startup Dreams to National Impact
           </p>
           <Separator className="mt-10 max-w-xs mx-auto" />
-        </motion.div>
-        
-        {/* Vision Title - Fixed spacing issue */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-center mb-12"
-        >
-          <h3 className="text-2xl md:text-3xl font-semibold text-primary">
-            From Startup Dreams to National Impact
-          </h3>
         </motion.div>
         
         {/* Economic Stats Section */}

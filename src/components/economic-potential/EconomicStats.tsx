@@ -44,7 +44,7 @@ const EconomicStats = () => {
                 prefix="$" 
                 suffix=" Billion"
                 highlightColor="text-primary"
-                fontSize="text-5xl md:text-6xl"
+                fontSize="text-5xl md:text-6xl lg:text-7xl"
               />
             </div>
             <p className="mt-4 text-muted-foreground text-center font-medium">Only 0.38% of global economy</p>
@@ -61,7 +61,7 @@ const EconomicStats = () => {
                 prefix="$" 
                 suffix=" Trillion" 
                 highlightColor="text-white"
-                fontSize="text-5xl md:text-6xl"
+                fontSize="text-5xl md:text-6xl lg:text-7xl"
               />
             </div>
             <p className="mt-4 text-white/90 text-center font-medium">Within the next decade</p>
@@ -77,7 +77,7 @@ const EconomicStats = () => {
                 targetNumber={7.5} 
                 suffix="x"
                 highlightColor="text-primary" 
-                fontSize="text-6xl md:text-7xl font-bold"
+                fontSize="text-6xl md:text-7xl lg:text-8xl font-bold"
               />
             </div>
             <p className="mt-4 text-muted-foreground text-center font-medium">Increase in economic potential</p>
