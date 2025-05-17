@@ -42,8 +42,9 @@ const EconomicStats = () => {
               <CounterAnimation 
                 targetNumber={404.6} 
                 prefix="$" 
-                suffix=" billion"
+                suffix=" Billion"
                 highlightColor="text-primary"
+                fontSize="text-5xl md:text-6xl"
               />
             </div>
             <p className="mt-4 text-muted-foreground text-center font-medium">Only 0.38% of global economy</p>
@@ -58,8 +59,9 @@ const EconomicStats = () => {
               <CounterAnimation 
                 targetNumber={3} 
                 prefix="$" 
-                suffix=" trillion" 
+                suffix=" Trillion" 
                 highlightColor="text-white"
+                fontSize="text-5xl md:text-6xl"
               />
             </div>
             <p className="mt-4 text-white/90 text-center font-medium">Within the next decade</p>
@@ -75,6 +77,7 @@ const EconomicStats = () => {
                 targetNumber={7.5} 
                 suffix="x"
                 highlightColor="text-primary" 
+                fontSize="text-6xl md:text-7xl font-bold"
               />
             </div>
             <p className="mt-4 text-muted-foreground text-center font-medium">Increase in economic potential</p>

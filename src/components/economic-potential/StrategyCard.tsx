@@ -32,28 +32,28 @@ const StrategyCard = ({
       transition={{ duration: 0.5, delay: number * 0.1 }}
     >
       <Card 
-        className={`overflow-hidden transition-all duration-300 border ${
-          isOpen || isHovered ? 'border-primary shadow-lg shadow-primary/5' : 'border-border'
+        className={`overflow-hidden transition-all duration-300 transform ${
+          isOpen || isHovered ? 'border-primary shadow-lg shadow-primary/10 scale-[1.01]' : 'border-border shadow-sm'
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         <button
           onClick={toggleOpen}
-          className="w-full flex items-center justify-between p-5 text-left bg-gradient-to-r"
+          className="w-full flex items-center justify-between p-5 text-left"
           aria-expanded={isOpen}
         >
           <div className="flex items-center gap-4">
-            <div className={`flex items-center justify-center w-12 h-12 rounded-lg ${
+            <div className={`flex items-center justify-center w-14 h-14 rounded-lg ${
               isOpen || isHovered ? 'bg-primary text-white' : 'bg-primary/10 text-primary'
             } transition-colors duration-300`}>
-              <Icon size={24} />
+              <Icon size={24} strokeWidth={2.5} />
             </div>
-            <div>
-              <div className="text-xs text-muted-foreground font-medium mb-1">
-                Strategic Driver #{number}
+            <div className="text-left">
+              <div className="text-xs text-muted-foreground font-semibold mb-1">
+                DRIVER #{number}
               </div>
-              <div className="font-semibold text-lg">{title}</div>
+              <div className="font-semibold text-lg leading-tight">{title}</div>
             </div>
           </div>
           <div className={`text-muted-foreground ${isOpen || isHovered ? 'text-primary' : ''} transition-colors duration-300`}>
@@ -62,7 +62,7 @@ const StrategyCard = ({
         </button>
         
         <motion.div 
-          className="bg-muted/5 border-t border-border px-5"
+          className="bg-muted/5 border-t border-border"
           initial={false}
           animate={{ 
             height: isOpen ? 'auto' : 0,
@@ -70,8 +70,8 @@ const StrategyCard = ({
           }}
           transition={{ duration: 0.3 }}
         >
-          <div className="py-4">
-            <p className="text-muted-foreground">
+          <div className="p-5">
+            <p className="text-muted-foreground text-left">
               {description}
             </p>
           </div>

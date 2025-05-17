@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import StrategyCard from './StrategyCard';
+import { motion } from 'framer-motion';
 import { 
   TrendingUp, DollarSign, Users, Briefcase, 
   Rocket, Lightbulb, Building, Handshake, 
@@ -76,14 +77,26 @@ const StrategicDrivers = () => {
   };
 
   return (
-    <div className="mb-16 md:mb-24">
-      <div className="flex items-center gap-4 mb-8">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="mb-16 md:mb-24"
+    >
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="flex items-center gap-4 mb-10"
+      >
         <div className="h-0.5 flex-grow bg-gradient-to-r from-primary/10 to-primary"></div>
         <h3 className="text-2xl md:text-3xl font-bold text-foreground whitespace-nowrap">
           10 Strategic Drivers
         </h3>
         <div className="h-0.5 flex-grow bg-gradient-to-l from-primary/10 to-primary"></div>
-      </div>
+      </motion.div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {strategies.map((strategy, index) => (
@@ -98,7 +111,7 @@ const StrategicDrivers = () => {
           />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

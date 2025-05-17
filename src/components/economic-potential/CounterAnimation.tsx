@@ -7,6 +7,7 @@ interface CounterAnimationProps {
   suffix?: string;
   duration?: number;
   highlightColor?: string;
+  fontSize?: string;
 }
 
 const CounterAnimation = ({ 
@@ -14,7 +15,8 @@ const CounterAnimation = ({
   prefix = "", 
   suffix = "", 
   duration = 2000,
-  highlightColor = "text-primary" 
+  highlightColor = "text-primary",
+  fontSize = "text-4xl md:text-5xl lg:text-6xl"
 }: CounterAnimationProps) => {
   const [count, setCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -68,7 +70,7 @@ const CounterAnimation = ({
 
   return (
     <div ref={counterRef} className="text-center">
-      <div className={`text-4xl md:text-5xl lg:text-6xl font-bold ${highlightColor}`}>
+      <div className={`${fontSize} font-bold ${highlightColor}`}>
         {prefix}<span className="tabular-nums">{count.toLocaleString()}</span>{suffix}
       </div>
     </div>

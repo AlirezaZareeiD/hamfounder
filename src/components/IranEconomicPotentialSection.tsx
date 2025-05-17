@@ -31,15 +31,15 @@ const IranEconomicPotentialSection = () => {
   }, []);
   
   return (
-    <section id="economic-potential" className="py-20 md:py-32 bg-white overflow-hidden" ref={sectionRef}>
+    <section id="economic-potential" className="py-20 md:py-28 bg-white overflow-hidden" ref={sectionRef}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Section Title */}
+        {/* Section Title - Fixed padding issue with 'g' */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="text-center mb-12 md:mb-20"
+          className="text-center mb-10 md:mb-16 pb-2"
         >
           <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600 mb-6 leading-tight">
             Unleashing Iran's Economic Potential
@@ -47,16 +47,16 @@ const IranEconomicPotentialSection = () => {
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             A Global Call to Action
           </p>
-          <Separator className="mt-12 max-w-xs mx-auto" />
+          <Separator className="mt-10 max-w-xs mx-auto" />
         </motion.div>
         
-        {/* Vision Title */}
+        {/* Vision Title - Fixed spacing issue */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <h3 className="text-2xl md:text-3xl font-semibold text-primary">
             From Startup Dreams to National Impact
@@ -67,7 +67,7 @@ const IranEconomicPotentialSection = () => {
         <EconomicStats />
         
         {/* Main Content */}
-        <div className="mb-20 md:mb-32">
+        <div className="mb-20 md:mb-28">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -78,7 +78,7 @@ const IranEconomicPotentialSection = () => {
             <div className="grid md:grid-cols-2 gap-x-16 gap-y-8">
               <div className="bg-white rounded-xl p-8 shadow-lg shadow-primary/5 border-l-4 border-primary flex flex-col space-y-5">
                 <p className="text-xl leading-relaxed text-left">
-                  The vision ahead is bold: reaching <span className="text-primary font-semibold">$3 trillion</span> within the next decade. It may sound audacious, but it's not impossible. The real question isn't if it's achievable—it's how.
+                  The vision ahead is bold: reaching <span className="text-primary font-semibold">$3 Trillion</span> within the next decade. It may sound audacious, but it's not impossible. The real question isn't if it's achievable—it's how.
                 </p>
                 
                 <p className="text-xl leading-relaxed text-left">
