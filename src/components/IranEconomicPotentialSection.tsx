@@ -33,25 +33,14 @@ const IranEconomicPotentialSection = () => {
   return (
     <section id="economic-potential" className="py-20 md:py-28 bg-white overflow-visible" ref={sectionRef}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Section Title - Apple-inspired design */}
+        {/* Restoring the original section title */}
         <div className="mb-20">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="text-center"
-          >
-            <span className="text-sm text-primary font-semibold tracking-wider uppercase block mb-3">
-              Economic Growth
-            </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-10 leading-[1.1]">
-              Unleashing Iran's <br/>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
-                Economic Potential
-              </span>
-            </h2>
-          </motion.div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-6 leading-tight">
+            Unleashing Iran's <span className="text-primary">Economic Potential</span>
+          </h2>
+          <p className="text-xl md:text-2xl text-center text-slate-600 max-w-3xl mx-auto">
+            From current GDP of $404 Billion to a vision of $3 Trillion through strategic economic transformation
+          </p>
         </div>
         
         {/* Economic Stats Section */}
