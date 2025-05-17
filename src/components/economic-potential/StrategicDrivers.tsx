@@ -3,7 +3,7 @@ import { useState } from 'react';
 import StrategyCard from './StrategyCard';
 import { motion } from 'framer-motion';
 import { 
-  Globe, Award, Building, Rocket, 
+  Globe, Shield, Building, Rocket, 
   Lightbulb, Handshake, GraduationCap, 
   Target, Map, Presentation
 } from 'lucide-react';
@@ -22,7 +22,7 @@ const StrategicDrivers = () => {
   const strategies: Strategy[] = [
     { 
       title: "Macroeconomic Stability & Financial Reform", 
-      icon: Award,
+      icon: Shield,
       description: "Creating the foundations for sustainable growth through monetary policy reform, inflation control, and modern financial infrastructure that supports business innovation."
     },
     { 

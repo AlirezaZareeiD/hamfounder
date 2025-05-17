@@ -46,6 +46,11 @@ const IranEconomicPotentialSection = () => {
         {/* Economic Stats Section */}
         <EconomicStats />
         
+        {/* Call to Action - Moved here */}
+        <div className="my-16 md:my-20">
+          <CallToAction />
+        </div>
+        
         {/* Vision Content - Apple-inspired cards layout with updated headings */}
         <div className="mb-20 md:mb-28">
           <motion.div 
@@ -96,9 +101,6 @@ const IranEconomicPotentialSection = () => {
         
         {/* Strategic Drivers Section */}
         <StrategicDrivers />
-        
-        {/* Call to Action */}
-        <CallToAction />
       </div>
     </section>
   );
