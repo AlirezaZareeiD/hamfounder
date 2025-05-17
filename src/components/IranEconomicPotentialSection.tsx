@@ -33,21 +33,21 @@ const IranEconomicPotentialSection = () => {
   return (
     <section id="economic-potential" className="py-20 md:py-28 bg-white overflow-hidden" ref={sectionRef}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Section Title - Increased padding to prevent 'g' being cut off */}
+        {/* Section Title - Fixed padding to properly display the 'g' character */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="text-center mb-14 pb-8" // Increased bottom padding to fix 'g' cutoff
+          className="text-center mb-20 pb-10" // Increased bottom margins significantly
         >
-          <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600 mb-8 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600 mb-10 leading-relaxed">
             Unleashing Iran's Economic Potential
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mt-4">
             From Startup Dreams to National Impact
           </p>
-          <Separator className="mt-12 max-w-xs mx-auto" />
+          <Separator className="mt-14 max-w-xs mx-auto" />
         </motion.div>
         
         {/* Economic Stats Section */}
