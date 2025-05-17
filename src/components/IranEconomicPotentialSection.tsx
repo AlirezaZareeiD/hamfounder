@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator';
 import EconomicStats from './economic-potential/EconomicStats';
 import StrategicDrivers from './economic-potential/StrategicDrivers';
 import CallToAction from './economic-potential/CallToAction';
+import { motion } from 'framer-motion';
 
 const IranEconomicPotentialSection = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -30,45 +31,77 @@ const IranEconomicPotentialSection = () => {
   }, []);
   
   return (
-    <section id="economic-potential" className="py-16 md:py-20 bg-white overflow-hidden" ref={sectionRef}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="economic-potential" className="py-20 md:py-32 bg-white overflow-hidden" ref={sectionRef}>
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Title */}
-        <div className="text-center mb-12 md:mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
-          <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 mb-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-12 md:mb-20"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600 mb-6 leading-tight">
             Unleashing Iran's Economic Potential
           </h2>
-          <p className="text-lg text-muted-foreground">A Global Call to Action</p>
-          <Separator className="mt-8 max-w-xs mx-auto" />
-        </div>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            A Global Call to Action
+          </p>
+          <Separator className="mt-12 max-w-xs mx-auto" />
+        </motion.div>
         
-        {/* Highlighted Intro */}
-        <div className="text-center mb-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
-          <h3 className="text-2xl md:text-3xl font-semibold mb-4 text-primary">
+        {/* Vision Title */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-center mb-16"
+        >
+          <h3 className="text-2xl md:text-3xl font-semibold text-primary">
             From Startup Dreams to National Impact
           </h3>
-        </div>
+        </motion.div>
         
-        {/* Economic Numbers - Cards with Animation */}
+        {/* Economic Stats Section */}
         <EconomicStats />
         
         {/* Main Content */}
-        <div className="grid md:grid-cols-2 gap-x-10 gap-y-6 mb-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-300">
-          <p className="text-lg text-left">
-            The vision ahead is bold: reaching $3 trillion within the next decade. It may sound audacious, but it's not impossible. The real question isn't if it's achievable—it's how.
-          </p>
-          <p className="text-lg text-left">
-            At Hamfounder, we believe the answer starts with us: the global Iranian startup ecosystem.
-          </p>
-          <p className="text-lg text-left md:col-span-2">
-            Our diaspora holds some of the brightest minds, boldest builders, and most resilient innovators. When united under one shared vision, we have the power to ignite a generational movement—one that redefines what Iran can contribute to the global economy.
-          </p>
-          <Separator className="my-4 md:col-span-2" />
-          <p className="text-lg md:col-span-2 font-medium border-l-4 border-primary pl-4 py-2 bg-primary/5">
-            That's why Hamfounder isn't just about finding co-founders or building startups. It's about building economic transformation through entrepreneurship.
-          </p>
+        <div className="mb-20 md:mb-32">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="max-w-7xl mx-auto"
+          >
+            <div className="grid md:grid-cols-2 gap-x-16 gap-y-8">
+              <div className="bg-white rounded-xl p-8 shadow-lg shadow-primary/5 border-l-4 border-primary flex flex-col space-y-5">
+                <p className="text-xl leading-relaxed text-left">
+                  The vision ahead is bold: reaching <span className="text-primary font-semibold">$3 trillion</span> within the next decade. It may sound audacious, but it's not impossible. The real question isn't if it's achievable—it's how.
+                </p>
+                
+                <p className="text-xl leading-relaxed text-left">
+                  At Hamfounder, we believe the answer starts with us: the global Iranian startup ecosystem.
+                </p>
+              </div>
+              
+              <div className="flex flex-col justify-center">
+                <p className="text-xl leading-relaxed text-left mb-6">
+                  Our diaspora holds some of the brightest minds, boldest builders, and most resilient innovators. When united under one shared vision, we have the power to ignite a generational movement.
+                </p>
+                
+                <div className="bg-gradient-to-r from-primary/5 to-blue-50 rounded-lg p-5 border-l-4 border-primary">
+                  <p className="text-xl font-medium text-left">
+                    That's why Hamfounder isn't just about finding co-founders or building startups. It's about building economic transformation through entrepreneurship.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
         
-        {/* 10 Strategic Drivers Section */}
+        {/* Strategic Drivers Section */}
         <StrategicDrivers />
         
         {/* Call to Action */}

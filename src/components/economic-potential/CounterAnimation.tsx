@@ -6,13 +6,15 @@ interface CounterAnimationProps {
   prefix?: string;
   suffix?: string;
   duration?: number;
+  highlightColor?: string;
 }
 
 const CounterAnimation = ({ 
   targetNumber, 
   prefix = "", 
   suffix = "", 
-  duration = 2000 
+  duration = 2000,
+  highlightColor = "text-primary" 
 }: CounterAnimationProps) => {
   const [count, setCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -65,8 +67,10 @@ const CounterAnimation = ({
   }, [targetNumber, duration, isVisible]);
 
   return (
-    <div ref={counterRef} className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary">
-      {prefix}{count.toLocaleString()}{suffix}
+    <div ref={counterRef} className="text-center">
+      <div className={`text-4xl md:text-5xl lg:text-6xl font-bold ${highlightColor}`}>
+        {prefix}<span className="tabular-nums">{count.toLocaleString()}</span>{suffix}
+      </div>
     </div>
   );
 };
