@@ -31,10 +31,10 @@ const IranEconomicPotentialSection = () => {
   }, []);
   
   return (
-    <section id="economic-potential" className="py-20 md:py-28 bg-white overflow-hidden" ref={sectionRef}>
+    <section id="economic-potential" className="py-20 md:py-28 bg-white overflow-visible" ref={sectionRef}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Section Title - Using margin approach with no bottom overflow */}
-        <div className="py-16">
+        {/* Section Title - Apple-inspired design */}
+        <div className="mb-20">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -42,51 +42,65 @@ const IranEconomicPotentialSection = () => {
             transition={{ duration: 0.7 }}
             className="text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600 mb-8 leading-relaxed">
-              Unleashing Iran's Economic Potential
+            <span className="text-sm text-primary font-semibold tracking-wider uppercase block mb-3">
+              Economic Growth
+            </span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-10 leading-[1.1]">
+              Unleashing Iran's <br/>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
+                Economic Potential
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mt-6">
-              From Startup Dreams to National Impact
-            </p>
-            <div className="h-10"></div>
-            <Separator className="max-w-xs mx-auto" />
           </motion.div>
         </div>
         
         {/* Economic Stats Section */}
         <EconomicStats />
         
-        {/* Main Content */}
+        {/* Vision Content - Apple-inspired cards layout */}
         <div className="mb-20 md:mb-28">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="max-w-7xl mx-auto"
+            transition={{ duration: 0.5 }}
           >
-            <div className="grid md:grid-cols-2 gap-x-16 gap-y-8">
-              <div className="bg-white rounded-xl p-8 shadow-lg shadow-primary/5 border-l-4 border-primary flex flex-col space-y-5">
-                <p className="text-xl leading-relaxed text-left">
+            <div className="grid md:grid-cols-2 gap-8 md:gap-16">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="rounded-2xl p-8 md:p-10 bg-gradient-to-br from-slate-50 to-white shadow-xl border border-slate-100"
+              >
+                <h3 className="text-2xl md:text-3xl font-semibold mb-6 text-slate-800">The Vision</h3>
+                <p className="text-xl leading-relaxed text-slate-700 mb-6">
                   The vision ahead is bold: reaching <span className="text-primary font-semibold">$3 Trillion</span> within the next decade. It may sound audacious, but it's not impossible. The real question isn't if it's achievable—it's how.
                 </p>
                 
-                <p className="text-xl leading-relaxed text-left">
+                <p className="text-xl leading-relaxed text-slate-700">
                   At Hamfounder, we believe the answer starts with us: the global Iranian startup ecosystem.
                 </p>
-              </div>
+              </motion.div>
               
-              <div className="flex flex-col justify-center">
-                <p className="text-xl leading-relaxed text-left mb-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="rounded-2xl p-8 md:p-10 bg-gradient-to-br from-primary/[0.03] to-blue-500/[0.03] shadow-xl border border-primary/10"
+              >
+                <h3 className="text-2xl md:text-3xl font-semibold mb-6 text-slate-800">The Movement</h3>
+                <p className="text-xl leading-relaxed text-slate-700 mb-6">
                   Our diaspora holds some of the brightest minds, boldest builders, and most resilient innovators. When united under one shared vision, we have the power to ignite a generational movement.
                 </p>
                 
-                <div className="bg-gradient-to-r from-primary/5 to-blue-50 rounded-lg p-5 border-l-4 border-primary">
-                  <p className="text-xl font-medium text-left">
+                <div className="rounded-xl p-6 bg-slate-800 text-white">
+                  <p className="text-xl font-medium">
                     That's why Hamfounder isn't just about finding co-founders or building startups. It's about building economic transformation through entrepreneurship.
                   </p>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
