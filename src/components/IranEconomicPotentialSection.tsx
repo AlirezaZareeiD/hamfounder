@@ -1,11 +1,10 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, TrendingUp, DollarSign, Users, Briefcase, Rocket, LightBulb, Building, HandShake, LinkIcon, BadgeCheck, Flag } from 'lucide-react';
+import { ChevronDown, ChevronUp, TrendingUp, DollarSign, Users, Briefcase, Rocket, Lightbulb, Building, Handshake, LinkIcon, BadgeCheck, Flag } from 'lucide-react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 const CounterAnimation = ({ targetNumber, prefix = "", suffix = "", duration = 2000 }) => {
@@ -110,8 +109,8 @@ const IranEconomicPotentialSection = () => {
     { title: "Governance & Business Climate Reform", icon: Building },
     { title: "FDI and Diaspora Investment Channels", icon: Briefcase },
     { title: "Smart Export Acceleration", icon: TrendingUp },
-    { title: "Tech & Innovation Ecosystems", icon: LightBulb },
-    { title: "Infrastructure Revamp through Public-Private Partnerships", icon: HandShake },
+    { title: "Tech & Innovation Ecosystems", icon: Lightbulb },
+    { title: "Infrastructure Revamp through Public-Private Partnerships", icon: Handshake },
     { title: "Skills Revolution & Talent Pipeline", icon: Users },
     { title: "AgTech and Resource Sustainability", icon: Rocket },
     { title: "Tourism & Experience Economy Expansion", icon: Flag },
