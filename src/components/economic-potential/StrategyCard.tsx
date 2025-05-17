@@ -48,9 +48,9 @@ const StrategyCard = ({
           <div className="flex items-center gap-5">
             <div className={`flex items-center justify-center w-16 h-16 rounded-xl ${
               isOpen || isHovered 
-                ? 'bg-primary text-white' 
-                : 'bg-slate-100 text-slate-700'
-            } transition-colors duration-300`}>
+                ? 'bg-gradient-to-br from-purple-500 to-blue-500 text-white' 
+                : 'bg-gradient-to-br from-purple-100 to-blue-100 text-purple-500'
+            } transition-all duration-300 shadow-md`}>
               <Icon size={28} strokeWidth={2} />
             </div>
             <div className="text-left">

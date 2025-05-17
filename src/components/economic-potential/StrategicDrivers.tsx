@@ -3,9 +3,9 @@ import { useState } from 'react';
 import StrategyCard from './StrategyCard';
 import { motion } from 'framer-motion';
 import { 
-  TrendingUp, DollarSign, Users, Briefcase, 
-  Rocket, Lightbulb, Building, Handshake, 
-  BadgeCheck, Flag 
+  Globe, Award, Building, Rocket, 
+  Lightbulb, Handshake, GraduationCap, 
+  Target, Map, Presentation
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
@@ -22,7 +22,7 @@ const StrategicDrivers = () => {
   const strategies: Strategy[] = [
     { 
       title: "Macroeconomic Stability & Financial Reform", 
-      icon: DollarSign,
+      icon: Award,
       description: "Creating the foundations for sustainable growth through monetary policy reform, inflation control, and modern financial infrastructure that supports business innovation."
     },
     { 
@@ -32,12 +32,12 @@ const StrategicDrivers = () => {
     },
     { 
       title: "FDI and Diaspora Investment Channels", 
-      icon: Briefcase,
+      icon: Globe,
       description: "Building structured pathways for global Iranian capital to flow back into the country through transparent, secure investment vehicles and cross-border partnerships."
     },
     { 
       title: "Smart Export Acceleration", 
-      icon: TrendingUp,
+      icon: Target,
       description: "Identifying and developing high-value export categories where Iran can compete globally, focusing on knowledge-intensive products and services."
     },
     { 
@@ -52,7 +52,7 @@ const StrategicDrivers = () => {
     },
     { 
       title: "Skills Revolution & Talent Pipeline", 
-      icon: Users,
+      icon: GraduationCap,
       description: "Transforming education and professional development to prepare Iran's workforce for high-growth global industries and future economic opportunities."
     },
     { 
@@ -62,12 +62,12 @@ const StrategicDrivers = () => {
     },
     { 
       title: "Tourism & Experience Economy Expansion", 
-      icon: Flag,
+      icon: Map,
       description: "Developing Iran's immense potential in cultural, historical and experiential tourism to create jobs and generate foreign exchange."
     },
     { 
       title: "National Task Force for Growth", 
-      icon: BadgeCheck,
+      icon: Presentation,
       description: "Establishing a cross-sector coordinating body to align public and private initiatives toward the shared vision of transformational economic growth."
     }
   ];
