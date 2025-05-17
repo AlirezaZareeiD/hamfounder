@@ -52,18 +52,18 @@ const IranEconomicPotentialSection = () => {
         <EconomicStats />
         
         {/* Main Content */}
-        <div className="max-w-3xl mx-auto mb-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-300">
-          <p className="text-lg text-center mb-6">
+        <div className="grid md:grid-cols-2 gap-x-10 gap-y-6 mb-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-300">
+          <p className="text-lg text-left">
             The vision ahead is bold: reaching $3 trillion within the next decade. It may sound audacious, but it's not impossible. The real question isn't if it's achievable—it's how.
           </p>
-          <p className="text-lg text-center mb-6">
+          <p className="text-lg text-left">
             At Hamfounder, we believe the answer starts with us: the global Iranian startup ecosystem.
           </p>
-          <p className="text-lg text-center mb-8">
+          <p className="text-lg text-left md:col-span-2">
             Our diaspora holds some of the brightest minds, boldest builders, and most resilient innovators. When united under one shared vision, we have the power to ignite a generational movement—one that redefines what Iran can contribute to the global economy.
           </p>
-          <Separator className="my-8 max-w-md mx-auto" />
-          <p className="text-lg text-center font-medium">
+          <Separator className="my-4 md:col-span-2" />
+          <p className="text-lg md:col-span-2 font-medium border-l-4 border-primary pl-4 py-2 bg-primary/5">
             That's why Hamfounder isn't just about finding co-founders or building startups. It's about building economic transformation through entrepreneurship.
           </p>
         </div>
