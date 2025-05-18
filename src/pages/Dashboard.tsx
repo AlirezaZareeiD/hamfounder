@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "@/lib/firebase";
@@ -14,11 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LearningHub from "@/components/dashboard/LearningHub";
 import EventsCommunity from "@/components/dashboard/EventsCommunity";
 import NotificationsPanel from "@/components/dashboard/NotificationsPanel";
-<<<<<<< HEAD
 import FounderRoadmapSection from '@/components/FounderRoadmapSection';
 import TrustBuildingSection from '@/components/TrustBuildingSection';
-=======
->>>>>>> origin/main
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -73,11 +66,7 @@ const Dashboard = () => {
       <main className="py-8 px-4 sm:px-6">
         <div className="container max-w-7xl mx-auto">
           <div className="bg-white shadow rounded-lg p-6">
-<<<<<<< HEAD
             <h1 className="text-2xl font-bold text-slate-900 mb-6"> Welcome to Your Personal Dashboard!</h1>
-=======
-            <h1 className="text-2xl font-bold text-slate-900 mb-6">Hamfounder Dashboard</h1>
->>>>>>> origin/main
             
             <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="mb-6 w-full max-w-full justify-start overflow-x-auto">

@@ -71,12 +71,7 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
-<<<<<<< HEAD
         <EconomicPotentialSection />
-=======
-        <IranEconomicPotentialSection />
-        <OurMissionSection />
->>>>>>> origin/main
         <GlobalImpactSection />
         <OurMissionSection />
         <EcosystemPillarsSection />

@@ -97,9 +97,6 @@ const HeroSection = () => {
               variant="default"
               className="bg-[#0ea5e9] hover:bg-[#0891d2] text-white text-base sm:text-lg py-5 sm:py-6 px-6 sm:px-8 rounded-md transform transition-transform duration-300 hover:scale-105 h-auto"
             >
-              <Link to="/dashboard">
-                View Dashboard
-              </Link>
             </Button>
           </div>
         </div>
