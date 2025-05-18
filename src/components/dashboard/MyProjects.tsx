@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 import React, { useState } from 'react';
 import { 
   Plus, 

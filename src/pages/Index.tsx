@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/navbar/Navbar';
 import HeroSection from '@/components/HeroSection';
+import IranEconomicPotentialSection from '@/components/IranEconomicPotentialSection';
 import GlobalImpactSection from '@/components/GlobalImpactSection';
 import OurMissionSection from '@/components/OurMissionSection';
 import PathToPartnershipSection from '@/components/PathToPartnershipSection';
@@ -70,7 +71,12 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
+<<<<<<< HEAD
         <EconomicPotentialSection />
+=======
+        <IranEconomicPotentialSection />
+        <OurMissionSection />
+>>>>>>> origin/main
         <GlobalImpactSection />
         <OurMissionSection />
         <EcosystemPillarsSection />
