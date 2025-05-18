@@ -11,10 +11,9 @@ import StartupSpotlightSection from '@/components/StartupSpotlightSection';
 import FinalCTASection from '@/components/FinalCTASection';
 import Footer from '@/components/Footer';
 import EcosystemPillarsSection from '@/components/EcosystemPillarsSection';
-import TrustBuildingSection from '@/components/TrustBuildingSection';
 import PartnersIntegrationsSection from '@/components/PartnersIntegrationsSection';
-import FounderRoadmapSection from '@/components/FounderRoadmapSection';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
+import EconomicPotentialSection from '@/components/EconomicPotentialSection';
 import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
@@ -71,16 +70,15 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
-        <OurMissionSection />
+        <EconomicPotentialSection />
         <GlobalImpactSection />
-        <PathToPartnershipSection />
+        <OurMissionSection />
         <EcosystemPillarsSection />
-        <FounderRoadmapSection />
+        <PathToPartnershipSection />
         <StartupSpotlightSection />
-        <TrustBuildingSection />
+        <PartnersIntegrationsSection />
         <EcosystemAdvantageSection />
         <FounderWisdomSection />
-        <PartnersIntegrationsSection />
         <FinalCTASection onSubmit={handleEmailSubmit} submitted={submitted} />
       </main>
       <ScrollToTopButton />

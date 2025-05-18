@@ -1,20 +1,27 @@
-
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "@/lib/firebase";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { signOut } from "firebase/auth";
 import { toast } from "@/hooks/use-toast";
+import MyProjects from "@/components/dashboard/MyProjects";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LearningHub from "@/components/dashboard/LearningHub";
+import EventsCommunity from "@/components/dashboard/EventsCommunity";
+import NotificationsPanel from "@/components/dashboard/NotificationsPanel";
+import FounderRoadmapSection from '@/components/FounderRoadmapSection';
+import TrustBuildingSection from '@/components/TrustBuildingSection';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const user = auth.currentUser;
+  const [activeTab, setActiveTab] = useState("projects");
 
   useEffect(() => {
     // Redirect to login page if user is not authenticated
     if (!user) {
-      navigate('/');
+      navigate('/login');
       return;
     }
   }, [user, navigate]);
@@ -59,11 +66,38 @@ const Dashboard = () => {
       <main className="py-8 px-4 sm:px-6">
         <div className="container max-w-7xl mx-auto">
           <div className="bg-white shadow rounded-lg p-6">
-            <h1 className="text-2xl font-bold text-slate-900 mb-6">Hamfounder Dashboard</h1>
-            <p className="text-slate-600">
-              Welcome! This is your dashboard. In the final version, here you'll be able to complete your profile information and connect with the Iranian innovator network worldwide.
-            </p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-6"> Welcome to Your Personal Dashboard!</h1>
+            
+            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="mb-6 w-full max-w-full justify-start overflow-x-auto">
+                <TabsTrigger value="projects">My Projects</TabsTrigger>
+                <TabsTrigger value="learning">Learning Hub</TabsTrigger>
+                <TabsTrigger value="events">Events & Community</TabsTrigger>
+                <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="projects">
+                <MyProjects />
+              </TabsContent>
+              
+              <TabsContent value="learning">
+                <LearningHub />
+              </TabsContent>
+              
+              <TabsContent value="events">
+                <EventsCommunity />
+              </TabsContent>
+              
+              <TabsContent value="notifications">
+                <NotificationsPanel />
+              </TabsContent>
+            </Tabs>
           </div>
+
+          <div><TrustBuildingSection /></div>
+          <div><FounderRoadmapSection /></div>
+          
+
         </div>
       </main>
     </div>
