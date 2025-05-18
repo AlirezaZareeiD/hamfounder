@@ -1,23 +1,21 @@
 
-import { useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "@/lib/firebase";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { signOut } from "firebase/auth";
 import { toast } from "@/hooks/use-toast";
+import MyProjects from "@/components/dashboard/MyProjects";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LearningHub from "@/components/dashboard/LearningHub";
+import EventsCommunity from "@/components/dashboard/EventsCommunity";
+import NotificationsPanel from "@/components/dashboard/NotificationsPanel";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const user = auth.currentUser;
-
-  useEffect(() => {
-    // Redirect to login page if user is not authenticated
-    if (!user) {
-      navigate('/');
-      return;
-    }
-  }, [user, navigate]);
+  const [activeTab, setActiveTab] = useState("projects");
 
   const handleSignOut = async () => {
     try {
@@ -36,10 +34,6 @@ const Dashboard = () => {
     }
   };
 
-  if (!user) {
-    return null; // Loading or redirecting state
-  }
-
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -47,10 +41,16 @@ const Dashboard = () => {
         <div className="container max-w-7xl mx-auto flex justify-between items-center">
           <Logo />
           <div className="flex items-center space-x-4">
-            <span className="text-slate-700">
-              {user.email}
-            </span>
-            <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
+            {user ? (
+              <>
+                <span className="text-slate-700">
+                  {user.email}
+                </span>
+                <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
+              </>
+            ) : (
+              <Button variant="outline" onClick={() => navigate('/login')}>Sign In</Button>
+            )}
           </div>
         </div>
       </header>
@@ -60,9 +60,37 @@ const Dashboard = () => {
         <div className="container max-w-7xl mx-auto">
           <div className="bg-white shadow rounded-lg p-6">
             <h1 className="text-2xl font-bold text-slate-900 mb-6">Hamfounder Dashboard</h1>
-            <p className="text-slate-600">
-              Welcome! This is your dashboard. In the final version, here you'll be able to complete your profile information and connect with the Iranian innovator network worldwide.
-            </p>
+            
+            {!user && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-700 p-4 rounded-md mb-6">
+                <p>You are viewing the dashboard in demo mode. <Button variant="link" className="p-0 h-auto" onClick={() => navigate('/login')}>Sign in</Button> to access all features.</p>
+              </div>
+            )}
+            
+            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="mb-6 w-full max-w-full justify-start overflow-x-auto">
+                <TabsTrigger value="projects">My Projects</TabsTrigger>
+                <TabsTrigger value="learning">Learning Hub</TabsTrigger>
+                <TabsTrigger value="events">Events & Community</TabsTrigger>
+                <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="projects">
+                <MyProjects />
+              </TabsContent>
+              
+              <TabsContent value="learning">
+                <LearningHub />
+              </TabsContent>
+              
+              <TabsContent value="events">
+                <EventsCommunity />
+              </TabsContent>
+              
+              <TabsContent value="notifications">
+                <NotificationsPanel />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </main>
