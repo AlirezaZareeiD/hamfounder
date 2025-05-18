@@ -1,15 +1,15 @@
+
 import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ChevronDown } from 'lucide-react';
-
+import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   const headerRef = useRef<HTMLHeadingElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const btnContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -25,11 +25,9 @@ const HeroSection = () => {
       { threshold: 0.1 }
     );
 
-
     if (headerRef.current) observer.observe(headerRef.current);
     if (descriptionRef.current) observer.observe(descriptionRef.current);
     if (btnContainerRef.current) observer.observe(btnContainerRef.current);
-
 
     return () => {
       if (headerRef.current) observer.unobserve(headerRef.current);
@@ -37,7 +35,6 @@ const HeroSection = () => {
       if (btnContainerRef.current) observer.unobserve(btnContainerRef.current);
     };
   }, []);
-
 
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
@@ -51,7 +48,6 @@ const HeroSection = () => {
       });
     }
   };
-
 
   return (
     <section id="top" className="relative min-h-[90vh] sm:min-h-[70vh] flex items-center justify-center text-center">
@@ -96,10 +92,18 @@ const HeroSection = () => {
             >
               Join Early Access
             </Button>
+            <Button
+              asChild
+              variant="default"
+              className="bg-[#0ea5e9] hover:bg-[#0891d2] text-white text-base sm:text-lg py-5 sm:py-6 px-6 sm:px-8 rounded-md transform transition-transform duration-300 hover:scale-105 h-auto"
+            >
+              <Link to="/dashboard">
+                View Dashboard
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
-
 
       <div
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10 cursor-pointer"
@@ -111,6 +115,5 @@ const HeroSection = () => {
     </section>
   );
 };
-
 
 export default HeroSection;
