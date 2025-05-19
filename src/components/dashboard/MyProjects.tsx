@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Plus, 
-  Users, 
-  Calendar, 
-  MoreVertical, 
+import {
+  Plus,
+  Users,
+  Calendar,
+  MoreVertical,
   ChevronRight,
   Rocket,
   Lock,
@@ -26,7 +26,7 @@ import {
 
 const MyProjects = () => {
   const [filter, setFilter] = useState("all");
-  
+
   // Mock data for projects
   const projects = [
     {
@@ -83,7 +83,7 @@ const MyProjects = () => {
   ];
 
   // Filter projects based on the selected filter
-  const filteredProjects = filter === 'all' ? projects : 
+  const filteredProjects = filter === 'all' ? projects :
     projects.filter(project => {
       if (filter === 'private') return project.isPrivate;
       if (filter === 'public') return !project.isPrivate;
@@ -94,9 +94,9 @@ const MyProjects = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-slate-900">My Projects</h1>
-        
-        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-          <div className="relative">
+
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center w-full sm:w-auto"> {/* Added w-full for mobile */}
+          <div className="relative w-full sm:w-auto"> {/* Added w-full for mobile */}
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <input
               type="text"
@@ -104,32 +104,32 @@ const MyProjects = () => {
               className="pl-9 pr-4 py-2 text-sm border rounded-md w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
           </div>
-          
-          <Button className="flex items-center gap-1">
+
+          <Button className="flex items-center gap-1 w-full sm:w-auto"> {/* Added w-full for mobile */}
             <Plus className="h-4 w-4" />
             New Project
           </Button>
         </div>
       </div>
-      
+
       <div className="flex gap-2 overflow-x-auto pb-2">
-        <Button 
-          variant={filter === 'all' ? 'default' : 'outline'} 
+        <Button
+          variant={filter === 'all' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setFilter('all')}
         >
           All Projects
         </Button>
-        <Button 
-          variant={filter === 'public' ? 'default' : 'outline'} 
+        <Button
+          variant={filter === 'public' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setFilter('public')}
         >
           <Globe className="h-4 w-4 mr-1" />
           Public
         </Button>
-        <Button 
-          variant={filter === 'private' ? 'default' : 'outline'} 
+        <Button
+          variant={filter === 'private' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setFilter('private')}
         >
@@ -137,12 +137,12 @@ const MyProjects = () => {
           Private
         </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProjects.map((project) => (
           <Card key={project.id} className="relative group hover:shadow-md transition-shadow">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold text-slate-800 flex items-center justify-between">
+              <CardTitle className="text-lg font-bold text-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0"> {/* Adjusted flex for mobile */}
                 <div className="flex items-center">
                   <span>{project.name}</span>
                   {project.isPrivate && <Lock className="h-4 w-4 text-slate-400 ml-2" />}
@@ -167,10 +167,10 @@ const MyProjects = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-slate-600 line-clamp-2">{project.description}</p>
-              
-              <div className="flex items-center justify-between text-sm">
-                <Badge 
-                  variant="outline" 
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm gap-2 sm:gap-0"> {/* Adjusted flex for mobile */}
+                <Badge
+                  variant="outline"
                   className={`
                     ${project.stage === 'Ideation' ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}
                     ${project.stage === 'Building' ? 'bg-purple-50 text-purple-600 border-purple-200' : ''}
@@ -183,7 +183,7 @@ const MyProjects = () => {
                 </Badge>
                 <span className="text-xs text-slate-500">Updated {project.lastUpdate}</span>
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Project Progress</span>
@@ -191,8 +191,8 @@ const MyProjects = () => {
                 </div>
                 <Progress value={project.progress} className="h-1.5" />
               </div>
-              
-              <div className="flex items-center justify-between">
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0"> {/* Adjusted flex for mobile */}
                 <div className="flex -space-x-2">
                   {project.team.map((member) => (
                     <Avatar key={member.id} className="border-2 border-white h-8 w-8">
@@ -211,7 +211,7 @@ const MyProjects = () => {
                   {project.tasks.completed}/{project.tasks.total} tasks
                 </div>
               </div>
-              
+
               <Button variant="outline" size="sm" className="w-full mt-2">
                 View Project <ChevronRight className="h-4 w-4 ml-1" />
               </Button>

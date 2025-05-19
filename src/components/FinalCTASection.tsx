@@ -66,12 +66,9 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
           
           <div className="text-sm text-white/80 mt-6 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4">
             <p>
-              Get notified when we launch. No spam, guaranteed.
+              Your future CoFounder might be one click away!
             </p>
-            <div className="border-l border-white/20 h-4 hidden sm:block"></div>
-            <Link to="/signup" className="text-white hover:text-white/90 font-medium underline underline-offset-4">
-              View Sign-up Page Demo
-            </Link>
+            
           </div>
         </div>
       </div>
@@ -80,3 +77,7 @@ const FinalCTASection = ({ onSubmit, submitted }: FinalCTASectionProps) => {
 };
 
 export default FinalCTASection;
+
+
+              
+   

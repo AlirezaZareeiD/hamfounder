@@ -76,11 +76,11 @@ const EconomicPotentialSection: React.FC = () => {
 
         {/* Main Titles - Centered and with Gradient Color */}
         <div className="text-center mb-12">
-             <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-900 to-blue-400 dark:from-blue-700 dark:to-blue-300">
-                Unleashing Iran's Economic Potential
+             <h2 className="text-3xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-900 to-blue-400 dark:from-blue-700 dark:to-blue-300 leading-tight">
+                United by Roots, Driven by Vision
              </h2>
              <h3 className="text-xl md:text-2xl font-semibold text-gray-700 dark:text-gray-300">
-                From Startup Dreams to National Impact
+                Where Global Founders Ignite a Nation’s Future
              </h3>
         </div>
 
@@ -90,7 +90,7 @@ const EconomicPotentialSection: React.FC = () => {
           {/* Current GDP Card */}
           <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-xl flex-1 min-w-[280px] max-w-xs border border-gray-200 dark:border-slate-600 text-center">
             <p className="text-lg text-gray-600 dark:text-gray-300">CURRENT GDP</p>
-            <p className="text-4xl font-bold text-green-600 dark:text-green-400">${currentGdpAnimated} Billion</p>
+            <p className="text-4xl font-bold text-gray-900 dark:text-white">${currentGdpAnimated} Billion</p>
             <p className="text-md text-gray-500 dark:text-gray-400">Only 0.38% of global economy</p>
           </div>
 
@@ -107,7 +107,7 @@ const EconomicPotentialSection: React.FC = () => {
             {/* Growth Multiplier Card */}
           <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-xl flex-1 min-w-[280px] max-w-xs border border-gray-200 dark:border-slate-600 text-center">
             <p className="text-lg text-gray-600 dark:text-gray-300">GROWTH MULTIPLIER</p>
-            <p className="text-4xl font-bold text-orange-600 dark:text-orange-400">{growthMultiplierAnimated}x</p>
+            <p className="text-6xl font-bold text-gray-900 dark:text-white">{growthMultiplierAnimated}x</p>
             <p className="text-md text-gray-500 dark:text-gray-400">Increase in economic potential</p>
           </div>
         </div>
@@ -132,12 +132,12 @@ const EconomicPotentialSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 text-left"> {/* Changed gap to gap-6 for consistency */}
             {/* The Vision Card - Light Background */}
             <div className="bg-white dark:bg-slate-700 p-8 rounded-lg shadow-xl border border-gray-200 dark:border-slate-600">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Vision</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our North Star</h3>
                  <p className="text-gray-700 dark:text-gray-200 mb-4">
-                    The vision ahead is bold: reaching ${targetGdpAnimated} trillion within the next decade. It may sound audacious, but it's not impossible. The real question isn't if it's achievable—it's how.
+                    We’ve set our sights on a bold destination: elevating Iran’s GDP from $404 billion to ${targetGdpAnimated} trillion within the next decade. It’s an ambitious leap—but not an impossible one. The real question isn’t it's achievable—it's how.
                 </p>
                  <p className="text-gray-700 dark:text-gray-200">
-                    At Hamfounder, we believe the answer starts with us: the global Iranian startup ecosystem.
+                    At Hamfounder, we believe the answer begins with us: connecting visionary Iranian minds across continents, sparking deep collaboration, and building ventures that can shape a stronger, more prosperous future for all.
                 </p>
             </div>
 

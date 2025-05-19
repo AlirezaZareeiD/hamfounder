@@ -60,7 +60,7 @@ const Footer = () => {
 
                 <div className="text-sm text-gray-300">
                   <span className="font-semibold block">Locations:</span>
-                  <span>Tehran, Iran • San Francisco, USA</span>
+                  <span>Isabel La Católica N24-274 y Galavis esq, IMPAQTO La Floresta - Quito , Pichincha, EC</span>
                 </div>
               </div>
             </div>
@@ -74,7 +74,7 @@ const Footer = () => {
                   <a href="#mission" className="text-gray-400 hover:text-blue-400 transition">Our Mission</a>
                 </li>
                 <li>
-                  <a href="#how-it-works" className="text-gray-400 hover:text-blue-400 transition">How It Works</a>
+                  <a href="#how-it-works" className="text-gray-400 hover:text-blue-400 transition">The Blueprint</a>
                 </li>
                 <li>
                   <a href="#global-network" className="text-gray-400 hover:text-blue-400 transition">Global Network</a>

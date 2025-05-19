@@ -56,7 +56,7 @@ const OurMissionSection = () => {
           <div className="lg:w-1/2">
             <div ref={headingRef} className="opacity-0 translate-x-[-50px] transition-all duration-700 ease-out">
               <div className="mb-6 inline-block">
-                <span className="bg-blue-100 text-blue-600 py-1 px-4 rounded-full text-sm font-medium">Our Vision</span>
+                <span className="bg-blue-100 text-blue-600 py-1 px-4 rounded-full text-sm font-medium">Our Mission</span>
               </div>
               
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-blue-500">

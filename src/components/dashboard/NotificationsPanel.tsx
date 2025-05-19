@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Bell, 
-  MessageSquare, 
-  UserPlus, 
-  Calendar, 
+import {
+  Bell,
+  MessageSquare,
+  UserPlus,
+  Calendar,
   HelpCircle,
   CheckCircle2,
   AlertCircle,
@@ -23,7 +23,7 @@ const NotificationsPanel = () => {
     events: true,
     system: true,
   });
-  
+
   // Mock data for notifications
   const notifications = {
     unread: [
@@ -87,7 +87,7 @@ const NotificationsPanel = () => {
       }
     ]
   };
-  
+
   // Helper function to get the appropriate icon for each notification type
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -106,16 +106,16 @@ const NotificationsPanel = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> {/* Adjusted flex for mobile */}
         <h1 className="text-2xl font-bold text-slate-900">Notifications</h1>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="w-full sm:w-auto"> {/* Made button full width on mobile */}
           Mark All as Read
         </Button>
       </div>
 
       <Tabs defaultValue="all">
-        <div className="flex items-center justify-between mb-4">
-          <TabsList>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4 sm:gap-0"> {/* Adjusted flex and gap for mobile */}
+          <TabsList className="w-full sm:w-auto justify-start overflow-x-auto flex-wrap sm:flex-nowrap"> {/* Made tabs full width and wrap on mobile */}
             <TabsTrigger value="all">
               All
               <Badge variant="secondary" className="ml-1">{notifications.unread.length + notifications.read.length}</Badge>
@@ -127,22 +127,22 @@ const NotificationsPanel = () => {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
         </div>
-        
+
         <TabsContent value="all" className="m-0 space-y-4">
           {notifications.unread.length > 0 && (
             <div className="space-y-2">
               <h2 className="text-sm font-medium text-slate-500">New</h2>
               {notifications.unread.map((notification) => (
                 <Card key={notification.id} className="bg-blue-50 border-blue-100 hover:bg-blue-100/70 transition-colors">
-                  <CardContent className="p-4 flex">
-                    <div className="mr-4 flex-shrink-0">
+                  <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center"> {/* Adjusted flex for mobile */}
+                    <div className="mr-0 sm:mr-4 mb-2 sm:mb-0 flex-shrink-0"> {/* Adjusted margin and added margin-bottom for mobile */}
                       {getNotificationIcon(notification.type)}
                     </div>
-                    <div className="flex-grow">
+                    <div className="flex-grow w-full"> {/* Made content take full width on mobile */}
                       <p className="text-sm mb-1">{notification.content}</p>
                       <span className="text-xs text-slate-500">{notification.time}</span>
                     </div>
-                    <div className="flex items-start ml-2">
+                    <div className="flex items-start ml-0 sm:ml-2 mt-2 sm:mt-0"> {/* Adjusted margin and added margin-top for mobile */}
                       <Button variant="ghost" size="icon" className="h-7 w-7">
                         <CheckCircle2 className="h-4 w-4" />
                       </Button>
@@ -152,17 +152,17 @@ const NotificationsPanel = () => {
               ))}
             </div>
           )}
-          
+
           {notifications.read.length > 0 && (
             <div className="space-y-2">
               <h2 className="text-sm font-medium text-slate-500">Earlier</h2>
               {notifications.read.map((notification) => (
                 <Card key={notification.id} className="hover:bg-slate-50 transition-colors">
-                  <CardContent className="p-4 flex">
-                    <div className="mr-4 flex-shrink-0">
+                  <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center"> {/* Adjusted flex for mobile */}
+                    <div className="mr-0 sm:mr-4 mb-2 sm:mb-0 flex-shrink-0"> {/* Adjusted margin and added margin-bottom for mobile */}
                       {getNotificationIcon(notification.type)}
                     </div>
-                    <div className="flex-grow">
+                    <div className="flex-grow w-full"> {/* Made content take full width on mobile */}
                       <p className="text-sm mb-1">{notification.content}</p>
                       <span className="text-xs text-slate-500">{notification.time}</span>
                     </div>
@@ -172,20 +172,20 @@ const NotificationsPanel = () => {
             </div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="unread" className="m-0 space-y-4">
           {notifications.unread.length > 0 ? (
             notifications.unread.map((notification) => (
               <Card key={notification.id} className="bg-blue-50 border-blue-100 hover:bg-blue-100/70 transition-colors">
-                <CardContent className="p-4 flex">
-                  <div className="mr-4 flex-shrink-0">
+                <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center"> {/* Adjusted flex for mobile */}
+                  <div className="mr-0 sm:mr-4 mb-2 sm:mb-0 flex-shrink-0"> {/* Adjusted margin and added margin-bottom for mobile */}
                     {getNotificationIcon(notification.type)}
                   </div>
-                  <div className="flex-grow">
+                  <div className="flex-grow w-full"> {/* Made content take full width on mobile */}
                     <p className="text-sm mb-1">{notification.content}</p>
                     <span className="text-xs text-slate-500">{notification.time}</span>
                   </div>
-                  <div className="flex items-start ml-2">
+                  <div className="flex items-start ml-0 sm:ml-2 mt-2 sm:mt-0"> {/* Adjusted margin and added margin-top for mobile */}
                     <Button variant="ghost" size="icon" className="h-7 w-7">
                       <CheckCircle2 className="h-4 w-4" />
                     </Button>
@@ -201,13 +201,13 @@ const NotificationsPanel = () => {
             </div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="settings" className="m-0 space-y-6">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-6 space-y-6"> {/* Added space-y for mobile */}
               <h3 className="text-lg font-medium mb-4">Notification Preferences</h3>
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"> {/* Adjusted flex and gap for mobile */}
                   <div className="space-y-0.5">
                     <div className="flex items-center text-base font-medium">
                       <MessageSquare className="h-4 w-4 mr-2 text-purple-500" />
@@ -217,15 +217,15 @@ const NotificationsPanel = () => {
                       Receive notifications when someone sends you a message
                     </p>
                   </div>
-                  <Switch 
+                  <Switch
                     checked={notificationSettings.messages}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNotificationSettings({...notificationSettings, messages: checked})
                     }
                   />
                 </div>
-                
-                <div className="flex items-center justify-between">
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"> {/* Adjusted flex and gap for mobile */}
                   <div className="space-y-0.5">
                     <div className="flex items-center text-base font-medium">
                       <UserPlus className="h-4 w-4 mr-2 text-blue-500" />
@@ -235,15 +235,15 @@ const NotificationsPanel = () => {
                       Receive notifications about connection requests and profile views
                     </p>
                   </div>
-                  <Switch 
+                  <Switch
                     checked={notificationSettings.connections}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNotificationSettings({...notificationSettings, connections: checked})
                     }
                   />
                 </div>
-                
-                <div className="flex items-center justify-between">
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"> {/* Adjusted flex and gap for mobile */}
                   <div className="space-y-0.5">
                     <div className="flex items-center text-base font-medium">
                       <Calendar className="h-4 w-4 mr-2 text-green-500" />
@@ -253,15 +253,15 @@ const NotificationsPanel = () => {
                       Receive reminders about upcoming events and webinars
                     </p>
                   </div>
-                  <Switch 
+                  <Switch
                     checked={notificationSettings.events}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNotificationSettings({...notificationSettings, events: checked})
                     }
                   />
                 </div>
-                
-                <div className="flex items-center justify-between">
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"> {/* Adjusted flex and gap for mobile */}
                   <div className="space-y-0.5">
                     <div className="flex items-center text-base font-medium">
                       <Info className="h-4 w-4 mr-2 text-slate-500" />
@@ -271,9 +271,9 @@ const NotificationsPanel = () => {
                       Receive notifications about platform updates and new features
                     </p>
                   </div>
-                  <Switch 
+                  <Switch
                     checked={notificationSettings.system}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNotificationSettings({...notificationSettings, system: checked})
                     }
                   />
@@ -281,9 +281,9 @@ const NotificationsPanel = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-6 space-y-4"> {/* Added space-y for mobile */}
               <h3 className="text-lg font-medium mb-4">Email Notification Frequency</h3>
               <div className="grid gap-4">
                 <div className="flex items-start space-x-2">
@@ -303,7 +303,7 @@ const NotificationsPanel = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-2">
                   <input
                     type="radio"
@@ -320,7 +320,7 @@ const NotificationsPanel = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-2">
                   <input
                     type="radio"
@@ -338,8 +338,8 @@ const NotificationsPanel = () => {
                   </div>
                 </div>
               </div>
-              
-              <Button className="mt-6 w-full">Save Preferences</Button>
+
+              <Button className="mt-6 w-full">Save Preferences</Button> {/* Made button full width on mobile */}
             </CardContent>
           </Card>
         </TabsContent>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Shield, ShieldCheck, UserRoundCheck, Star } from 'lucide-react';
@@ -24,7 +23,7 @@ interface Testimonial {
 
 const TrustBuildingSection = () => {
   const [activeTab, setActiveTab] = useState<'advisors' | 'testimonials' | 'security'>('advisors');
-  
+
   const advisors: Advisor[] = [
     {
       id: 1,
@@ -112,41 +111,44 @@ const TrustBuildingSection = () => {
     <section className="py-16 bg-gradient-to-b from-background to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#161d30]">
+          {/* Adjusted text size for smaller screens */}
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-[#161d30]">
             Trusted by Leaders in the Iranian Founder Community
           </h2>
-          <p className="text-lg text-[#161d30] max-w-3xl mx-auto">
+          {/* Adjusted text size for smaller screens */}
+          <p className="text-base sm:text-lg text-[#161d30] max-w-3xl mx-auto">
             Join a network supported by experienced advisors and trusted by successful Iranian entrepreneurs worldwide.
           </p>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex justify-center mb-8 border-b border-white/20">
-          <button 
+        {/* Adjusted flex and spacing for mobile, added overflow-x for scrolling if needed */}
+        <div className="flex justify-center mb-8 border-b border-white/20 overflow-x-auto">
+          <button
             onClick={() => setActiveTab('advisors')}
-            className={`px-6 py-3 font-medium text-sm ${
-              activeTab === 'advisors' 
-                ? 'text-white border-b-2 border-white' 
+            className={`flex-shrink-0 px-4 sm:px-6 py-3 font-medium text-sm ${
+              activeTab === 'advisors'
+                ? 'text-white border-b-2 border-white'
                 : 'text-white/70 hover:text-white hover:border-b-2 hover:border-white/50'
             }`}
           >
             Advisors & Mentors
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('testimonials')}
-            className={`px-6 py-3 font-medium text-sm ${
-              activeTab === 'testimonials' 
-                ? 'text-white border-b-2 border-white' 
+            className={`flex-shrink-0 px-4 sm:px-6 py-3 font-medium text-sm ${
+              activeTab === 'testimonials'
+                ? 'text-white border-b-2 border-white'
                 : 'text-white/70 hover:text-white hover:border-b-2 hover:border-white/50'
             }`}
           >
             Success Stories
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('security')}
-            className={`px-6 py-3 font-medium text-sm ${
-              activeTab === 'security' 
-                ? 'text-white border-b-2 border-white' 
+            className={`flex-shrink-0 px-4 sm:px-6 py-3 font-medium text-sm ${
+              activeTab === 'security'
+                ? 'text-white border-b-2 border-white'
                 : 'text-white/70 hover:text-white hover:border-b-2 hover:border-white/50'
             }`}
           >
@@ -156,15 +158,16 @@ const TrustBuildingSection = () => {
 
         {/* Content for Advisors Tab */}
         {activeTab === 'advisors' && (
+          // Adjusted grid columns for different screen sizes
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {advisors.map((advisor) => (
               <Card key={advisor.id} className="bg-slate-800/40 border-slate-700 hover:border-blue-500/50 transition-all">
                 <CardContent className="p-6">
                   <div className="flex flex-col items-center text-center">
                     <div className="w-24 h-24 rounded-full overflow-hidden mb-4 bg-slate-700">
-                      <img 
-                        src={advisor.image} 
-                        alt={advisor.name} 
+                      <img
+                        src={advisor.image}
+                        alt={advisor.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -172,9 +175,9 @@ const TrustBuildingSection = () => {
                     <p className="text-blue-400 mb-1">{advisor.role}</p>
                     <p className="text-gray-400 mb-3">{advisor.company}</p>
                     {advisor.linkedIn && (
-                      <a 
-                        href={advisor.linkedIn} 
-                        target="_blank" 
+                      <a
+                        href={advisor.linkedIn}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-gray-400 hover:text-blue-400 flex items-center"
                       >
@@ -193,15 +196,16 @@ const TrustBuildingSection = () => {
 
         {/* Content for Testimonials Tab */}
         {activeTab === 'testimonials' && (
+          // Adjusted grid columns for different screen sizes
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {testimonials.map((testimonial) => (
               <Card key={testimonial.id} className="bg-slate-800/40 border-slate-700 hover:border-blue-500/50 transition-all h-full">
                 <CardContent className="p-6 flex flex-col h-full">
                   <div className="flex mb-4">
                     {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        className={`h-5 w-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-500'}`} 
+                      <Star
+                        key={i}
+                        className={`h-5 w-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-500'}`}
                         fill={i < testimonial.rating ? 'currentColor' : 'none'}
                       />
                     ))}
@@ -222,6 +226,7 @@ const TrustBuildingSection = () => {
         {/* Content for Security Tab */}
         {activeTab === 'security' && (
           <div>
+            {/* Adjusted grid columns for different screen sizes */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
               {securityPolicies.map((policy) => (
                 <Card key={policy.id} className="bg-slate-800/40 border-slate-700 hover:border-blue-500/50 transition-all">
@@ -235,16 +240,17 @@ const TrustBuildingSection = () => {
                 </Card>
               ))}
             </div>
-            
+
             <div className="bg-slate-800/20 border border-slate-700 rounded-lg p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Our Trust Commitment</h3>
+              {/* Adjusted text size for smaller screens */}
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Our Trust Commitment</h3>
               <div className="text-gray-300 space-y-4">
                 <p>
-                  At Hamfounder, we understand the unique challenges Iranian entrepreneurs face in the global landscape. 
+                  At Hamfounder, we understand the unique challenges Iranian entrepreneurs face in the global landscape.
                   Our platform is built with security and privacy as core principles, ensuring a safe space for collaboration.
                 </p>
                 <p>
-                  All user data is protected by industry-standard encryption, and we follow strict data protection policies 
+                  All user data is protected by industry-standard encryption, and we follow strict data protection policies
                   to ensure your information and ideas remain secure.
                 </p>
                 <HoverCard>
@@ -253,8 +259,8 @@ const TrustBuildingSection = () => {
                   </HoverCardTrigger>
                   <HoverCardContent className="bg-slate-800 border-slate-700 text-gray-300 w-80">
                     <p className="text-sm">
-                      Our comprehensive privacy policy details how we collect, use, and protect your data. 
-                      We never share your information with third parties without explicit consent, and you maintain 
+                      Our comprehensive privacy policy details how we collect, use, and protect your data.
+                      We never share your information with third parties without explicit consent, and you maintain
                       full control over your data at all times.
                     </p>
                   </HoverCardContent>

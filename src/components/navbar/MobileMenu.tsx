@@ -38,7 +38,7 @@ const MobileMenu = ({ isOpen, onClose, scrollToSection }: MobileMenuProps) => {
           onClick={(e) => handleClick(e, 'how-it-works')}
           className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium border-b border-border/40 shadow-sm"
         >
-          How It Works
+          The Blueprint
         </a>
 
         <a
@@ -54,7 +54,7 @@ const MobileMenu = ({ isOpen, onClose, scrollToSection }: MobileMenuProps) => {
           onClick={(e) => handleClick(e, 'startups')}
           className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium border-b border-border/40 shadow-sm"
         >
-          Startups
+          Spotlight
         </a>
 
         <a
@@ -62,7 +62,7 @@ const MobileMenu = ({ isOpen, onClose, scrollToSection }: MobileMenuProps) => {
           onClick={(e) => handleClick(e, 'join')}
           className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium border-b border-border/40 shadow-sm"
         >
-          Join Us
+          Find a CoFounder
         </a>
 
       </div>

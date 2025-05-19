@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { 
-  Calendar, 
-  Filter, 
-  Globe, 
-  MapPin, 
-  Clock, 
-  Users, 
-  ExternalLink, 
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Calendar,
+  Filter,
+  Globe,
+  MapPin,
+  Clock,
+  Users,
+  ExternalLink,
   Search,
   CalendarDays
 } from 'lucide-react';
@@ -17,9 +17,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const EventsCommunity = () => {
+  const tabsListRef = useRef<HTMLDivElement>(null);
+  const [showLeftFade, setShowLeftFade] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(true); // Initially show right fade
   const [filter, setFilter] = useState("all");
   const [view, setView] = useState("list");
-  
+
   // Mock data for events
   const events = [
     {
@@ -68,7 +71,7 @@ const EventsCommunity = () => {
       image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
     }
   ];
-  
+
   // Mock data for communities
   const communities = [
     {
@@ -96,7 +99,7 @@ const EventsCommunity = () => {
       image: "https://images.unsplash.com/photo-1573164713349-6e4b873ef24a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
     }
   ];
-  
+
   // Helper function to format dates
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -106,7 +109,7 @@ const EventsCommunity = () => {
       year: 'numeric'
     });
   };
-  
+
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', {
@@ -116,29 +119,72 @@ const EventsCommunity = () => {
   };
 
   // Filter events based on the selected filter
-  const filteredEvents = filter === 'all' ? events : 
+  const filteredEvents = filter === 'all' ? events :
     events.filter(event => {
       if (filter === 'virtual') return event.type === 'Virtual';
       if (filter === 'in-person') return event.type === 'In-Person';
       return true;
     });
 
+  const checkFadeEffects = () => {
+    if (tabsListRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current;
+      const atLeftEnd = scrollLeft === 0;
+      const atRightEnd = scrollLeft + clientWidth >= scrollWidth - 1; // Allow for 1px tolerance
+
+      setShowLeftFade(!atLeftEnd);
+      setShowRightFade(!atRightEnd);
+    }
+  };
+
+  useEffect(() => {
+    // Check fade effects initially and on window resize
+    checkFadeEffects();
+    const handleResize = () => checkFadeEffects();
+    window.addEventListener('resize', handleResize);
+
+    // Check fade effects when tabs are clicked (content changes might affect scrollWidth)
+    const observer = new MutationObserver(checkFadeEffects);
+    if (tabsListRef.current) {
+      observer.observe(tabsListRef.current, { childList: true, subtree: true });
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+       if (tabsListRef.current) {
+         observer.disconnect();
+       }
+    };
+  }, []);
+
+  useEffect(() => {
+    // Re-check fade effects after scroll
+    const handleScroll = () => {
+      checkFadeEffects();
+    };
+    tabsListRef.current?.addEventListener('scroll', handleScroll);
+    return () => {
+      tabsListRef.current?.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> {/* Adjusted flex for mobile */}
         <h1 className="text-2xl font-bold text-slate-900">Events & Community</h1>
-        
-        <div className="flex items-center space-x-3">
-          <div className="relative">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto"> {/* Adjusted flex and spacing for mobile */}
+          <div className="relative w-full sm:w-auto"> {/* Made search full width on mobile */}
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <input
               type="text"
               placeholder="Search events..."
-              className="pl-9 pr-4 py-2 text-sm border rounded-md w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="pl-9 pr-4 py-2 text-sm border rounded-md w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
           </div>
-          
-          <Button>
+
+          <Button className="w-full sm:w-auto"> {/* Made button full width on mobile */}
             <Calendar className="h-4 w-4 mr-2" />
             Create Event
           </Button>
@@ -146,32 +192,50 @@ const EventsCommunity = () => {
       </div>
 
       <Tabs defaultValue="events">
-        <TabsList>
-          <TabsTrigger value="events">Events</TabsTrigger>
-          <TabsTrigger value="communities">Communities</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar</TabsTrigger>
-        </TabsList>
-        
+        <div className="relative"> {/* Added relative positioning for fades */}
+           {/* Left Fade */}
+          {showLeftFade && (
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 sm:hidden"></div> // Only visible on small screens
+          )}
+
+          {/* TabsList with overflow-x-auto and flex-nowrap for mobile scrollability */}
+          <TabsList
+             ref={tabsListRef}
+             className="mb-6 w-full justify-start overflow-x-auto flex-nowrap scrollbar-hide px-4 sm:px-0" // Added horizontal padding for fades
+             onScroll={checkFadeEffects} // Check fade visibility on scroll
+          >
+            <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="communities">Communities</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          </TabsList>
+
+          {/* Right Fade */}
+          {showRightFade && (
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 sm:hidden"></div> // Only visible on small screens
+          )}
+        </div>
+
+
         <TabsContent value="events" className="m-0 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4">
-            <div className="flex space-x-2">
-              <Button 
-                variant={filter === 'all' ? 'default' : 'outline'} 
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4"> {/* Adjusted flex for mobile */}
+            <div className="flex flex-wrap gap-2"> {/* Allowed filter buttons to wrap on mobile */}
+              <Button
+                variant={filter === 'all' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setFilter('all')}
               >
                 All Events
               </Button>
-              <Button 
-                variant={filter === 'virtual' ? 'default' : 'outline'} 
+              <Button
+                variant={filter === 'virtual' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setFilter('virtual')}
               >
                 <Globe className="h-4 w-4 mr-1" />
                 Virtual
               </Button>
-              <Button 
-                variant={filter === 'in-person' ? 'default' : 'outline'} 
+              <Button
+                variant={filter === 'in-person' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setFilter('in-person')}
               >
@@ -179,17 +243,17 @@ const EventsCommunity = () => {
                 In-Person
               </Button>
             </div>
-            
+
             <div className="flex space-x-2">
-              <Button 
-                variant={view === 'list' ? 'secondary' : 'outline'} 
+              <Button
+                variant={view === 'list' ? 'secondary' : 'outline'}
                 size="sm"
                 onClick={() => setView('list')}
               >
                 List
               </Button>
-              <Button 
-                variant={view === 'grid' ? 'secondary' : 'outline'} 
+              <Button
+                variant={view === 'grid' ? 'secondary' : 'outline'}
                 size="sm"
                 onClick={() => setView('grid')}
               >
@@ -197,32 +261,36 @@ const EventsCommunity = () => {
               </Button>
             </div>
           </div>
-          
+
           <div className={view === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5' : 'space-y-4'}>
             {filteredEvents.map((event) => (
               view === 'grid' ? (
                 <Card key={event.id} className="overflow-hidden hover:shadow-md transition-shadow">
                   <AspectRatio ratio={16/9}>
-                    <img 
-                      src={event.image} 
-                      alt={event.title} 
+                    <img
+                      src={event.image}
+                      alt={event.title}
                       className="w-full h-full object-cover"
                     />
                   </AspectRatio>
                   <CardContent className="p-4">
                     <Badge className="mb-2">{event.category}</Badge>
                     <h3 className="font-bold mb-1">{event.title}</h3>
-                    
-                    <div className="flex items-center text-xs text-slate-500 mb-2">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      <span>{formatDate(event.date)}</span>
-                      <Clock className="h-3 w-3 ml-2 mr-1" />
-                      <span>{formatTime(event.date)}</span>
+
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center text-xs text-slate-500 mb-2 gap-1 sm:gap-0"> {/* Adjusted flex for mobile */}
+                      <div className="flex items-center">
+                         <Calendar className="h-3 w-3 mr-1" />
+                        <span>{formatDate(event.date)}</span>
+                      </div>
+                       <div className="flex items-center sm:ml-2"> {/* Added margin for spacing on desktop */}
+                         <Clock className="h-3 w-3 mr-1" />
+                        <span>{formatTime(event.date)}</span>
+                      </div>
                     </div>
-                    
+
                     <p className="text-sm text-slate-600 line-clamp-2 mb-3">{event.description}</p>
-                    
-                    <div className="flex items-center justify-between">
+
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0"> {/* Adjusted flex for mobile */}
                       <Badge variant={event.type === 'Virtual' ? 'secondary' : 'outline'}>
                         {event.type === 'Virtual' ? (
                           <Globe className="h-3 w-3 mr-1" />
@@ -232,21 +300,21 @@ const EventsCommunity = () => {
                         {event.type}
                         {event.location && ` • ${event.location}`}
                       </Badge>
-                      
+
                       <span className="text-xs text-slate-500 flex items-center">
                         <Users className="h-3 w-3 mr-1" />
                         {event.attendees} attending
                       </span>
                     </div>
-                    
-                    <Button className="w-full mt-3">Register Now</Button>
+
+                    <Button className="w-full mt-3">Register Now</Button> {/* Made button full width on mobile */}
                   </CardContent>
                 </Card>
               ) : (
                 <Card key={event.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
-                    <div className="flex">
-                      <div className="mr-4 flex-shrink-0 w-16 sm:w-24 bg-slate-50 rounded-md border p-2 text-center">
+                    <div className="flex flex-col sm:flex-row"> {/* Adjusted flex for mobile */}
+                      <div className="mr-0 sm:mr-4 mb-4 sm:mb-0 flex-shrink-0 w-full sm:w-24 bg-slate-50 rounded-md border p-2 text-center"> {/* Adjusted width and margin for mobile */}
                         <span className="block text-sm font-medium text-slate-500">
                           {new Date(event.date).toLocaleDateString('en-US', { month: 'short' })}
                         </span>
@@ -254,24 +322,25 @@ const EventsCommunity = () => {
                           {new Date(event.date).getDate()}
                         </span>
                       </div>
-                      
+
                       <div className="flex-grow">
                         <div className="flex items-start justify-between mb-1">
                           <div>
                             <h3 className="font-bold">{event.title}</h3>
-                            <div className="flex items-center text-xs text-slate-500">
-                              <Clock className="h-3 w-3 mr-1" />
-                              <span>{formatTime(event.date)} • {event.duration}</span>
-                              
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center text-xs text-slate-500 gap-1 sm:gap-0"> {/* Adjusted flex for mobile */}
+                              <div className="flex items-center">
+                                <Clock className="h-3 w-3 mr-1" />
+                                <span>{formatTime(event.date)} • {event.duration}</span>
+                              </div>
                               {event.type === 'In-Person' && event.location && (
-                                <>
-                                  <MapPin className="h-3 w-3 ml-2 mr-1" />
+                                <div className="flex items-center sm:ml-2"> {/* Added margin for spacing on desktop */}
+                                  <MapPin className="h-3 w-3 mr-1" />
                                   <span>{event.location}</span>
-                                </>
+                                </div>
                               )}
                             </div>
                           </div>
-                          
+
                           <Badge variant={event.type === 'Virtual' ? 'secondary' : 'outline'}>
                             {event.type === 'Virtual' ? (
                               <Globe className="h-3 w-3 mr-1" />
@@ -281,10 +350,10 @@ const EventsCommunity = () => {
                             {event.type}
                           </Badge>
                         </div>
-                        
+
                         <p className="text-sm text-slate-600 mb-3 line-clamp-2">{event.description}</p>
-                        
-                        <div className="flex items-center justify-between">
+
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0"> {/* Adjusted flex for mobile */}
                           <div className="flex items-center">
                             <Badge variant="outline" className="mr-2">{event.category}</Badge>
                             <span className="text-xs text-slate-500 flex items-center">
@@ -292,8 +361,8 @@ const EventsCommunity = () => {
                               {event.attendees} attending
                             </span>
                           </div>
-                          
-                          <Button size="sm">Register</Button>
+
+                          <Button size="sm" className="w-full sm:w-auto">Register</Button> {/* Made button full width on mobile */}
                         </div>
                       </div>
                     </div>
@@ -302,7 +371,7 @@ const EventsCommunity = () => {
               )
             ))}
           </div>
-          
+
           <div className="flex justify-center mt-4">
             <Button variant="outline">
               View All Events
@@ -310,15 +379,15 @@ const EventsCommunity = () => {
             </Button>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="communities" className="m-0">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
             {communities.map((community) => (
               <Card key={community.id} className="overflow-hidden hover:shadow-md transition-shadow">
                 <AspectRatio ratio={16/9}>
-                  <img 
-                    src={community.image} 
-                    alt={community.name} 
+                  <img
+                    src={community.image}
+                    alt={community.name}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
@@ -327,7 +396,7 @@ const EventsCommunity = () => {
                 </AspectRatio>
                 <CardContent className="p-4">
                   <p className="text-sm text-slate-600 mb-3">{community.description}</p>
-                  
+
                   <div className="flex flex-wrap gap-1 mb-3">
                     {community.topics.map((topic, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
@@ -335,20 +404,20 @@ const EventsCommunity = () => {
                       </Badge>
                     ))}
                   </div>
-                  
-                  <div className="flex items-center justify-between">
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0"> {/* Adjusted flex for mobile */}
                     <span className="text-sm text-slate-500 flex items-center">
                       <Users className="h-4 w-4 mr-1" />
                       {community.members.toLocaleString()} members
                     </span>
-                    <Button size="sm">Join</Button>
+                    <Button size="sm" className="w-full sm:w-auto">Join</Button> {/* Made button full width on mobile */}
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         </TabsContent>
-        
+
         <TabsContent value="calendar" className="m-0 p-4 border rounded-md mt-4">
           <div className="flex justify-center items-center py-16">
             <div className="text-center">

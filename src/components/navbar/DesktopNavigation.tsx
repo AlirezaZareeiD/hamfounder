@@ -25,7 +25,7 @@ const DesktopNavigation = ({ scrollToSection }: DesktopNavigationProps) => {
           }} 
           className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium transition"
         >
-          How It Works
+          The Blueprint
         </a>
         <a 
           href="#global-network" 
@@ -38,14 +38,14 @@ const DesktopNavigation = ({ scrollToSection }: DesktopNavigationProps) => {
           Global Network
         </a>
         <a 
-          href="#startups" 
+          href="#startup" 
           onClick={(e) => { 
             e.preventDefault(); 
             scrollToSection('startups'); 
           }} 
           className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium transition"
         >
-          Startups
+          Spotlight
         </a>
         <a 
           href="#join" 
@@ -55,7 +55,7 @@ const DesktopNavigation = ({ scrollToSection }: DesktopNavigationProps) => {
           }} 
           className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium transition"
         >
-          Join Us
+          Find a CoFounder
         </a>
       </div>
     </div>
