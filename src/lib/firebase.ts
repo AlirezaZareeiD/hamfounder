@@ -35,7 +35,7 @@ try {
 setPersistence(getAuth(app), browserLocalPersistence);
 console.log("Firebase Auth persistence set to local.");
 export const auth: Auth = getAuth(app);
-export const db: Firestore = getFirestore(app);
+export const db: Firestore = getFirestore(app, 'hamfounderdatabase');
 
 // اضافه شده برای Sign-in با گوگل
 const googleProvider = new GoogleAuthProvider();
