@@ -11,6 +11,21 @@
         "source": "**",
         "destination": "/index.html"
       }
+    ],
+    "headers": [  // اضافه کردن بخش headers
+      {
+        "source": "**/*.{html,js,css,svg,png,jpg,gif,webp}",  // الگوهای فایل برای اعمال هدرها
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"  // مثال: تنظیم Cache-Control
+          },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.google.com https://www.gstatic.com;"  // تنظیم CSP با دامنه‌های reCAPTCHA
+          }
+        ]
+      }
     ]
   },
   "functions": [

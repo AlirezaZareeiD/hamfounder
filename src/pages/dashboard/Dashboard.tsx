@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"; // Add useRef
 import { useNavigate } from "react-router-dom";
-import { auth } from "@/lib/firebase";
+import { auth, getUserProfile } from "@/lib/firebase";
 // Logo و DashboardHamburgerMenu دیگر در اینجا لازم نیستند چون در DashboardLayout هستند
 // import { Logo } from "@/components/Logo"; // این خط را حذف کنید
 // import { DashboardHamburgerMenu } from "@/components/dashboard/DashboardHamburgerMenu"; // این خط را حذف کنید
@@ -26,6 +26,7 @@ const Dashboard = () => {
   // user ممکن است برای نمایش محتوای شرطی در تب ها لازم باشد، نگه دارید
   const user = auth.currentUser;
   const [activeTab, setActiveTab] = useState("projects");
+  const [userProfileImage, setUserProfileImage] = useState<string | undefined>(undefined); // State to store profile image URL
   const tabsListRef = useRef<HTMLDivElement>(null); // Create a ref for the TabsList
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(true); // Initially show right fade
@@ -40,6 +41,26 @@ const Dashboard = () => {
        return;
      }
    }, [user, navigate]);
+
+  // Effect to fetch user profile image
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      console.log("Fetching user profile..."); // Add this log
+      console.log("auth.currentUser:", auth.currentUser); // Add this log
+      console.log("user variable:", user); // Add this log
+      if (user) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          if (profile?.profileImageUrl) {
+            setUserProfileImage(profile.profileImageUrl);
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
+      }
+    };
+    fetchUserProfile();
+  }, [user]); // Rerun when the user object changes
 
 
   // handleSignOut دیگر در اینجا مدیریت نمی شود و به DashboardLayout منتقل شده است
@@ -111,7 +132,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout> {/* استفاده از لایه‌بندی داشبورد */}
-      {/* محتوای اصلی داشبورد (تب ها و سکشن ها) */}
+      {/* محتوای اصلی داشبورد (تب ها و سکشن ها) - profileImageURL passed implicitly via DashboardLayout */}
       <div className="bg-white shadow rounded-lg p-6">
         <h1 className="text-2xl font-bold text-slate-900 mb-6 text-center sm:text-left"> Welcome to Your Personal Dashboard!</h1> {/* Centered heading on mobile */}
 
@@ -158,7 +179,7 @@ const Dashboard = () => {
       </div>
 
       <div className="mt-8"><TrustBuildingSection /></div> {/* Added margin top for spacing */}
-      <div className="mt-8"><FounderRoadmapSection /></div> {/* Added margin top for spacing */}
+      <div className="mt-8\"><FounderRoadmapSection /></div> {/* Added margin top for spacing */}
     </DashboardLayout>
   );
 };

@@ -8,9 +8,10 @@ import { toast } from '@/hooks/use-toast'; // برای نمایش پیام خر�
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  userProfileImage?: string; // Add this prop
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userProfileImage }) => {
   const navigate = useNavigate();
   const user = auth.currentUser; // دریافت کاربر فعلی
 
@@ -46,7 +47,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <Logo />
           {/* منوی همبرگری در لایه‌بندی */}
           {/* user.email و onSignOut از لایه‌بندی پاس داده می شوند */}
-          <DashboardHamburgerMenu userEmail={user.email || ""} onSignOut={handleSignOut} />
+          <DashboardHamburgerMenu userEmail={user.email || ""} onSignOut={handleSignOut} userProfileImage={userProfileImage} /> {/* Pass userProfileImage */}
         </div>
       </header>
 
