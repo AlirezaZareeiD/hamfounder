@@ -81,7 +81,22 @@ export const uploadProfileImage = async (file: File, userId: string): Promise<st
 };
 
 // Function to update user profile data in Firestore
-export const updateUserProfile = async (userId: string, profileData: { profileImageUrl?: string }) => {
+export const updateUserProfile = async (userId: string, profileData: {
+  profileImageUrl?: string;
+  firstName?: string;
+  lastName?: string;
+  pronouns?: string;
+  tagline?: string;
+  location?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  personalSummary?: string;
+  role?: string;
+  lookingFor?: string;
+  businessStage?: string;
+  skills?: string[] | undefined;
+  interests?: string[] | undefined;
+}) => {
   // Get a reference to the user's profile document
   const userDocRef = doc(db, 'userProfiles', userId);
   // Update the document with the provided profile data, merging with existing fields

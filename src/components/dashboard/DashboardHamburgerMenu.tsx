@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, User, Settings, Search, Bell, LogOut, Edit } from 'lucide-react'; // آیکون Edit اضافه شد
-import { Link } from 'react-router-dom'; // فرض بر استفاده از react-router-dom برای مسیریابی
+import { Menu, User, Settings, Search, Bell, LogOut, Edit, Home } from 'lucide-react'; // آیکون Edit و Home اضافه شد
+import { Link, useNavigate } from 'react-router-dom'; // فرض بر استفاده از react-router-dom برای مسیریابی
 
 interface DashboardHamburgerMenuProps {
   userEmail: string;
@@ -11,6 +11,7 @@ interface DashboardHamburgerMenuProps {
 }
 
 export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ userEmail, onSignOut, userProfileImage }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLinkClick = () => {
@@ -41,7 +42,7 @@ export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ 
                 userEmail ? userEmail.charAt(0).toUpperCase() : '?' // نمایش حرف اول ایمیل اگر تصویر پروفایل نباشد
               )}
               {/* آیکون مداد برای ویرایش تصویر - روی تصویر یا Placeholder قرار می‌گیرد */}
-              <div className="absolute bottom-0 right-0 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow cursor-pointer">
+              <div className="absolute bottom-0 right-0 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow cursor-pointer" onClick={() => { navigate('/dashboard/edit-profile'); handleLinkClick(); }}>
                 <Edit className="h-4 w-4 text-gray-600" /> {/* آیکون Edit */}
               </div>
             </div>
@@ -55,6 +56,11 @@ export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ 
 
         {/* گزینه‌های منو */}
         <nav className="flex flex-col space-y-2 flex-grow"> {/* flex-grow برای اشغال فضای باقی‌مانده */}
+          {/* Dashboard Home Link */}
+          <Link to="/dashboard" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
+            <Home className="h-5 w-5 mr-3 text-gray-600" /> {/* می‌توانید از آیکون خانه استفاده کنید */}
+ Dashboard Home
+ </Link>
           <Link to="/dashboard/edit-profile" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
             <User className="h-5 w-5 mr-3 text-gray-600" />
             Edit Profile

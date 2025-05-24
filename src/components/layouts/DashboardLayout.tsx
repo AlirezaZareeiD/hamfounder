@@ -5,15 +5,18 @@ import { auth } from '@/lib/firebase'; // وارد کردن auth برای دست
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom'; // برای هدایت پس از خروج
 import { toast } from '@/hooks/use-toast'; // برای نمایش پیام خروج موفق
+// REMOVED: import { useUser } from '@/contexts/UserContext'; // Import the useUser hook
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  userProfileImage?: string; // Add this prop
+  // Assuming userEmail and userProfileImage are passed as props now
+  userEmail: string;
+  userProfileImage?: string;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userProfileImage }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userEmail, userProfileImage }) => {
   const navigate = useNavigate();
-  const user = auth.currentUser; // دریافت کاربر فعلی
+  // REMOVED: const { user, loading } = useUser(); // Use the useUser hook to get the user object
 
   const handleSignOut = async () => {
     try {
@@ -32,12 +35,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userProfile
     }
   };
 
-
-  // اگر کاربر لاگین نکرده، ریدایرکت یا نمایش صفحه بارگذاری
-   if (!user) {
-     return null; // یا یک صفحه بارگذاری
-   }
-
+   // REMOVED: Conditional rendering based on loading or user state
+   // if (loading || !user) {
+   //   return <div>Loading...</div>; // Or a proper loading component
+   // }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -46,8 +47,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userProfile
         <div className="container max-w-7xl mx-auto flex justify-between items-center">
           <Logo />
           {/* منوی همبرگری در لایه‌بندی */}
-          {/* user.email و onSignOut از لایه‌بندی پاس داده می شوند */}
-          <DashboardHamburgerMenu userEmail={user.email || ""} onSignOut={handleSignOut} userProfileImage={userProfileImage} /> {/* Pass userProfileImage */}
+          {/* userEmail و onSignOut از لایه‌بندی پاس داده می شوند */}
+          <DashboardHamburgerMenu userEmail={userEmail || ""} onSignOut={handleSignOut} userProfileImage={userProfileImage} /> {/* Pass userEmail and userProfileImage */}
         </div>
       </header>
 

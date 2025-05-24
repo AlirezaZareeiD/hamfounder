@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from "react"; // Add useRef
 import { useNavigate } from "react-router-dom";
-import { auth, getUserProfile } from "@/lib/firebase";
+// Remove direct auth import, will get user from context
+// import { auth, getUserProfile } from "@/lib/firebase";
+
+// Import the useUser hook from the context
+// import { useUser } from "@/contexts/UserContext";
+
 // Logo و DashboardHamburgerMenu دیگر در اینجا لازم نیستند چون در DashboardLayout هستند
 // import { Logo } from "@/components/Logo"; // این خط را حذف کنید
 // import { DashboardHamburgerMenu } from "@/components/dashboard/DashboardHamburgerMenu"; // این خط را حذف کنید
@@ -23,44 +28,45 @@ import DashboardLayout from '@/components/layouts/DashboardLayout'; // وارد 
 
 
 const Dashboard = () => {
-  // user ممکن است برای نمایش محتوای شرطی در تب ها لازم باشد، نگه دارید
-  const user = auth.currentUser;
+  // Get user and loading state from the context
+ // const { user, loading } = useUser(); // این خط قبلا حذف شده است
   const [activeTab, setActiveTab] = useState("projects");
-  const [userProfileImage, setUserProfileImage] = useState<string | undefined>(undefined); // State to store profile image URL
+  // Remove userProfileImage state, handled by context and layout
+  // const [userProfileImage, setUserProfileImage] = useState<string | undefined>(undefined); // State to store profile image URL - این خط قبلا کامنت یا حذف شده است
   const tabsListRef = useRef<HTMLDivElement>(null); // Create a ref for the TabsList
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(true); // Initially show right fade
 
-  // useEffect برای ریدایرکت اگر کاربر نبود، در DashboardLayout هم هست.
-  // اگر مطمئن هستید که همیشه قبل از رسیدن به این صفحه در DashboardLayout بررسی می‌شود، می‌توانید این useEffect را حذف کنید.
-  // اگر نه، می‌توانید آن را نگه دارید به عنوان یک لایه حفاظتی اضافه.
-  const navigate = useNavigate(); // useNavigate لازم است اگر useEffect بالا را نگه می دارید
-  useEffect(() => {
-     if (!user) {
-       navigate('/login');
-       return;
-     }
-   }, [user, navigate]);
+  const navigate = useNavigate(); // useNavigate لازم است اگر useEffect بالا را نگه می دارید - با حذف useEffect بالا ممکن است دیگر لازم نباشد، اما فعلا نگه می داریم
 
-  // Effect to fetch user profile image
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      console.log("Fetching user profile..."); // Add this log
-      console.log("auth.currentUser:", auth.currentUser); // Add this log
-      console.log("user variable:", user); // Add this log
-      if (user) {
-        try {
-          const profile = await getUserProfile(user.uid);
-          if (profile?.profileImageUrl) {
-            setUserProfileImage(profile.profileImageUrl);
-          }
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-        }
-      }
-    };
-    fetchUserProfile();
-  }, [user]); // Rerun when the user object changes
+  // REMOVED: useEffect for redirection, which was using user and loading
+  // useEffect(() => {
+  //    // Only redirect if loading is false and user is null
+  //    if (!loading && !user) {
+  //      navigate('/login');
+  //      return;
+  //    }
+  //  }, [user, loading, navigate]); // Added loading to dependency array
+
+  // Remove the effect to fetch user profile image, handled by context and layout
+  // useEffect(() => {
+  //   const fetchUserProfile = async () => {
+  //     console.log("Fetching user profile..."); // Add this log
+  //     console.log("auth.currentUser:", auth.currentUser); // Add this log
+  //     console.log("user variable:", user); // Add this log
+  //     if (user) {
+  //       try {
+  //         const profile = await getUserProfile(user.uid);
+  //         if (profile?.profileImageUrl) {
+  //           setUserProfileImage(profile.profileImageUrl);
+  //         }
+  //       } catch (error) {
+  //         console.error("Error fetching user profile:", error);
+  //       }
+  //     }
+  //   };
+  //   fetchUserProfile();
+  // }, [user]); // Rerun when the user object changes
 
 
   // handleSignOut دیگر در اینجا مدیریت نمی شود و به DashboardLayout منتقل شده است
@@ -83,7 +89,7 @@ const Dashboard = () => {
 
   // بررسی کاربر در DashboardLayout انجام می شود
   // if (!user) {
-  //   return null; // Loading or redirecting state - در DashboardLayout مدیریت می شود
+  //   return null; // Loading or redirecting state - در DashboardLayout مدیریت می شود - این هم قبلا کامنت یا حذف شده است
   // }
 
   const checkFadeEffects = () => {
@@ -161,25 +167,33 @@ const Dashboard = () => {
           </div>
 
           <TabsContent value="projects">
+            {/* Optionally show loading state here if MyProjects depends heavily on user */}
+            {/* {loading ? <div>Loading Projects...</div> : <MyProjects />} */}
             <MyProjects />
           </TabsContent>
 
           <TabsContent value="learning">
+             {/* Optionally show loading state here if LearningHub depends heavily on user */}
+             {/* {loading ? <div>Loading Learning Hub...</div> : <LearningHub />} */}
             <LearningHub />
           </TabsContent>
 
           <TabsContent value="events">
+             {/* Optionally show loading state here if EventsCommunity depends heavily on user */}
+             {/* {loading ? <div>Loading Events & Community...</div> : <EventsCommunity />} */}
             <EventsCommunity />
           </TabsContent>
 
           <TabsContent value="notifications">
+             {/* Optionally show loading state here if NotificationsPanel depends heavily on user */}
+             {/* {loading ? <div>Loading Notifications...</div> : <NotificationsPanel />} */}
             <NotificationsPanel />
           </TabsContent>
         </Tabs>
       </div>
 
       <div className="mt-8"><TrustBuildingSection /></div> {/* Added margin top for spacing */}
-      <div className="mt-8\"><FounderRoadmapSection /></div> {/* Added margin top for spacing */}
+      <div className="mt-8"><FounderRoadmapSection /></div> {/* Added margin top for spacing */}
     </DashboardLayout>
   );
 };
