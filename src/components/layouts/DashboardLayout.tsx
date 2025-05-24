@@ -1,67 +1,72 @@
-import React from 'react';
-import { DashboardHamburgerMenu } from '../dashboard/DashboardHamburgerMenu'; // مسیر صحیح برای وارد کردن منوی همبرگری
-import { Logo } from '../Logo'; // مسیر صحیح برای وارد کردن لوگو
-import { auth } from '@/lib/firebase'; // وارد کردن auth برای دسترسی به اطلاعات کاربر و signOut
-import { signOut } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom'; // برای هدایت پس از خروج
-import { toast } from '@/hooks/use-toast'; // برای نمایش پیام خروج موفق
-// REMOVED: import { useUser } from '@/contexts/UserContext'; // Import the useUser hook
+import React, { ReactNode } from 'react';
+import { Logo } from '../Logo'; // Import Logo as a named export
+import { DashboardHamburgerMenu } from '../dashboard/DashboardHamburgerMenu'; // Import DashboardHamburgerMenu as a named export
+import { useUser } from '@/contexts/UserContext'; // Import useUser hook
+import { signOut } from 'firebase/auth'; // Import signOut
+import { auth } from '@/lib/firebase'; // Import auth
 
+// Define props interface (adjust if needed, removing userEmail and userProfileImage)
 interface DashboardLayoutProps {
-  children: React.ReactNode;
-  // Assuming userEmail and userProfileImage are passed as props now
-  userEmail: string;
-  userProfileImage?: string;
+  children: ReactNode;
+  // userEmail and userProfileImage are now accessed via Context
+  // onSignOut is still needed if you manage sign out here
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userEmail, userProfileImage }) => {
-  const navigate = useNavigate();
-  // REMOVED: const { user, loading } = useUser(); // Use the useUser hook to get the user object
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => { // Removed userEmail, onSignOut, userProfileImage from props
+  const { user, loading, userProfileImage } = useUser(); // Use the useUser hook
 
+  // Handle sign out logic
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      toast({
-        title: "Sign Out Successful",
-        description: "You have been successfully signed out of your account.",
-      });
-      navigate('/');
+      // Redirect to login page after sign out if needed
+      // Example: navigate('/login'); (if you use react-router-dom's useNavigate)
     } catch (error) {
-      toast({
-        title: "Sign Out Error",
-        description: "There was a problem signing out. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Error signing out:", error);
+      // Handle sign out error if needed
     }
   };
 
-   // REMOVED: Conditional rendering based on loading or user state
-   // if (loading || !user) {
-   //   return <div>Loading...</div>; // Or a proper loading component
-   // }
+
+  // You might want to show a loading indicator while loading auth state
+  if (loading) {
+    return <div>Loading...</div>; // Replace with a proper loading component
+  }
+
+  // You might want to redirect unauthenticated users
+  if (!user) {
+    // Example: Redirect to login page
+    // navigate('/login'); (if you use react-router-dom's useNavigate)
+    return null; // Or a message indicating redirection
+  }
+
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm py-4 px-4 sm:px-6">
-        <div className="container max-w-7xl mx-auto flex justify-between items-center">
-          <Logo />
-          {/* منوی همبرگری در لایه‌بندی */}
-          {/* userEmail و onSignOut از لایه‌بندی پاس داده می شوند */}
-          <DashboardHamburgerMenu userEmail={userEmail || ""} onSignOut={handleSignOut} userProfileImage={userProfileImage} /> {/* Pass userEmail and userProfileImage */}
-        </div>
-      </header>
+      <div className="min-h-screen bg-slate-50">
+        {/* Header */}
+        <header className="bg-white shadow-sm py-4 px-4 sm:px-6">
+          <div className="container max-w-7xl mx-auto flex justify-between items-center">
+            <Logo />
+            {/* Pass userEmail and userProfileImage from Context */}
+            {/* Pass handleSignOut as before */}
+            <DashboardHamburgerMenu
+              userEmail={user?.email || ""} // Use user.email from Context
+              onSignOut={handleSignOut} // Pass the local handleSignOut
+              userProfileImage={userProfileImage} // Use userProfileImage from Context
+            />
+          </div>
+        </header>
 
-      {/* Main Content */}
-      <main className="py-8 px-4 sm:px-6">
-        <div className="container max-w-7xl mx-auto">
-          {children} {/* محتوای صفحه خاص در اینجا رندر می شود */}
-        </div>
-      </main>
+        {/* Main Content */}
+        <main className="py-8 px-4 sm:px-6">
+          <div className="container max-w-7xl mx-auto">
+            {children} {/* محتوای صفحه خاص در اینجا رندر می شود */}
+          </div>
+        </main>
 
-      {/* می توانید فوتر را نیز در اینجا اضافه کنید */}
-    </div>
-  );
-};
+        {/* می توانید فوتر را نیز در اینجا اضافه کنید */}
+      </div>
+    );
+  };
 
 export default DashboardLayout;
