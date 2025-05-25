@@ -69,10 +69,22 @@ export const signInWithLinkedInPlaceholder = () => {
   console.log("LinkedIn login feature coming soon.");
 };
 
-// Function to upload a profile image to Firebase Storage
-export const uploadProfileImage = async (file: File, userId: string): Promise<string> => {
+// Function to upload an image to Firebase Storage with a specified type
+export const uploadImage = async (file: File, userId: string, type: 'profile' | 'companyLogo'): Promise<string> => {
   const storage = getStorage();
-  const storageRef: StorageReference = ref(storage, `profile_pictures/${userId}`);
+  let storagePath: string;
+
+  // Determine the storage path based on the image type
+  if (type === 'profile') {
+    storagePath = `profile_pictures/${userId}`;
+  } else if (type === 'companyLogo') {
+    storagePath = `company_logos/${userId}`; // Use a different path for company logos
+  } else {
+    // Handle unexpected types or throw an error
+    throw new Error(`Unsupported image type: ${type}`);
+  }
+
+  const storageRef: StorageReference = ref(storage, storagePath);
 
   // Upload the file
   const snapshot = await uploadBytes(storageRef, file);
@@ -96,6 +108,9 @@ export const updateUserProfile = async (userId: string, profileData: {
   businessStage?: string;
   skills?: string[] | undefined;
   interests?: string[] | undefined;
+  companyName?: string;
+  companyLogoUrl?: string;
+  companyWebsiteUrl?: string;
 }) => {
   // Get a reference to the user's profile document
   const userDocRef = doc(db, 'userProfiles', userId);
