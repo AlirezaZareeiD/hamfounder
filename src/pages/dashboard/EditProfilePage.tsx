@@ -3,8 +3,8 @@ import DashboardLayout from '@/components/layouts/DashboardLayout'; // فرض ب
 import { ProfileImageUploader } from '@/components/dashboard/ProfileImageUploader'; // Import the new component
 import { getUserProfile, auth, updateUserProfile } from '@/lib/firebase'; // Import getUserProfile, auth, and updateUserProfile
 import TagsInput from 'react-tagsinput'; // Import TagsInput
-import 'react-tagsinput/react-tagsinput.css'; // Import react-tagsinput CSS
-import './EditProfilePage.css'; // Import custom CSS for this page
+// Remove the import for the custom CSS file
+// import './EditProfilePage.css'; // Import custom CSS for this page
 import { useToast } from '@/hooks/use-toast'; // Import useToast hook
 // import { useUser } from '@/contexts/UserContext'; // We are not using UserContext here anymore
 
@@ -196,278 +196,291 @@ const EditProfilePage: React.FC = () => {
 
   // You might want to show a loading indicator here while fetching profile data
   if (loading) {
-      return <DashboardLayout><div className="container mx-auto py-8">Loading Profile...</div></DashboardLayout>;
+      return (
+      <DashboardLayout>
+        <div className="container mx-auto py-8">Loading Profile...</div>
+      </DashboardLayout>
+      );
   }
 
   return (
     // DashboardLayout will get the userProfileImage from the UserContext
     <DashboardLayout> {/* استفاده از لایه‌بندی داشبورد */}
-      <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-4">Edit Profile</h1>
-        {/* Pass userProfileImage state to ProfileImageUploader */}
-        <ProfileImageUploader userProfileImage={userProfileImage} userId={auth.currentUser?.uid || ''} onImageUpdate={handleProfileImageUpdate} /> {/* Pass state and userId to ProfileImageUploader */}
-      </div>
-
-      {/* Personal Information Section */}
-      <div className="container mx-auto py-8">
-        <h2 className="text-2xl font-bold mb-4">Personal Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
-            <input
-              type="text"
-              id="firstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
-            <input
-              type="text"
-              id="lastName"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="pronouns" className="block text-sm font-medium text-gray-700">Pronouns</label>
-            <select
-              id="pronouns"
-              value={pronouns}
-              onChange={(e) => setPronouns(e.target.value)} // Update state on selection change
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="">Select Pronouns</option> {/* Optional: add a default empty option */}
-              <option value="She/Her">She/Her</option>
-              <option value="He/Him">He/Him</option>
-              <option value="They/Them">They/Them</option>
-              <option value="Don't Want To Share">Don't Want To Share</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="tagline" className="block text-sm font-medium text-gray-700">Tagline</label>
-            <input
-              type="text"
-              id="tagline"
-              value={tagline}
-              onChange={(e) => setTagline(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
-            <input
-              type="text"
-              id="location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Start typing to search for a city"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700">LinkedIn Url</label>
-            <input
-              type="text"
-              id="linkedinUrl"
-              value={linkedinUrl}
-              onChange={(e) => setLinkedinUrl(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="twitterUrl" className="block text-sm font-medium text-gray-700">Twitter Url</label>
-            <input
-              type="text"
-              id="twitterUrl"
-              value={twitterUrl}
-              onChange={(e) => setTwitterUrl(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            />
-          </div>
+      <div className="container mx-auto p-4 md:p-8"> {/* Adjusted padding for mobile and desktop */} {/* Main container for the page content */}
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">Edit Profile</h1> {/* Adjusted heading size and margin */}
+        <div className="mb-8"> {/* Added margin below the image uploader */}
+            {/* Pass userProfileImage state to ProfileImageUploader */}
+            <ProfileImageUploader userProfileImage={userProfileImage} userId={auth.currentUser?.uid || ''} onImageUpdate={handleProfileImageUpdate} /> {/* Pass state and userId to ProfileImageUploader */}
         </div>
-        {/* Save button for Personal Information */}
-        <button
-          className={`mt-4 px-4 py-2 bg-blue-600 text-white rounded-md ${isSavingPersonalInfo ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={handleSavePersonalInfo}
-          disabled={isSavingPersonalInfo} // Disable button while saving
-        >
-          {isSavingPersonalInfo ? 'Saving...' : 'Save Personal Information'} {/* Change button text while saving */}
-        </button>
-      </div>
 
-      {/* Personal Summary Section */}
-      <div className="container mx-auto py-8">
-        <h2 className="text-2xl font-bold mb-4">Personal Summary</h2>
-        <div>
-          <label htmlFor="personalSummary" className="block text-sm font-medium text-gray-700">Personal Summary</label>
-          <textarea
-            id="personalSummary"
-            rows={4} // Adjust rows as needed
-            value={personalSummary}
-            onChange={(e) => setPersonalSummary(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-          />
-        </div>
-        {/* Save button for Personal Summary */}
-        <button
-          className={`mt-4 px-4 py-2 bg-blue-600 text-white rounded-md ${isSavingPersonalSummary ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={handleSavePersonalSummary}
-          disabled={isSavingPersonalSummary} // Disable button while saving
-        >
-          {isSavingPersonalSummary ? 'Saving...' : 'Save Personal Summary'} {/* Change button text while saving */}
-        </button>
-      </div>
-
-      {/* Professional Information Section */}
-      <div className="container mx-auto py-8">
-        <h2 className="text-2xl font-bold mb-4">Professional Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="">Select Role</option>
-              <option value="Entrepreneur">Entrepreneur</option>
-              <option value="Investor">Investor</option>
-              <option value="Mentor">Mentor</option>
-              <option value="Service Provider">Service Provider</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="lookingFor" className="block text-sm font-medium text-gray-700">Looking For</label>
-            <select
-              id="lookingFor"
-              value={lookingFor}
-              onChange={(e) => setLookingFor(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="">Select What You're Looking For</option>
-              <option value="Co-founder">Co-founder</option>
-              <option value="Investment">Investment</option>
-              <option value="Mentorship">Mentorship</option>
-              <option value="Collaboration">Collaboration</option>
-              <option value="Services">Services</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="businessStage" className="block text-sm font-medium text-gray-700">Current Business Stage</label>
-            <select
-              id="businessStage"
-              value={businessStage}
-              onChange={(e) => setBusinessStage(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="">Select Business Stage</option>
-              <option value="Idea Stage">Idea Stage</option>
-              <option value="Prototype">Prototype</option>
-              <option value="Early Traction">Early Traction</option>
-              <option value="Scaling">Scaling</option>
-              <option value="Established">Established</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="skills" className="block text-sm font-medium text-gray-700">Skills</label>
-            <div style={{ position: 'relative' }}> {/* Added a container for positioning */}
-              <TagsInput
-                id="skills"
-                value={skills}
-                onChange={setSkills} // TagsInput provides the new array directly
-                className="react-tagsinput" // Use the default class for styling
-                renderInput={({ addTag, ...inputProps }) => {
-                  return (
-                    <input type="text" className="z-10 bg-white" {...inputProps} placeholder="Add skills by typing and pressing Enter or Tab" />
-                  );
-                }}
+        {/* Personal Information Section */}
+        <div className="bg-white p-6 rounded-lg shadow mb-8"> {/* Added card styling */}
+          <h2 className="text-xl md:text-2xl font-semibold mb-4">Personal Information</h2> {/* Adjusted heading size */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"> {/* Adjusted gap */}
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">First Name</label> {/* Adjusted margin */}
+              <input
+                type="text"
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
               />
-              <span
-                onClick={() => setShowSkillsTooltip(!showSkillsTooltip)}
-                style={{ cursor: 'pointer', marginLeft: '5px', position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }}
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">Last Name</label> {/* Adjusted margin */}
+              <input
+                type="text"
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
+              />
+            </div>
+            <div>
+              <label htmlFor="pronouns" className="block text-sm font-medium text-gray-700 mb-1">Pronouns</label> {/* Adjusted margin */}
+              <select
+                id="pronouns"
+                value={pronouns}
+                onChange={(e) => setPronouns(e.target.value)} // Update state on selection change
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              </span>
-              {/* The tooltip div for skills */}
-              {showSkillsTooltip && (
-                <div
-                  className="tooltip"
-                  style={{
-                    position: 'absolute', // Position the tooltip absolutely
-                    top: '100%', // Example: position below the icon/input
-                    left: '0', // Example: align to the left of the icon/input
-                    backgroundColor: '#333', // Example background
-                    color: '#fff', // Example text color
-                    padding: '5px', // Example padding
-                    borderRadius: '4px', // Example border radius
-                    zIndex: 20, // Ensure tooltip is above other elements
+                <option value="">Select Pronouns</option> {/* Optional: add a default empty option */}
+                <option value="She/Her">She/Her</option>
+                <option value="He/Him">He/Him</option>
+                <option value="They/Them">They/Them</option>
+                <option value="Don't Want To Share">Don't Want To Share</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="tagline" className="block text-sm font-medium text-gray-700 mb-1">Tagline</label> {/* Adjusted margin */}
+              <input
+                type="text"
+                id="tagline"
+                value={tagline}
+                onChange={(e) => setTagline(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
+              />
+            </div>
+            <div>
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label> {/* Adjusted margin */}
+              <input
+                type="text"
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Start typing to search for a city"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
+              />
+            </div>
+            <div>
+              <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 mb-1">LinkedIn Url</label> {/* Adjusted margin */}
+              <input
+                type="text"
+                id="linkedinUrl"
+                value={linkedinUrl}
+                onChange={(e) => setLinkedinUrl(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
+              />
+            </div>
+            <div>
+              <label htmlFor="twitterUrl" className="block text-sm font-medium text-gray-700 mb-1">Twitter Url</label> {/* Adjusted margin */}
+              <input
+                type="text"
+                id="twitterUrl"
+                value={twitterUrl}
+                onChange={(e) => setTwitterUrl(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
+              />
+            </div>
+          </div>
+          {/* Save button for Personal Information */}
+          <button
+            className={`mt-6 px-6 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isSavingPersonalInfo ? 'opacity-50 cursor-not-allowed' : ''}`} // Updated button styling
+            onClick={handleSavePersonalInfo}
+            disabled={isSavingPersonalInfo} // Disable button while saving
+          >
+            {isSavingPersonalInfo ? 'Saving...' : 'Save Personal Information'} {/* Change button text while saving */}
+          </button>
+        </div>
+
+        {/* Personal Summary Section */}
+        <div className="bg-white p-6 rounded-lg shadow mb-8"> {/* Added card styling */}
+          <h2 className="text-xl md:text-2xl font-semibold mb-4">Personal Summary</h2> {/* Adjusted heading size */}
+          <div>
+            <label htmlFor="personalSummary" className="block text-sm font-medium text-gray-700 mb-1">Personal Summary</label> {/* Adjusted margin */}
+            <textarea
+              id="personalSummary"
+              rows={4} // Adjust rows as needed
+              value={personalSummary}
+              onChange={(e) => setPersonalSummary(e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
+            />
+          </div>
+          {/* Save button for Personal Summary */}
+          <button
+            className={`mt-6 px-6 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isSavingPersonalSummary ? 'opacity-50 cursor-not-allowed' : ''}`} // Updated button styling
+            onClick={handleSavePersonalSummary}
+            disabled={isSavingPersonalSummary} // Disable button while saving
+          >
+            {isSavingPersonalSummary ? 'Saving...' : 'Save Personal Summary'} {/* Change button text while saving */}
+          </button>
+        </div>
+
+        {/* Professional Information Section */}
+        <div className="bg-white p-6 rounded-lg shadow mb-8"> {/* Added card styling */}
+          <h2 className="text-xl md:text-2xl font-semibold mb-4">Professional Information</h2> {/* Adjusted heading size */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"> {/* Adjusted gap */}
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">Role</label> {/* Adjusted margin */}
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
+              >
+                <option value="">Select Role</option>
+                <option value="Entrepreneur">Entrepreneur</option>
+                <option value="Investor">Investor</option>
+                <option value="Mentor">Mentor</option>
+                <option value="Service Provider">Service Provider</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="lookingFor" className="block text-sm font-medium text-gray-700 mb-1">Looking For</label> {/* Adjusted margin */}
+              <select
+                id="lookingFor"
+                value={lookingFor}
+                onChange={(e) => setLookingFor(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
+              >
+                <option value="">Select What You're Looking For</option>
+                <option value="Co-founder">Co-founder</option>
+                <option value="Investment">Investment</option>
+                <option value="Mentorship">Mentorship</option>
+                <option value="Collaboration">Collaboration</option>
+                <option value="Services">Services</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="businessStage" className="block text-sm font-medium text-gray-700 mb-1">Current Business Stage</label> {/* Adjusted margin */}
+              <select
+                id="businessStage"
+                value={businessStage}
+                onChange={(e) => setBusinessStage(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2" // Added padding
+              >
+                <option value="">Select Business Stage</option>
+                <option value="Idea Stage">Idea Stage</option>
+                <option value="Prototype">Prototype</option>
+                <option value="Early Traction">Early Traction</option>
+                <option value="Scaling">Scaling</option>
+                <option value="Established">Established</option>
+              </select>
+            </div>
+            {/* Skills Input */}
+            <div>
+              <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-1">Skills</label> {/* Adjusted margin */}
+              <div className="relative"> {/* Use Tailwind relative class */}
+                <TagsInput
+                  id="skills"
+                  value={skills}
+                  onChange={setSkills} // TagsInput provides the new array directly
+                  // Modified className for better tag display and input padding
+                  className="react-tagsinput border border-gray-300 rounded-md shadow-sm focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm flex flex-wrap items-center px-2 py-1 min-h-[38px]" // Applied Tailwind classes for flex container
+                  focusedClassName='react-tagsinput--focused' // Default class for focused state
+                  tagProps={{
+                    className: 'react-tagsinput-tag bg-blue-500 text-white rounded-md px-2 py-1 mr-1 my-0.5 text-sm inline-flex items-center', // Applied Tailwind classes for individual tags
+                    classNameRemove: 'react-tagsinput-remove ml-1 cursor-pointer text-white hover:text-gray-100', // Applied Tailwind classes
                   }}
-                >Add skills by typing and pressing Enter or Tab</div>
-              )}
+                  inputProps={{
+                    className: 'react-tagsinput-input px-3 py-2 text-sm w-full', // Applied Tailwind classes
+                    placeholder: 'Add skills by typing and pressing Enter or Tab',
+                  }}
+                  renderInput={({ addTag, ...inputProps }) => {
+                    return (
+                      // Modified className for input to take available space
+                      <input type="text" className="react-tagsinput-input px-1 py-0.5 text-sm outline-none flex-grow min-w-[100px]" {...inputProps} placeholder="Add skills by typing and pressing Enter or Tab" /> // Ensure input itself has no default outline and grows
+                    );
+                  }}
+                />
+                <span
+                  onClick={() => setShowSkillsTooltip(!showSkillsTooltip)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600" // Applied Tailwind classes
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </span>
+                {/* The tooltip div for skills */}
+                {showSkillsTooltip && (
+                  <div
+                    className="absolute top-full left-0 mt-2 w-max rounded-md bg-gray-800 text-white text-xs px-3 py-2 shadow-lg z-20" // Applied Tailwind classes for tooltip
+                  >
+                    Add skills by typing and pressing Enter or Tab
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-          <div>
-            <label htmlFor="interests" className="block text-sm font-medium text-gray-700">
-              Interests
-            </label>
-            <div style={{ position: 'relative' }}> {/* Added a container for positioning */}
-              <TagsInput
-                id="interests"
-                // @ts-ignore // Ignore TypeScript error for now if needed
-                value={interests}
-                onChange={setInterests} // TagsInput provides the new array directly
-                className="react-tagsinput" // Use the default class for styling
-                renderInput={({ addTag, ...inputProps }) => {
-                  return (
-                    <input type="text" className="z-10 bg-white" {...inputProps} placeholder="Add interests by typing and pressing Enter or Tab" />
-                  );
-                }}
-              />
-              <span
-                onClick={() => setShowInterestsTooltip(!showInterestsTooltip)}
-                style={{ cursor: 'pointer', marginLeft: '5px', position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              </span>
-              {/* The tooltip div for interests */}
-              {showInterestsTooltip && (
-                <div
-                   className="tooltip"
-                   style={{
-                     position: 'absolute', // Position the tooltip absolutely
-                     top: '100%', // Example: position below the icon/input
-                     left: '0', // Example: align to the left of the icon/input
-                     backgroundColor: '#333', // Example background
-                     color: '#fff', // Example text color
-                     padding: '5px', // Example padding
-                     borderRadius: '4px', // Example border radius
-                     zIndex: 20, // Ensure tooltip is above other elements
+            {/* Interests Input */}
+            <div>
+              <label htmlFor="interests" className="block text-sm font-medium text-gray-700 mb-1">
+                Interests
+              </label> {/* Adjusted margin */}
+              <div className="relative"> {/* Use Tailwind relative class */}
+                <TagsInput
+                  id="interests"
+                  // @ts-ignore // Ignore TypeScript error for now if needed
+                  value={interests}
+                  onChange={setInterests} // TagsInput provides the new array directly
+                  // Modified className for better tag display and input padding
+                  className="react-tagsinput border border-gray-300 rounded-md shadow-sm focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm flex flex-wrap items-center px-2 py-1 min-h-[38px]" // Applied Tailwind classes for flex container
+                   focusedClassName='react-tagsinput--focused' // Default class for focused state
+                   tagProps={{
+                     className: 'react-tagsinput-tag bg-blue-500 text-white rounded-md px-2 py-1 mr-1 my-0.5 text-sm inline-flex items-center', // Applied Tailwind classes for individual tags
+                     classNameRemove: 'react-tagsinput-remove ml-1 cursor-pointer text-white hover:text-gray-100', // Applied Tailwind classes
                    }}
-                >Add interests by typing and pressing Enter or Tab</div>
-              )}
+                   inputProps={{
+                     className: 'react-tagsinput-input px-3 py-2 text-sm w-full', // Applied Tailwind classes
+                     placeholder: 'Add interests by typing and pressing Enter or Tab',
+                   }}
+                   renderInput={({ addTag, ...inputProps }) => {
+                     return (
+                       // Modified className for input to take available space
+                       <input type="text" className="react-tagsinput-input px-1 py-0.5 text-sm outline-none flex-grow min-w-[100px]" {...inputProps} placeholder="Add interests by typing and pressing Enter or Tab" /> // Ensure input itself has no default outline and grows
+                     );
+                   }}
+                />
+                <span
+                  onClick={() => setShowInterestsTooltip(!showInterestsTooltip)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600" // Applied Tailwind classes
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </span>
+                {/* The tooltip div for interests */}
+                {showInterestsTooltip && (
+                  <div
+                     className="absolute top-full left-0 mt-2 w-max rounded-md bg-gray-800 text-white text-xs px-3 py-2 shadow-lg z-20" // Applied Tailwind classes for tooltip
+                   >
+                     Add interests by typing and pressing Enter or Tab
+                   </div>
+                )}
+              </div>
             </div>
           </div>
+          {/* Save button for Professional Information */}
+          <button
+            className={`mt-6 px-6 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isSavingProfessionalInfo ? 'opacity-50 cursor-not-allowed' : ''}`} // Updated button styling
+            onClick={handleSaveProfessionalInfo}
+            disabled={isSavingProfessionalInfo} // Disable button while saving
+          >
+            {isSavingProfessionalInfo ? 'Saving...' : 'Save Professional Information'} {/* Change button text while saving */}
+          </button>
         </div>
-        {/* Save button for Professional Information */}
-        <button
-          className={`mt-4 px-4 py-2 bg-blue-600 text-white rounded-md ${isSavingProfessionalInfo ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={handleSaveProfessionalInfo}
-          disabled={isSavingProfessionalInfo} // Disable button while saving
-        >
-          {isSavingProfessionalInfo ? 'Saving...' : 'Save Professional Information'} {/* Change button text while saving */}
-        </button>
-
       </div>
     </DashboardLayout> // Close DashboardLayout
   );
