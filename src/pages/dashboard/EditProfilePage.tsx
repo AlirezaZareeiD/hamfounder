@@ -355,8 +355,8 @@ const EditProfilePage: React.FC = () => {
             <button
               onClick={handleSavePersonalInfo}
               disabled={isSavingPersonalInfo}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
+              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
+              >
               {isSavingPersonalInfo ? 'Saving...' : 'Save Personal Info'}
             </button>
           </div>
@@ -379,8 +379,8 @@ const EditProfilePage: React.FC = () => {
             <button
               onClick={handleSavePersonalSummary}
               disabled={isSavingPersonalSummary}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
+              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
+              >
               {isSavingPersonalSummary ? 'Saving...' : 'Save Personal Summary'}
             </button>
           </div>
@@ -472,7 +472,7 @@ const EditProfilePage: React.FC = () => {
                <TagsInput
                 value={skills}
                 onChange={setSkills}
-                tagProps={{ className: 'react-tagsinput-tag bg-blue-500 text-white rounded px-2 py-1 mr-1 text-sm' }}
+                tagProps={{ className: 'react-tagsinput-tag bg-black text-white rounded px-2 py-1 mr-1 text-sm' }}
                 inputProps={{ placeholder: 'Add a skill' }}
                 className="react-tagsinput border border-gray-300 rounded-md p-2 w-full focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm"
               />
@@ -498,7 +498,7 @@ const EditProfilePage: React.FC = () => {
                <TagsInput
                 value={interests}
                 onChange={setInterests}
-                tagProps={{ className: 'react-tagsinput-tag bg-green-500 text-white rounded px-2 py-1 mr-1 text-sm' }}
+                tagProps={{ className: 'react-tagsinput-tag bg-black text-white rounded px-2 py-1 mr-1 text-sm' }}
                 inputProps={{ placeholder: 'Add an interest' }}
                  className="react-tagsinput border border-gray-300 rounded-md p-2 w-full focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm"
               />
@@ -535,8 +535,8 @@ const EditProfilePage: React.FC = () => {
             <button
               onClick={handleSaveProfessionalInfo}
               disabled={isSavingProfessionalInfo}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
+              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
+              >
               {isSavingProfessionalInfo ? 'Saving...' : 'Save Professional Info'}
             </button>
           </div>
