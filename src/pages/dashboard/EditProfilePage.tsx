@@ -296,7 +296,7 @@ const EditProfilePage: React.FC = () => {
           </div>
           {/* Save button for Personal Information */}
           <button
-            className={`mt-6 px-6 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isSavingPersonalInfo ? 'opacity-50 cursor-not-allowed' : ''}`} // Updated button styling
+            className={`mt-6 px-6 py-2 bg-black text-white rounded-md font-semibold hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isSavingPersonalInfo ? 'opacity-50 cursor-not-allowed' : ''}`} // Updated button styling
             onClick={handleSavePersonalInfo}
             disabled={isSavingPersonalInfo} // Disable button while saving
           >
@@ -319,7 +319,7 @@ const EditProfilePage: React.FC = () => {
           </div>
           {/* Save button for Personal Summary */}
           <button
-            className={`mt-6 px-6 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isSavingPersonalSummary ? 'opacity-50 cursor-not-allowed' : ''}`} // Updated button styling
+            className={`mt-6 px-6 py-2 bg-black text-white rounded-md font-semibold hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isSavingPersonalSummary ? 'opacity-50 cursor-not-allowed' : ''}`} // Updated button styling
             onClick={handleSavePersonalSummary}
             disabled={isSavingPersonalSummary} // Disable button while saving
           >
@@ -392,7 +392,7 @@ const EditProfilePage: React.FC = () => {
                   className="react-tagsinput border border-gray-300 rounded-md shadow-sm focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm flex flex-wrap items-center px-2 py-1 min-h-[38px]" // Applied Tailwind classes for flex container
                   focusedClassName='react-tagsinput--focused' // Default class for focused state
                   tagProps={{
-                    className: 'react-tagsinput-tag bg-blue-500 text-white rounded-md px-2 py-1 mr-1 my-0.5 text-sm inline-flex items-center', // Applied Tailwind classes for individual tags
+                    className: 'react-tagsinput-tag bg-black text-white rounded-md px-2 py-1 mr-1 my-0.5 text-sm inline-flex items-center', // Applied Tailwind classes for individual tags
                     classNameRemove: 'react-tagsinput-remove ml-1 cursor-pointer text-white hover:text-gray-100', // Applied Tailwind classes
                   }}
                   inputProps={{
@@ -439,7 +439,7 @@ const EditProfilePage: React.FC = () => {
                   className="react-tagsinput border border-gray-300 rounded-md shadow-sm focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm flex flex-wrap items-center px-2 py-1 min-h-[38px]" // Applied Tailwind classes for flex container
                    focusedClassName='react-tagsinput--focused' // Default class for focused state
                    tagProps={{
-                     className: 'react-tagsinput-tag bg-blue-500 text-white rounded-md px-2 py-1 mr-1 my-0.5 text-sm inline-flex items-center', // Applied Tailwind classes for individual tags
+                     className: 'react-tagsinput-tag bg-black text-white rounded-md px-2 py-1 mr-1 my-0.5 text-sm inline-flex items-center', // Applied Tailwind classes for individual tags
                      classNameRemove: 'react-tagsinput-remove ml-1 cursor-pointer text-white hover:text-gray-100', // Applied Tailwind classes
                    }}
                    inputProps={{
@@ -474,7 +474,7 @@ const EditProfilePage: React.FC = () => {
           </div>
           {/* Save button for Professional Information */}
           <button
-            className={`mt-6 px-6 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isSavingProfessionalInfo ? 'opacity-50 cursor-not-allowed' : ''}`} // Updated button styling
+            className={`mt-6 px-6 py-2 bg-black text-white rounded-md font-semibold hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isSavingProfessionalInfo ? 'opacity-50 cursor-not-allowed' : ''}`} // Updated button styling
             onClick={handleSaveProfessionalInfo}
             disabled={isSavingProfessionalInfo} // Disable button while saving
           >
