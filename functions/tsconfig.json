@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "noImplicitReturns": true,
+      "noUnusedLocals": true,
+      "outDir": "lib",
+      "sourceMap": true,
+      "strict": true,
+      "target": "es2017",
+      "esModuleInterop": true  // اضافه شده برای سازگاری بهتر با ماژول‌ها
+    },
+    "compileOnSave": true,
+    "include": [
+      "src/**/*.ts"  // TypeScript files are in the src folder
+    ]
+  }
+  
