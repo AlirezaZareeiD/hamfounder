@@ -25,6 +25,7 @@ const EditProfilePage: React.FC = () => {
   // Personal Information states
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [displayName, setDisplayName] = useState(''); // Added displayName state
   const [pronouns, setPronouns] = useState('');
   const [tagline, setTagline] = useState('');
   const [location, setLocation] = useState('');
@@ -49,6 +50,7 @@ const EditProfilePage: React.FC = () => {
 
   // Initialize useToast hook
   const { toast } = useToast();
+
   // useEffect to fetch user profile data on component mount
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -61,6 +63,7 @@ const EditProfilePage: React.FC = () => {
             // Populate personal information states
             setFirstName(profile.firstName || '');
             setLastName(profile.lastName || '');
+            setDisplayName(profile.displayName || ''); // Populate displayName state
             setPronouns(profile.pronouns || '');
             setTagline(profile.tagline || '');
             setLocation(profile.location || '');
@@ -137,6 +140,7 @@ const EditProfilePage: React.FC = () => {
     const personalInfoData = {
       firstName,
       lastName,
+      displayName, // Added displayName to the data being saved
       pronouns,
       tagline,
       location,
@@ -182,6 +186,7 @@ const EditProfilePage: React.FC = () => {
       toast({ title: "Error", description: "Failed to save personal summary.", variant: "destructive" });
     } finally { setIsSavingPersonalSummary(false); }
   };
+
   const handleSaveProfessionalInfo = async () => {
     setIsSavingProfessionalInfo(true);
     const userId = auth.currentUser?.uid;
@@ -287,6 +292,18 @@ const EditProfilePage: React.FC = () => {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
+              />
+            </div>
+            {/* Display Name - Added new input field */}
+            <div>
+              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+              <input
+                type="text"
+                id="displayName"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
+                placeholder="e.g. John Doe or Your Company Name" // Added a placeholder for guidance
               />
             </div>
             {/* Pronouns */}
