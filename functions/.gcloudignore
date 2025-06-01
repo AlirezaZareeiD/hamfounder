@@ -1,0 +1,19 @@
+gitignore
+# Ignore everything except the lib directory and node_modules in this functions directory
+*
+
+# Unignore the lib directory
+!/lib
+
+# Unignore the node_modules directory in this functions directory
+!/node_modules
+
+# Unignore package.json and package-lock.json in this functions directory
+!/package.json
+!/package-lock.json
+
+# Optionally, if you have a .env file in functions directory
+!/.env
+
+# Ignore .gcloudignore itself
+.gcloudignore

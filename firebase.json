@@ -12,17 +12,17 @@
         "destination": "/index.html"
       }
     ],
-    "headers": [  // اضافه کردن بخش headers
+    "headers": [
       {
-        "source": "**/*.{html,js,css,svg,png,jpg,gif,webp}",  // الگوهای فایل برای اعمال هدرها
+        "source": "**/*.{html,js,css,svg,png,jpg,gif,webp}",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "max-age=31536000"  // مثال: تنظیم Cache-Control
+            "value": "max-age=31536000"
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.google.com https://www.gstatic.com;"  // تنظیم CSP با دامنه‌های reCAPTCHA
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.google.com https://www.gstatic.com;"
           }
         ]
       }
@@ -38,6 +38,10 @@
         "firebase-debug.log",
         "firebase-debug.*.log",
         "*.local"
+      ],
+      "predeploy": [
+       // "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
     }
   ]
