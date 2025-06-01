@@ -14,7 +14,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import EditProfilePage from "./pages/dashboard/EditProfilePage"; // وارد کردن صفحه ویرایش پروفایل
 import FindCofounderPage from "./pages/dashboard/FindCofounderPage"; // وارد کردن صفحه جستجوی کوفاندر
 import NotificationsPage from "./pages/dashboard/NotificationsPage"; // وارد کردن صفحه نوتیفیکیشن ها
-
+import ProjectDetailsPage from './components/dashboard/ProjectDetailsPage'; // Import ProjectDetailsPage
 
 const queryClient = new QueryClient();
 
@@ -30,16 +30,23 @@ const App = () => (
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           {/* مسیر اصلی داشبورد */} {/* Fix: Ensure Dashboard is a child of Routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
+          {/* از کامپوننت Dashboard به عنوان یک Layout برای مسیرهای داخلی آن استفاده کنید */}
+          {/* یا هر مسیر داخلی داشبورد را مستقیم در اینجا تعریف کنید */}
+          <Route path="/dashboard" element={<Dashboard />} /> {/* مسیر اصلی داشبورد */}
+
           {/* اضافه کردن مسیرهای جدید برای صفحات موقت داشبورد */}
           <Route path="/dashboard/edit-profile" element={<EditProfilePage />} />
           <Route path="/dashboard/find-cofounder" element={<FindCofounderPage />} />
           <Route path="/dashboard/notifications" element={<NotificationsPage />} />
+
+          {/* مسیر جدید برای صفحه جزئیات پروژه - استفاده از :projectId به عنوان پارامتر دینامیک */}
+          <Route path="/dashboard/projects/:projectId" element={<ProjectDetailsPage />} />
+
+          {/* مسیر Catch-all برای صفحات یافت نشد */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
-
 export default App;

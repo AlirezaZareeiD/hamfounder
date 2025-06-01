@@ -4,13 +4,13 @@ import {
   Users,
   Calendar,
   MoreVertical,
-  ChevronRight,
+  ChevronRight, // Keep ChevronRight for the button icon
   Rocket,
   Lock,
   Globe,
   Briefcase,
   Search,
-  Trash2 // Import Trash2 icon for delete
+  Trash2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,10 +26,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUser } from '@/contexts/UserContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot, DocumentData, deleteDoc, doc } from 'firebase/firestore'; // Import deleteDoc and doc
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"; // Import DialogFooter and DialogClose
+import { collection, query, where, onSnapshot, DocumentData, deleteDoc, doc } from 'firebase/firestore';
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import ProjectForm from './ProjectForm';
-import { useToast } from '@/hooks/use-toast'; // Import useToast
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 
 interface Project {
@@ -40,7 +41,7 @@ interface Project {
   progress: number;
   isPrivate: boolean;
   team: { id: string; name: string; image?: string }[];
-  lastUpdate: string;
+  lastUpdate: string; // Note: This is likely not in Firestore and might need to be removed or calculated
   tasks: {
     completed: number;
     total: number;
@@ -55,17 +56,18 @@ interface Project {
 
 const MyProjects = () => {
   const [filter, setFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); // State for delete dialog
-  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null); // State for project to delete
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
-
+  const navigate = useNavigate(); // Initialize navigate hook
   const { user, loading: userLoading } = useUser();
-  const { toast } = useToast(); // Initialize toast hook
+  const { toast } = useToast();
 
 
   useEffect(() => {
@@ -84,7 +86,7 @@ const MyProjects = () => {
             progress: data.progress || 0,
             isPrivate: data.isPrivate ?? false,
             team: data.team || [],
-            lastUpdate: data.lastUpdate || 'N/A',
+            lastUpdate: data.lastUpdate || 'N/A', // Still keeping this, but remember it's not in Firestore
             tasks: data.tasks || { completed: 0, total: 0 },
             ownerId: data.ownerId,
             ownerInfo: data.ownerInfo || {}
@@ -106,12 +108,18 @@ const MyProjects = () => {
   }, [user, userLoading]);
 
 
-  const filteredProjects = filter === 'all' ? projects :
-    projects.filter(project => {
-      if (filter === 'private') return project.isPrivate;
-      if (filter === 'public') return !project.isPrivate;
-      return true;
-    });
+  const filteredAndSearchedProjects = projects.filter(project => {
+      const filterMatch = filter === 'all' ||
+                          (filter === 'public' && !project.isPrivate) ||
+                          (filter === 'private' && project.isPrivate);
+
+      const searchMatch = searchTerm.trim() === '' ||
+                          project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          project.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return filterMatch && searchMatch;
+  });
+
 
    const handleCreateNewProject = () => {
        setEditingProject(null);
@@ -123,29 +131,26 @@ const MyProjects = () => {
        setIsFormOpen(true);
    };
 
-   // Function to handle clicking the Delete menu item
    const handleDeleteClick = (project: Project) => {
-       setProjectToDelete(project); // Set the project to be deleted
-       setIsDeleteDialogOpen(true); // Open the delete confirmation dialog
+       setProjectToDelete(project);
+       setIsDeleteDialogOpen(true);
    };
 
-
-   // Function to handle confirming the delete action
    const handleConfirmDelete = async () => {
        if (!projectToDelete) return;
 
-       setIsDeleteDialogOpen(false); // Close the dialog immediately
+       setIsDeleteDialogOpen(false);
 
        try {
            const projectRef = doc(db, 'projects', projectToDelete.id);
-           await deleteDoc(projectRef); // Delete the document from Firestore
+           await deleteDoc(projectRef);
 
            toast({
                title: "Success",
                description: `${projectToDelete.name} deleted successfully!`,
            });
 
-           setProjectToDelete(null); // Clear the projectToDelete state
+           setProjectToDelete(null);
 
        } catch (error) {
            console.error("Error deleting project:", error);
@@ -154,7 +159,7 @@ const MyProjects = () => {
                description: `Failed to delete ${projectToDelete.name}. Please try again.`,
                variant: "destructive",
            });
-            setProjectToDelete(null); // Clear the state even on error
+            setProjectToDelete(null);
        }
    };
 
@@ -162,6 +167,11 @@ const MyProjects = () => {
    const handleFormSuccess = () => {
        setIsFormOpen(false);
        setEditingProject(null);
+   };
+
+   // Function to navigate to Project Details page
+   const handleViewProject = (projectId: string) => {
+       navigate(`/dashboard/projects/${projectId}`); // Navigate to the specific project details URL
    };
 
 
@@ -197,10 +207,11 @@ const MyProjects = () => {
               type="text"
               placeholder="Search projects..."
               className="pl-9 pr-4 py-2 text-sm border rounded-md w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          {/* New Project Button with Dialog Trigger */}
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <DialogTrigger asChild>
                 <Button className="flex items-center gap-1 w-full sm:w-auto" onClick={handleCreateNewProject}>
@@ -247,15 +258,16 @@ const MyProjects = () => {
         </Button>
       </div>
 
-      {/* Display "No projects found" message only when filteredProjects is empty */}
-      {filteredProjects.length === 0 ? (
+      {filteredAndSearchedProjects.length === 0 ? (
          <div className="text-center text-slate-600 mt-8">
-             <p>No projects found.</p>
-             <p>Click "New Project" to create your first project.</p>
+             <p>No projects found matching your criteria.</p>
+             {searchTerm.trim() === '' && filter === 'all' && (
+                 <p>Click "New Project" to create your first project.</p>
+             )}
          </div>
       ) : (
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-           {filteredProjects.map((project) => (
+           {filteredAndSearchedProjects.map((project) => (
              <Card key={project.id} className="relative group hover:shadow-md transition-shadow">
                <CardHeader className="pb-2">
                  <CardTitle className="text-lg font-bold text-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
@@ -270,14 +282,16 @@ const MyProjects = () => {
                        </Button>
                      </DropdownMenuTrigger>
                      <DropdownMenuContent align="end">
-                       <DropdownMenuItem>View Project</DropdownMenuItem>
+                       {/* Updated onClick to navigate */}
+                       <DropdownMenuItem onClick={() => handleViewProject(project.id)}>
+                           View Project
+                       </DropdownMenuItem>
                        <DropdownMenuItem onClick={() => handleEditProject(project)}>Edit Details</DropdownMenuItem>
                        <DropdownMenuItem>Manage Team</DropdownMenuItem>
                        <DropdownMenuSeparator />
-                       {/* Delete Project Menu Item - calls handleDeleteClick */}
                        <DropdownMenuItem
                            className="text-destructive"
-                           onClick={() => handleDeleteClick(project)} // Call handler on click
+                           onClick={() => handleDeleteClick(project)}
                        >
                            <Trash2 className="h-4 w-4 mr-2" /> Delete Project
                        </DropdownMenuItem>
@@ -303,8 +317,6 @@ const MyProjects = () => {
                      <Rocket className="h-3 w-3 mr-1" />
                      {project.stage} Stage
                    </Badge>
-                   {/* lastUpdate is not in Firestore project document */}
-                   {/* <span className="text-xs text-slate-500">Updated {project.lastUpdate}</span> */}
                  </div>
 
 
@@ -335,7 +347,9 @@ const MyProjects = () => {
                    </div>
 
 
-                 <Button variant="outline" size="sm" className="w-full mt-2">
+                 {/* The button at the bottom of the card can also navigate */}
+                 {/* Updated onClick to navigate */}
+                 <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => handleViewProject(project.id)}>
                    View Project <ChevronRight className="h-4 w-4 ml-1" />
                  </Button>
                </CardContent>
@@ -344,7 +358,6 @@ const MyProjects = () => {
          </div>
       )}
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent>
               <DialogTitle>Confirm Deletion</DialogTitle>
