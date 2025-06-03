@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Import useEffect
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,64 +6,170 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUser } from '@/contexts/UserContext';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore'; // Import updateDoc and doc
+import { db, forceRefreshToken } from '@/lib/firebase'; // Import forceRefreshToken
+import { collection, addDoc, updateDoc, doc, serverTimestamp, getDocs } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { PlusCircle, MinusCircle } from 'lucide-react'; // Import icons
 
+
+
+// Define interfaces
+interface Document {
+    name: string;
+    url?: string;
+    description?: string;
+}
 
 interface ProjectFormData {
   name: string;
   description: string;
   stage: string;
   isPrivate: boolean;
-  // Add other fields as needed based on your project schema
+  fundingStage: string;
+  mvpStatus: string;
+  tags: string[];
+  milestones: string;
+  documents: Document[];
 }
 
-// Define the Project interface here or import it if already defined elsewhere
+
 interface Project {
   id: string;
   name: string;
   description: string;
   stage: string;
-  progress: number; // Assuming progress is a number
+  progress: number;
   isPrivate: boolean;
-  // Add other fields that might be in initialData
   ownerId: string;
   ownerInfo: {
     displayName?: string;
     profileImageUrl?: string;
   };
-  createdAt: any; // Use 'any' or Firebase Timestamp type if available
-  updatedAt: any; // Use 'any' or Firebase Timestamp type if available
+  createdAt: any;
+  updatedAt: any;
   tasks: {
     completed: number;
     total: number;
   };
-  // Add other fields that might be in the initialData object
-  milestones?: any[];
-  documents?: any[];
-  fundingStage?: string;
-  mvpStatus?: string;
+  fundingStage: string;
+  mvpStatus: string;
+  tags: string[];
+  milestones: string;
+  documents: Document[];
 }
+
+
 
 
 interface ProjectFormProps {
     onSuccess?: () => void;
-    initialData?: Project | null; // Add initialData prop for editing
+    initialData?: Project | null;
 }
 
 
-const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => { // Receive initialData prop
+
+
+const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => {
   const [formData, setFormData] = useState<ProjectFormData>({
     name: '',
     description: '',
     stage: '',
     isPrivate: false,
-    // Initialize other fields here
+    fundingStage: '',
+    mvpStatus: '',
+    tags: [],
+    milestones: '',
+    documents: [],
   });
   const [isSaving, setIsSaving] = useState(false);
   const { user } = useUser();
   const { toast } = useToast();
+
+  console.log("Current user:", user); // Added console log to check user status
+
+  // State for dropdown options
+  const [stages, setStages] = useState<{ name: string; id: string }[]>([]);
+  const [fundingStages, setFundingStages] = useState<{ name: string; id: string }[]>([]);
+  const [mvpStatuses, setMvpStatuses] = useState<{ name: string; id: string }[]>([]);
+  const [allMilestones, setAllMilestones] = useState<{ name: string; id: string }[]>([]);
+
+
+  // useEffect to fetch dropdown options from Firebase
+  useEffect(() => {
+      const fetchDropdownOptions = async () => {
+          // Force refresh auth token (NEWLY ADDED)
+          await forceRefreshToken();
+          console.log("Attempting to fetch dropdown data after token refresh...");
+
+
+          try {
+              console.log("Attempting to fetch projectStages...");
+              const stagesSnapshot = await getDocs(collection(db, 'projectStages'));
+              setStages(stagesSnapshot.docs.map(doc => ({ name: doc.data().name, id: doc.id })));
+              console.log("Successfully fetched projectStages:", stagesSnapshot.docs.length, "documents.");
+
+          } catch (error) {
+              console.error("Error fetching projectStages:", error);
+              toast({
+                  title: "Error",
+                  description: "Failed to load Project Stages.",
+                  variant: "destructive",
+              });
+          }
+
+          try {
+              console.log("Attempting to fetch fundingStage...");
+              const fundingStagesSnapshot = await getDocs(collection(db, 'fundingStage'));
+              setFundingStages(fundingStagesSnapshot.docs.map(doc => ({ name: doc.data().name, id: doc.id })));
+              console.log("Successfully fetched fundingStage:", fundingStagesSnapshot.docs.length, "documents.");
+
+          } catch (error) {
+              console.error("Error fetching fundingStage:", error);
+              toast({
+                  title: "Error",
+                  description: "Failed to load Funding Stages.",
+                  variant: "destructive",
+              });
+          }
+
+           try {
+              console.log("Attempting to fetch mvpStatus...");
+              const mvpStatusesSnapshot = await getDocs(collection(db, 'mvpStatus'));
+              setMvpStatuses(mvpStatusesSnapshot.docs.map(doc => ({ name: doc.data().name, id: doc.id })));
+               console.log("Successfully fetched mvpStatus:", mvpStatusesSnapshot.docs.length, "documents.");
+
+          } catch (error) {
+              console.error("Error fetching mvpStatus:", error);
+              toast({
+                  title: "Error",
+                  description: "Failed to load MVP Statuses.",
+                  variant: "destructive",
+              });
+          }
+
+          try {
+              console.log("Attempting to fetch milestones...");
+              const milestonesSnapshot = await getDocs(collection(db, 'milestones'));
+              setAllMilestones(milestonesSnapshot.docs.map(doc => ({ name: doc.data().name, id: doc.id })));
+              console.log("Successfully fetched milestones:", milestonesSnapshot.docs.length, "documents.");
+
+          } catch (error) {
+              console.error("Error fetching milestones:", error);
+              toast({
+                  title: "Error",
+                  description: "Failed to load Milestones.",
+                  variant: "destructive",
+              });
+          }
+      };
+
+      // Only fetch options if user is logged in.
+      if (user) {
+        fetchDropdownOptions();
+      }
+
+  }, [toast, user]); // Add user to dependency array
+
 
   // useEffect to populate form when initialData changes (for editing)
   useEffect(() => {
@@ -72,26 +178,34 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
               name: initialData.name || '',
               description: initialData.description || '',
               stage: initialData.stage || '',
-              isPrivate: initialData.isPrivate ?? false, // Use nullish coalescing for boolean
-              // Populate other fields from initialData if needed
+              isPrivate: initialData.isPrivate ?? false,
+              fundingStage: initialData.fundingStage || '',
+              mvpStatus: initialData.mvpStatus || '',
+              tags: initialData.tags || [],
+              milestones: initialData.milestones || '',
+              documents: initialData.documents || [],
           });
       } else {
-          // Clear form if initialData is null (for creating)
            setFormData({
              name: '',
              description: '',
              stage: '',
              isPrivate: false,
-             // Reset other fields
+             fundingStage: '',
+             mvpStatus: '',
+             tags: [],
+             milestones: '',
+             documents: [],
            });
       }
-  }, [initialData]); // Rerun effect when initialData changes
+  }, [initialData]);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
   };
+
 
    const handleSelectChange = (id: keyof ProjectFormData, value: string) => {
         setFormData(prev => ({ ...prev, [id]: value }));
@@ -102,9 +216,41 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
         setFormData(prev => ({ ...prev, [id]: checked }));
     };
 
+   // Handler for tags input (simple comma separation)
+   const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        // Split by comma, trim whitespace, filter out empty strings
+        const newTags = value.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+        setFormData(prev => ({ ...prev, tags: newTags }));
+   };
+
+   // Handler for documents input
+   const handleDocumentChange = (index: number, field: keyof Document, value: string) => {
+       setFormData(prev => {
+           const newDocuments = [...prev.documents];
+           newDocuments[index] = { ...newDocuments[index], [field]: value };
+           return { ...prev, documents: newDocuments };
+       });
+   };
+
+    const handleAddDocument = () => {
+        setFormData(prev => ({
+            ...prev,
+            documents: [...prev.documents, { name: '', url: '', description: '' }]
+        }));
+    };
+
+    const handleRemoveDocument = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            documents: prev.documents.filter((_, i) => i !== index)
+        }));
+    };
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
 
     if (!user) {
       toast({
@@ -115,9 +261,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
       return;
     }
 
+
     setIsSaving(true);
 
-    // Basic validation
+
+    // Basic validation (can be extended for new fields)
     if (!formData.name.trim() || !formData.description.trim() || !formData.stage.trim()) {
          toast({
             title: "Validation Error",
@@ -128,15 +276,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
          return;
     }
 
+
     try {
         if (initialData) {
             // Update existing project
-            const projectRef = doc(db, 'projects', initialData.id); // Get reference to the existing document
+            const projectRef = doc(db, 'projects', initialData.id);
             await updateDoc(projectRef, {
                 ...formData,
-                updatedAt: serverTimestamp(), // Update the timestamp
-                // Do NOT update ownerId, createdAt, progress, tasks directly here
-                // These should be handled by backend/Cloud Functions if needed
+                updatedAt: serverTimestamp(),
             });
 
             toast({
@@ -150,7 +297,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
             await addDoc(projectsCollectionRef, {
                 ...formData,
                 ownerId: user.uid,
-                ownerInfo: { // Initialize ownerInfo - will be updated by Cloud Function later
+                ownerInfo: {
                     displayName: user.displayName || null,
                     profileImageUrl: user.photoURL || null,
                 },
@@ -158,11 +305,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
                 updatedAt: serverTimestamp(),
                 progress: 0,
                 tasks: { completed: 0, total: 0 },
-                milestones: [],
-                documents: [],
-                fundingStage: '',
-                mvpStatus: '',
-                // ... add other initial fields
             });
 
             toast({
@@ -172,24 +314,28 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
         }
 
 
-      // Call the onSuccess prop if it exists
+
+
       if (onSuccess) {
           onSuccess();
       }
 
-      // Optionally, redirect the user
-      // navigate('/dashboard/projects');
 
-      // Clear the form after successful creation (not after update, as the user might want to continue editing)
       if (!initialData) {
            setFormData({
              name: '',
              description: '',
              stage: '',
              isPrivate: false,
-             // Reset other fields
+             fundingStage: '',
+             mvpStatus: '',
+             tags: [],
+             milestones: '',
+             documents: [],
            });
       }
+
+
 
 
     } catch (error) {
@@ -205,10 +351,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
   };
 
 
+
+
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      {/* Title is now handled by the Dialog in MyProjects */}
-      {/* <h2 className="text-xl font-bold mb-4">{initialData ? 'Edit Project' : 'Create New Project'}</h2> */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Project Name */}
         <div>
@@ -220,6 +366,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
             required
           />
         </div>
+
 
         {/* Project Description */}
         <div>
@@ -233,6 +380,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
           />
         </div>
 
+
         {/* Project Stage */}
         <div>
           <Label htmlFor="stage">Stage</Label>
@@ -241,15 +389,121 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
               <SelectValue placeholder="Select Stage" />
             </SelectTrigger>
             <SelectContent>
-              {/* Assuming you have stages defined somewhere, or hardcode them for now */}
-              <SelectItem value="Ideation">Ideation</SelectItem>
-              <SelectItem value="Building">Building</SelectItem>
-              <SelectItem value="Launching">Launching</SelectItem>
-              <SelectItem value="Scaling">Scaling</SelectItem>
-              {/* Add other stages from your projectStages collection */}
+              {stages.map(stage => (
+                  <SelectItem key={stage.id} value={stage.name}>{stage.name}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
+
+
+        {/* Funding Stage */}
+        <div>
+           <Label htmlFor="fundingStage">Funding Stage</Label>
+           <Select onValueChange={(value) => handleSelectChange('fundingStage', value)} value={formData.fundingStage}>
+               <SelectTrigger id="fundingStage">
+                   <SelectValue placeholder="Select Funding Stage" />
+               </SelectTrigger>
+               <SelectContent>
+                   {fundingStages.map(stage => (
+                       <SelectItem key={stage.id} value={stage.name}>{stage.name}</SelectItem>
+                   ))}
+               </SelectContent>
+           </Select>
+        </div>
+
+
+        {/* MVP Status */}
+        <div>
+           <Label htmlFor="mvpStatus">MVP Status</Label>
+           <Select onValueChange={(value) => handleSelectChange('mvpStatus', value)} value={formData.mvpStatus}>
+               <SelectTrigger id="mvpStatus">
+                   <SelectValue placeholder="Select MVP Status" />
+               </SelectTrigger>
+               <SelectContent>
+                    {mvpStatuses.map(status => (
+                        <SelectItem key={status.id} value={status.name}>{status.name}</SelectItem>
+                    ))}
+               </SelectContent>
+           </Select>
+        </div>
+
+
+        {/* Milestones (Single Select based on database structure) */}
+        <div>
+           <Label htmlFor="milestones">Milestone</Label>
+           <Select onValueChange={(value) => handleSelectChange('milestones', value)} value={formData.milestones}>
+               <SelectTrigger id="milestones">
+                   <SelectValue placeholder="Select Milestone" />
+               </SelectTrigger>
+               <SelectContent>
+                   {allMilestones.map(milestone => (
+                       <SelectItem key={milestone.id} value={milestone.name}>{milestone.name}</SelectItem>
+                   ))}
+               </SelectContent>
+           </Select>
+        </div>
+
+
+        {/* Tags Input */}
+        <div>
+            <Label htmlFor="tags">Tags</Label>
+             <Input
+                id="tags"
+                value={formData.tags.join(', ')} // Display tags as comma-separated string
+                onChange={handleTagsChange}
+                placeholder="Add tags (comma-separated)"
+            />
+        </div>
+
+
+        {/* Documents Input */}
+         <div>
+             <Label>Documents</Label>
+             <div className="space-y-2">
+                 {formData.documents.map((doc, index) => (
+                     <div key={index} className="flex items-center space-x-2 border p-2 rounded">
+                         <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-2">
+                             <Input
+                                 placeholder="Document Name"
+                                 value={doc.name}
+                                 onChange={(e) => handleDocumentChange(index, 'name', e.target.value)}
+                                 required
+                             />
+                              <Input
+                                 placeholder="Document URL (Optional)"
+                                 value={doc.url || ''}
+                                 onChange={(e) => handleDocumentChange(index, 'url', e.target.value)}
+                             />
+                             <Input
+                                 placeholder="Description (Optional)"
+                                 value={doc.description || ''}
+                                 onChange={(e) => handleDocumentChange(index, 'description', e.target.value)}
+                             />
+                         </div>
+                         <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleRemoveDocument(index)}
+                            className="shrink-0"
+                         >
+                             <MinusCircle className="h-4 w-4" />
+                         </Button>
+                     </div>
+                 ))}
+                 <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleAddDocument}
+                 >
+                     <PlusCircle className="h-4 w-4 mr-2" /> Add Document
+                 </Button>
+             </div>
+         </div>
+
+
 
         {/* Is Private */}
         <div className="flex items-center space-x-2">
@@ -262,9 +516,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
         </div>
 
 
-        {/* Add other form fields here based on your project schema */}
-
-
         <Button type="submit" disabled={isSaving}>
           {isSaving ? (initialData ? 'Saving Changes...' : 'Creating...') : (initialData ? 'Save Changes' : 'Create Project')}
         </Button>
@@ -272,6 +523,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
     </div>
   );
 };
+
+
 
 
 export default ProjectForm;

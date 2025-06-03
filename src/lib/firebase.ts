@@ -1,5 +1,5 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, Auth, getAuth, OAuthProvider, User, setPersistence, browserLocalPersistence } from "firebase/auth";
+import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, Auth, getAuth, OAuthProvider, User, setPersistence, browserLocalPersistence, getIdTokenResult } from "firebase/auth"; // Import getIdTokenResult
 import { getStorage, ref, uploadBytes, getDownloadURL, StorageReference } from "firebase/storage";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check"; // Import App Check functions
 import { getFirestore, Firestore, doc, setDoc, getDoc } from "firebase/firestore";
@@ -28,6 +28,19 @@ try {
     isTokenAutoRefreshEnabled: true, // Set to true to enable auto refresh.
   });
   console.log("Firebase App Check initialized successfully."); // Added console log for confirmation
+
+  // Add logging to check App Check token status (for debugging) - Optional, but good for diagnosis
+  appCheck.getToken().then((token) => {
+    if (token) {
+      console.log("App Check token obtained:", token.token);
+    } else {
+      console.log("App Check token not yet available.");
+    }
+  }).catch((error) => {
+    console.error("Error getting App Check token:", error);
+  });
+
+
 } catch (error) {
   console.error("Error initializing Firebase App Check:", error);
 }
@@ -36,6 +49,23 @@ setPersistence(getAuth(app), browserLocalPersistence);
 console.log("Firebase Auth persistence set to local.");
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app, 'hamfounderdatabase');
+
+// Function to force refresh the user's ID token (NEWLY ADDED)
+export const forceRefreshToken = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    try {
+      console.log("Attempting to force refresh auth token...");
+      await user.getIdTokenResult(true); // Pass true to force refresh
+      console.log("Auth token refreshed successfully.");
+    } catch (error) {
+      console.error("Error refreshing auth token:", error);
+    }
+  } else {
+    console.log("No authenticated user to refresh token.");
+  }
+};
+
 
 // اضافه شده برای Sign-in با گوگل
 const googleProvider = new GoogleAuthProvider();
