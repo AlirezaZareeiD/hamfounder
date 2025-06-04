@@ -14,9 +14,14 @@ const firebaseConfig = {
 };
 
 const app: FirebaseApp = initializeApp(firebaseConfig);
+console.log("Firebase App initialized:", app); // Add this line
+
 
 // Initialize App Check
 try {
+  console.log("Attempting to initialize Firebase App Check..."); // Added log
+  console.log("Firebase app object before initializeAppCheck:", app); // Added log
+
   // Pass your debug token in the isActivated field in debug builds
   if (process.env.NODE_ENV === 'development') {
     (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = 'A66D714E-16E2-4F07-A01E-5448F1B5B213'; // Replace with your actual debug token
@@ -27,18 +32,21 @@ try {
     provider: new ReCaptchaV3Provider('6LfRy0UrAAAAAGLYTGqCM2ITAk0OvKiCnQRYD0bk'), // Replace with your reCAPTCHA v3 site key
     isTokenAutoRefreshEnabled: true, // Set to true to enable auto refresh.
   });
+
+  console.log("initializeAppCheck call finished."); // Added log
+  console.log("App Check object after initialization:", appCheck); // Added log
   console.log("Firebase App Check initialized successfully."); // Added console log for confirmation
 
   // Add logging to check App Check token status (for debugging) - Optional, but good for diagnosis
   appCheck.getToken().then((token) => {
-    if (token) {
-      console.log("App Check token obtained:", token.token);
-    } else {
-      console.log("App Check token not yet available.");
-    }
-  }).catch((error) => {
-    console.error("Error getting App Check token:", error);
-  });
+     if (token) {
+       console.log("App Check token obtained:", token.token);
+     } else {
+       console.log("App Check token not yet available.");
+     }
+   }).catch((error) => {
+     console.error("Error getting App Check token:", error);
+   });
 
 
 } catch (error) {
@@ -50,7 +58,7 @@ console.log("Firebase Auth persistence set to local.");
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app, 'hamfounderdatabase');
 
-// Function to force refresh the user's ID token (NEWLY ADDED)
+// Function to force refresh the user\'s ID token (NEWLY ADDED)
 export const forceRefreshToken = async () => {
   const user = auth.currentUser;
   if (user) {
@@ -90,11 +98,6 @@ export const signInWithGitHub = async () => {
   }
 };
 
-// Placeholder for Sign-in with LinkedIn (Feature Coming Soon)
-// const linkedinProvider = new OAuthProvider('oidc.linkedin-oidc');
-// export const signInWithLinkedIn = () => {
-//   return signInWithPopup(auth, linkedinProvider);
-// };
 export const signInWithLinkedInPlaceholder = () => {
   console.log("LinkedIn login feature coming soon.");
 };
@@ -142,7 +145,7 @@ export const updateUserProfile = async (userId: string, profileData: {
   companyLogoUrl?: string;
   companyWebsiteUrl?: string;
 }) => {
-  // Get a reference to the user's profile document
+  // Get a reference to the user\'s profile document
   const userDocRef = doc(db, 'userProfiles', userId);
   // Update the document with the provided profile data, merging with existing fields
   await setDoc(userDocRef, profileData, { merge: true });
