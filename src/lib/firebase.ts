@@ -55,7 +55,7 @@ try {
 
 setPersistence(getAuth(app), browserLocalPersistence);
 console.log("Firebase Auth persistence set to local.");
-export const auth: Auth = getAuth(app);
+export const auth: Auth = getAuth(app); // Export auth
 export const db: Firestore = getFirestore(app, 'hamfounderdatabase');
 
 // Function to force refresh the user\'s ID token (NEWLY ADDED)
@@ -102,9 +102,10 @@ export const signInWithLinkedInPlaceholder = () => {
   console.log("LinkedIn login feature coming soon.");
 };
 
+export const storage = getStorage(app); // Initialize and export storage
+
 // Function to upload an image to Firebase Storage with a specified type
 export const uploadImage = async (file: File, userId: string, type: 'profile' | 'companyLogo'): Promise<string> => {
-  const storage = getStorage();
   let storagePath: string;
 
   // Determine the storage path based on the image type

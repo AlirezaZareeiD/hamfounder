@@ -33,6 +33,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 
+interface Document {
+    id: string;
+    name: string;
+    url?: string | null; // Expect null or string, not undefined
+    description?: string;
+    // file, uploadProgress, uploadError are not in Firestore documents
+}
+
 interface Project {
   id: string;
   name: string;
@@ -40,8 +48,8 @@ interface Project {
   stage: string;
   progress: number;
   isPrivate: boolean;
-  team: { id: string; name: string; image?: string }[];
-  lastUpdate: string; // Note: This is likely not in Firestore and might need to be removed or calculated
+  team: { id: string; name: string; image?: string }[]; // Assuming team structure
+  // lastUpdate: string; // Note: This is likely not in Firestore and might need to be removed or calculated
   tasks: {
     completed: number;
     total: number;
@@ -51,6 +59,14 @@ interface Project {
     displayName?: string;
     profileImageUrl?: string;
   };
+  // Added fields from ProjectForm
+  fundingStage: string;
+  mvpStatus: string;
+  milestones: string;
+  tags: string[];
+  documents: Document[];
+  createdAt: any; // Timestamp
+  updatedAt: any; // Timestamp
 }
 
 
@@ -75,23 +91,37 @@ const MyProjects = () => {
       const projectsCollectionRef = collection(db, 'projects');
       const q = query(projectsCollectionRef, where('ownerId', '==', user.uid));
 
+      console.log("Setting up Firestore listener for user:", user.uid);
+
       const unsubscribe = onSnapshot(q, (snapshot) => {
+        console.log("Received project snapshot.");
         const projectsData: Project[] = snapshot.docs.map(doc => {
            const data = doc.data() as DocumentData;
+            console.log(`Processing document ${doc.id}:`, data); // Log document data
+
            return {
             id: doc.id,
             name: data.name || 'Unnamed Project',
             description: data.description || '',
             stage: data.stage || 'Unknown',
-            progress: data.progress || 0,
+            progress: data.progress || 0, // Assuming progress is stored
             isPrivate: data.isPrivate ?? false,
-            team: data.team || [],
-            lastUpdate: data.lastUpdate || 'N/A', // Still keeping this, but remember it's not in Firestore
-            tasks: data.tasks || { completed: 0, total: 0 },
+            team: Array.isArray(data.team) ? data.team : [], // Ensure team is an array
+            // lastUpdate: data.lastUpdate || 'N/A', // Keep or remove based on Firestore schema
+            tasks: data.tasks || { completed: 0, total: 0 }, // Assuming tasks structure
             ownerId: data.ownerId,
-            ownerInfo: data.ownerInfo || {}
+            ownerInfo: data.ownerInfo || {}, // Assuming ownerInfo structure
+            tags: Array.isArray(data.tags) ? data.tags : [], // Ensure tags is an array
+            // ADDED: Read new fields from Firestore data
+            fundingStage: data.fundingStage || '',
+            mvpStatus: data.mvpStatus || '',
+            milestones: data.milestones || '',
+            documents: Array.isArray(data.documents) ? data.documents : [], // Ensure documents is an array
+            createdAt: data.createdAt || null, // Read createdAt
+            updatedAt: data.updatedAt || null, // Read updatedAt
            } as Project;
         });
+        console.log("Processed projects data:", projectsData);
         setProjects(projectsData);
         setLoading(false);
       }, (err) => {
@@ -100,12 +130,18 @@ const MyProjects = () => {
         setLoading(false);
       });
 
-      return () => unsubscribe();
+      return () => {
+          console.log("Unsubscribing from Firestore listener.");
+          unsubscribe();
+      }
     } else if (!userLoading && !user) {
+        console.log("User not logged in. Clearing projects.");
         setProjects([]);
         setLoading(false);
+    } else {
+        console.log("User loading or user not available yet.");
     }
-  }, [user, userLoading]);
+  }, [user, userLoading]); // Depend on user and userLoading
 
 
   const filteredAndSearchedProjects = projects.filter(project => {
@@ -113,33 +149,50 @@ const MyProjects = () => {
                           (filter === 'public' && !project.isPrivate) ||
                           (filter === 'private' && project.isPrivate);
 
+      // Include searching in new fields like tags, fundingStage, mvpStatus, milestones, document names/descriptions
       const searchMatch = searchTerm.trim() === '' ||
                           project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          project.description.toLowerCase().includes(searchTerm.toLowerCase());
+                          project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           project.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                           project.fundingStage.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           project.mvpStatus.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           project.milestones.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           project.documents.some(doc =>
+                               doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              (doc.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+                           );
+
 
       return filterMatch && searchMatch;
   });
 
 
    const handleCreateNewProject = () => {
+       console.log("Opening form for new project.");
        setEditingProject(null);
        setIsFormOpen(true);
    };
 
    const handleEditProject = (project: Project) => {
+       console.log("Opening form to edit project:", project.id);
        setEditingProject(project);
        setIsFormOpen(true);
    };
 
    const handleDeleteClick = (project: Project) => {
+       console.log("Confirming deletion for project:", project.id);
        setProjectToDelete(project);
        setIsDeleteDialogOpen(true);
    };
 
    const handleConfirmDelete = async () => {
-       if (!projectToDelete) return;
+       if (!projectToDelete) {
+           console.warn("No project selected for deletion.");
+           return;
+       }
 
        setIsDeleteDialogOpen(false);
+       console.log("Proceeding with deletion for project:", projectToDelete.id);
 
        try {
            const projectRef = doc(db, 'projects', projectToDelete.id);
@@ -150,7 +203,8 @@ const MyProjects = () => {
                description: `${projectToDelete.name} deleted successfully!`,
            });
 
-           setProjectToDelete(null);
+           console.log("Project deleted successfully:", projectToDelete.id);
+           setProjectToDelete(null); // Clear the projectToDelete state
 
        } catch (error) {
            console.error("Error deleting project:", error);
@@ -159,18 +213,21 @@ const MyProjects = () => {
                description: `Failed to delete ${projectToDelete.name}. Please try again.`,
                variant: "destructive",
            });
-            setProjectToDelete(null);
+           setProjectToDelete(null); // Clear the projectToDelete state even on error
        }
    };
 
 
    const handleFormSuccess = () => {
+       console.log("Project form submitted successfully. Closing form.");
        setIsFormOpen(false);
-       setEditingProject(null);
+       setEditingProject(null); // Clear editing state
+        // The onSnapshot listener will automatically update the projects list
    };
 
    // Function to navigate to Project Details page
    const handleViewProject = (projectId: string) => {
+       console.log("Navigating to project details page for ID:", projectId);
        navigate(`/dashboard/projects/${projectId}`); // Navigate to the specific project details URL
    };
 
@@ -219,11 +276,12 @@ const MyProjects = () => {
                   New Project
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto flex flex-col">
               <DialogTitle>{editingProject ? 'Edit Project' : 'Create New Project'}</DialogTitle>
               <DialogDescription>
                 {editingProject ? 'Edit the details of your project.' : 'Fill in the details below to create a new project.'}
               </DialogDescription>
+              {/* Pass editingProject as initialData */}
               <ProjectForm initialData={editingProject} onSuccess={handleFormSuccess} />
             </DialogContent>
           </Dialog>
@@ -302,15 +360,35 @@ const MyProjects = () => {
                <CardContent className="space-y-4">
                  <p className="text-sm text-slate-600 line-clamp-2">{project.description}</p>
 
+                 {/* Display new fields */}
+                 {project.fundingStage && (
+                     <div className="text-sm text-slate-600 flex items-center"><Briefcase className="h-4 w-4 mr-1 text-slate-500" /> Funding Stage: {project.fundingStage}</div>
+                 )}
+                  {project.mvpStatus && (
+                      <div className="text-sm text-slate-600 flex items-center"><Rocket className="h-4 w-4 mr-1 text-slate-500" /> MVP Status: {project.mvpStatus}</div>
+                  )}
+                   {project.milestones && (
+                      <div className="text-sm text-slate-600 flex items-center"><Calendar className="h-4 w-4 mr-1 text-slate-500" /> Milestone: {project.milestones}</div>
+                   )}
+                   {project.tags && project.tags.length > 0 && (
+                       <div className="flex flex-wrap gap-1">
+                           {project.tags.map(tag => (
+                               <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
+                           ))}
+                       </div>
+                   )}
+
 
                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm gap-2 sm:gap-0">
                    <Badge
                      variant="outline"
                      className={`
-                       ${project.stage === 'Ideation' ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}
-                       ${project.stage === 'Building' ? 'bg-purple-50 text-purple-600 border-purple-200' : ''}
-                       ${project.stage === 'Launching' ? 'bg-green-50 text-green-600 border-green-200' : ''}
-                       ${project.stage === 'Scaling' ? 'bg-amber-50 text-amber-600 border-amber-200' : ''}
+                       ${project.stage === 'Idea' ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}
+                       ${project.stage === 'Prototype' ? 'bg-purple-50 text-purple-600 border-purple-200' : ''}
+                       ${project.stage === 'MVP' ? 'bg-green-50 text-green-600 border-green-200' : ''}
+                       ${project.stage === 'Early Stage' ? 'bg-yellow-50 text-yellow-600 border-yellow-200' : ''}
+                       ${project.stage === 'Growth Stage' ? 'bg-teal-50 text-teal-600 border-teal-200' : ''}
+                       ${project.stage === 'Mature' ? 'bg-gray-50 text-gray-600 border-gray-200' : ''}
                        ${project.stage === 'Unknown' ? 'bg-gray-50 text-gray-600 border-gray-200' : ''}
                      `}
                    >
