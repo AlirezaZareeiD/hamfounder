@@ -200,8 +200,8 @@ const ProjectDetailsPage = () => {
 
     // Handle navigation back to the dashboard projects list
     const handleBackToProjects = () => {
-        console.log("Navigating back to /dashboard/projects");
-        navigate('/dashboard/projects'); // Assuming this is the route for the projects list
+        console.log("Navigating back to /dashboard");
+        navigate('/dashboard/'); // Assuming this is the route for the projects list
         // Or navigate(-1) if you want to go back to the previous page in history
     };
 

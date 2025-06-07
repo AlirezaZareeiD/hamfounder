@@ -14,7 +14,7 @@ interface Document {
     name: string;
     url?: string | null; // url will be populated after file upload, can be null in Firestore
     description?: string;
-    file?: File; // Temporarily store the file object before upload - NOT in Firestore
+    file?: File; // Temporary, not saved to Firestore directly
     uploadProgress?: number; // Track upload progress (0-100) - NOT in Firestore
     uploadError?: string; // Store upload error message - NOT in Firestore
 }
@@ -34,7 +34,7 @@ export interface DocumentsInputRef {
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
 const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ initialDocuments = [], onDocumentsChange, projectId }, ref) => {
-    // Ensure initial documents have a null url if undefined, matching the Document interface
+    // Initialize state ONLY with initialDocuments on the first render
     const [documents, setDocuments] = useState<Document[]>(initialDocuments.map(doc => ({
         ...doc,
         id: doc.id || Math.random().toString(36).substring(2, 15), // Simple ID generation if missing
@@ -47,31 +47,24 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
 
     const { toast } = useToast();
 
-    // UseEffect to handle initial population if needed, but the useState initializer above handles most cases
-    // Keeping this simplified for clarity, relying on useState initializer.
-    // If initialDocuments can change *after* the initial render, a useEffect might still be needed:
-     useEffect(() => {
-         const documentsWithIds = initialDocuments.map(doc => ({
-             ...doc,
-             id: doc.id || Math.random().toString(36).substring(2, 15),
-             url: doc.url === undefined ? null : doc.url,
-             file: undefined,
-             uploadProgress: undefined,
-             uploadError: undefined,
-         }));
-         // Only update state if initialDocuments actually changed to prevent infinite loops
-         // A deep comparison might be needed for complex objects if relying heavily on this effect
-         if (JSON.stringify(documentsWithIds) !== JSON.stringify(documents.map(({file, uploadProgress, uploadError, ...rest}) => rest))) {
-              setDocuments(documentsWithIds);
-         }
-     }, [initialDocuments]); // Depend only on initialDocuments
+    // REMOVED: The useEffect that was duplicating the state initialization.
+    // The useState initializer handles the initial population.
+    // If initialDocuments can change *after* the initial render and you need to react to it,
+    // you might need a different approach than replacing the entire state,
+    // perhaps merging or synchronizing in a more granular way, but for now,
+    // removing the duplicate initialization is the priority for fixing lurching.
+
 
     // Notify parent when documents change (filtering out temporary fields)
+    // Keeping this useEffect, but the comparison might be slightly less robust
+    // without the first useEffect ensuring a specific structure.
+    // We can revisit this if needed.
     useEffect(() => {
         const documentsToSave = documents.map(({ uploadProgress, uploadError, file, ...rest }) => rest);
         // Only call onDocumentsChange if the savable data has actually changed
         // This helps prevent unnecessary renders in the parent component
         // A deep comparison is used here for robustness
+         // Using a more reliable deep comparison if available, otherwise JSON.stringify is a fallback
         if (JSON.stringify(documentsToSave) !== JSON.stringify(initialDocuments.map(({uploadProgress, uploadError, file, ...rest}) => rest))) {
              onDocumentsChange(documentsToSave);
         }
@@ -338,6 +331,7 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
         <div className="space-y-4">
             <label className="block text-sm font-medium text-gray-700">Documents</label>
             {documents.map((doc, index) => (
+                // IMPORTANT: Ensure a stable and unique key here
                 <div key={doc.id} className="border p-4 rounded-md space-y-3 relative">
                     {/* Remove Button */}
                     <Button

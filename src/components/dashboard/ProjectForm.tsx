@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUser } from '@/contexts/UserContext';
 import { db, auth } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, updateDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'; // Removed addDoc as we'll use setDoc for new projects
 import { useToast } from '@/hooks/use-toast';
 import TagsInput from 'react-tagsinput';
 import 'react-tagsinput/react-tagsinput.css';
@@ -287,28 +287,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
       try {
           let currentProjectId = initialData?.id;
           let projectRef;
-          let finalDocumentsToSave: Omit<Document, 'file' | 'uploadProgress' | 'uploadError'>[] = [];
-
-          // Handle document uploads BEFORE writing to Firestore
-          if (documentsInputRef.current) {
-               console.log(`Handling document uploads for ${initialData ? 'existing' : 'new'} project.`);
-               // The DocumentsInput component should manage uploads/deletes and return the final list for existing docs
-               // Pass existing project ID if available, otherwise pass null or a temporary ID that DocumentsInput can handle
-               finalDocumentsToSave = await documentsInputRef.current.uploadDocuments(currentProjectId || null); // Pass existing ID or null for new projects
-               console.log("Document uploads completed. Final documents list:", finalDocumentsToSave);
-
-          } else {
-              console.warn("DocumentsInputRef is not available. Skipping document upload/update.");
-              // If no documentsInputRef or no files selected initially, use existing documents from formData (if editing)
-              finalDocumentsToSave = initialData?.documents || [];
-          }
-
 
           if (!initialData) {
-               // --- Single write operation for NEW projects ---
-               console.log("Performing single write operation to create new project.");
+               // --- Single write operation to CREATE NEW project first ---
+               console.log("Attempting to create new project document in Firestore.");
                const newProjectRef = doc(collection(db, 'projects')); // Get a new doc ref with auto-generated ID
-               currentProjectId = newProjectRef.id;
+               currentProjectId = newProjectRef.id; // Get the ID immediately
 
                const newProjectData = {
                    ownerId: user.uid,
@@ -322,26 +306,25 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
                    mvpStatus: formData.mvpStatus,
                    milestones: formData.milestones,
                    tags: projectTags,
-                   documents: finalDocumentsToSave, // Include uploaded documents directly
-                   progress: formData.progress, // Include progress from form
-                   tasks: { completed: 0, total: 0 }, // Initialize tasks
-                   ownerInfo: { // Initialize ownerInfo
+                   // Do NOT include documents here initially for new projects
+                   documents: [], // Initialize with an empty array
+                   progress: formData.progress,
+                   tasks: { completed: 0, total: 0 },
+                   ownerInfo: {
                        displayName: user.displayName,
                        profileImageUrl: user.photoURL,
                    }
                };
 
                const cleanedNewProjectData = removeUndefined(newProjectData);
-               console.log("Data being sent to Firestore for new project creation:", cleanedNewProjectData);
+               console.log("Data being sent to Firestore for initial new project creation:", cleanedNewProjectData);
 
-               await setDoc(newProjectRef, cleanedNewProjectData); // Use setDoc with the new ref
+               // Use setDoc with the new ref to create the document
+               await setDoc(newProjectRef, cleanedNewProjectData);
+               console.log("New project document created successfully with ID:", currentProjectId);
 
-               toast({
-                   title: "Project Created!",
-                   description: "Your new project has been successfully created.",
-                   variant: "success",
-               });
-               if (onSuccess) onSuccess();
+               projectRef = newProjectRef; // Set projectRef for potential later updates
+
 
            } else {
                // --- Update operation for EXISTING projects ---
@@ -357,30 +340,66 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
                    mvpStatus: formData.mvpStatus,
                    milestones: formData.milestones,
                    tags: projectTags,
-                   documents: finalDocumentsToSave, // Use the final documents list
-                   progress: formData.progress, // Include updated progress from form
-                   updatedAt: serverTimestamp(), // Update timestamp
-                   // Do NOT include ownerId or createdAt here
+                   progress: formData.progress,
+                   updatedAt: serverTimestamp(),
+                   // Do NOT include ownerId, createdAt, or documents here for update initially
                };
 
                const cleanedUpdatedProjectData = removeUndefined(updatedProjectData);
-               console.log('Data being sent to Firestore for existing project update:', cleanedUpdatedProjectData);
+               console.log('Data being sent to Firestore for existing project initial update:', cleanedUpdatedProjectData);
 
                await updateDoc(projectRef, cleanedUpdatedProjectData);
+               console.log("Existing project document updated successfully:", currentProjectId);
 
-               toast({
-                   title: "Project Updated!",
-                   description: "Your project has been successfully updated.",
-                   variant: "success",
-               });
-               if (onSuccess) onSuccess();
            }
 
+           // --- Handle Document Uploads AFTER project document is created/updated ---
+           let finalDocumentsToSave: Omit<Document, 'file' | 'uploadProgress' | 'uploadError'>[] = initialData?.documents || []; // Start with existing docs
+
+           if (documentsInputRef.current && currentProjectId) {
+                console.log(`Handling document uploads for project ID: ${currentProjectId}`);
+                // The DocumentsInput component should manage uploads/deletes and return the final list
+                // Pass the actual project ID
+                finalDocumentsToSave = await documentsInputRef.current.uploadDocuments(currentProjectId);
+                console.log("Document uploads completed. Final documents list:", finalDocumentsToSave);
+
+                // Update the project document in Firestore with the final documents list
+                console.log("Updating project document with final documents list:", finalDocumentsToSave);
+                await updateDoc(projectRef, {
+                    documents: finalDocumentsToSave
+                });
+                 console.log("Project document updated with documents.");
+
+           } else if (documentsInputRef.current && !currentProjectId) {
+               // This case should ideally not happen with the new flow, but included for safety
+               console.error("Attempted to upload documents without a valid project ID after initial save.");
+               toast({
+                   title: "Upload Error",
+                   description: "Failed to upload documents due to missing project ID.",
+                   variant: "destructive",
+               });
+               // We can still proceed with the project creation/update even if docs fail
+           } else {
+               console.log("No new documents to upload or documentsInputRef is not available.");
+               // If no documentsInputRef or no files selected initially, the project document is already correct
+               // based on initialData (for edits) or initialized empty (for new). No further update needed for docs.
+           }
+
+
+           // --- Final Success/Error Handling ---
+           toast({
+               title: initialData ? "Project Updated!" : "Project Created!",
+               description: initialData ? "Your project has been successfully updated." : "Your new project has been successfully created.",
+               variant: "success",
+           });
+           if (onSuccess) onSuccess();
+
+
       } catch (error) {
-          console.error(`Error ${initialData ? 'updating' : 'creating'} project:`, error);
+          console.error(`Error ${initialData ? 'updating' : 'creating'} project or uploading documents:`, error);
           toast({
               title: "Error",
-              description: `Failed to ${initialData ? 'update' : 'create'} project. Please try again. ${(error as Error).message}`,
+              description: `Failed to ${initialData ? 'update' : 'create'} project or upload documents. Please try again. ${(error as Error).message}`,
               variant: "destructive",
           });
       } finally {
@@ -431,21 +450,20 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
          </div>
 
         {/* MVP Status (Conditional Display) */}
-        {formData.stage === 'MVP' && (
-            <div>
-                <Label htmlFor="mvpStatus">MVP Status</Label>
-                <Select onValueChange={(value) => handleSelectChange('mvpStatus', value)} value={formData.mvpStatus}>
-                    <SelectTrigger id="mvpStatus">
-                        <SelectValue placeholder="Select MVP Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {mvpStatusOptions.map(status => (
-                            <SelectItem key={status} value={status}>{status}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-        )}
+        {/* Modified to use CSS for visibility instead of conditional rendering */}
+        <div style={{ display: formData.stage === 'MVP' ? 'block' : 'none' }}>
+            <Label htmlFor="mvpStatus">MVP Status</Label>
+            <Select onValueChange={(value) => handleSelectChange('mvpStatus', value)} value={formData.mvpStatus}>
+                <SelectTrigger id="mvpStatus">
+                    <SelectValue placeholder="Select MVP Status" />
+                </SelectTrigger>
+                <SelectContent>
+                    {mvpStatusOptions.map(status => (
+                        <SelectItem key={status} value={status}>{status}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
 
         {/* Milestones - ALWAYS Display */}
         <div>
