@@ -1,7 +1,7 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, Auth, getAuth, OAuthProvider, User, setPersistence, browserLocalPersistence, getIdTokenResult } from "firebase/auth"; // Import getIdTokenResult
+import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, Auth, getAuth, OAuthProvider, User, setPersistence, browserLocalPersistence, getIdTokenResult } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL, StorageReference } from "firebase/storage";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check"; // Import App Check functions
+import { initializeAppCheck, ReCaptchaV3Provider, AppCheck } from "firebase/app-check"; // Import AppCheck type
 import { getFirestore, Firestore, doc, setDoc, getDoc } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -14,13 +14,14 @@ const firebaseConfig = {
 };
 
 const app: FirebaseApp = initializeApp(firebaseConfig);
-console.log("Firebase App initialized:", app); // Add this line
-
+console.log("Firebase App initialized:", app);
 
 // Initialize App Check
+let appCheck: AppCheck | undefined; // Declare appCheck variable here
+
 try {
-  console.log("Attempting to initialize Firebase App Check..."); // Added log
-  console.log("Firebase app object before initializeAppCheck:", app); // Added log
+  console.log("Attempting to initialize Firebase App Check...");
+  console.log("Firebase app object before initializeAppCheck:", app);
 
   // Pass your debug token in the isActivated field in debug builds
   if (process.env.NODE_ENV === 'development') {
@@ -28,26 +29,20 @@ try {
     console.log("Firebase App Check debug token set for development.");
   }
 
-  const appCheck = initializeAppCheck(app, {
+  appCheck = initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider('6LfRy0UrAAAAAGLYTGqCM2ITAk0OvKiCnQRYD0bk'), // Replace with your reCAPTCHA v3 site key
     isTokenAutoRefreshEnabled: true, // Set to true to enable auto refresh.
   });
 
-  console.log("initializeAppCheck call finished."); // Added log
-  console.log("App Check object after initialization:", appCheck); // Added log
-  console.log("Firebase App Check initialized successfully."); // Added console log for confirmation
+  console.log("initializeAppCheck call finished.");
+  console.log("Firebase App Check initialized successfully.");
 
-  // Add logging to check App Check token status (for debugging) - Optional, but good for diagnosis
-  appCheck.getToken().then((token) => {
-     if (token) {
-       console.log("App Check token obtained:", token.token);
-     } else {
-       console.log("App Check token not yet available.");
-     }
-   }).catch((error) => {
-     console.error("Error getting App Check token:", error);
-   });
-
+  // Removed the immediate appCheck.getToken().then(...) block
+  // as this might be causing the TypeError if called too early.
+  // Firebase SDKs will handle token management internally once App Check is initialized.
+  // If you specifically need to manually get a token elsewhere, you should
+  // do so by importing the appCheck instance (if exported) and calling getToken there,
+  // potentially with checks for its readiness.
 
 } catch (error) {
   console.error("Error initializing Firebase App Check:", error);
@@ -58,7 +53,11 @@ console.log("Firebase Auth persistence set to local.");
 export const auth: Auth = getAuth(app); // Export auth
 export const db: Firestore = getFirestore(app, 'hamfounderdatabase');
 
-// Function to force refresh the user\'s ID token (NEWLY ADDED)
+// Export appCheck if needed elsewhere (optional)
+// export { appCheck };
+
+
+// Function to force refresh the user\'s ID token
 export const forceRefreshToken = async () => {
   const user = auth.currentUser;
   if (user) {

@@ -26,11 +26,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUser } from '@/contexts/UserContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot, DocumentData, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, DocumentData, deleteDoc, doc, getDoc } from 'firebase/firestore'; // Import getDoc
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import ProjectForm from './ProjectForm';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
 
 
 interface Document {
@@ -62,7 +62,7 @@ interface Project {
   // Added fields from ProjectForm
   fundingStage: string;
   mvpStatus: string;
-  milestones: string;
+  milestones: string[]; // Updated to string[] based on ProjectDetailsPage
   tags: string[];
   documents: Document[];
   createdAt: any; // Timestamp
@@ -82,8 +82,96 @@ const MyProjects = () => {
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   const navigate = useNavigate(); // Initialize navigate hook
+  const location = useLocation(); // Initialize useLocation hook
   const { user, loading: userLoading } = useUser();
   const { toast } = useToast();
+
+
+    // Effect to check for editProjectId query parameter on load
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const editProjectId = params.get('editProjectId');
+
+        if (editProjectId && user && !loading && !userLoading) {
+            console.log("Found editProjectId in URL:", editProjectId);
+            // Fetch the project data and open the edit form
+            const fetchProjectForEdit = async () => {
+                 try {
+                    const projectRef = doc(db, 'projects', editProjectId);
+                    const projectSnap = await getDoc(projectRef);
+
+                     if (projectSnap.exists()) {
+                         const data = projectSnap.data() as DocumentData;
+
+                         // Ensure milestones is treated as an array of strings
+                        let milestonesArray: string[] = [];
+                        if (data.milestones) {
+                            if (Array.isArray(data.milestones)) {
+                                milestonesArray = data.milestones.map((m: any) => String(m)); // Ensure elements are strings
+                            } else if (typeof data.milestones === 'string' && data.milestones.trim() !== '') {
+                                milestonesArray = [data.milestones]; // Treat non-empty string as single milestone
+                            }
+                        }
+
+                         const projectData: Project = {
+                              id: projectSnap.id,
+                              name: data.name || 'Unnamed Project',
+                              description: data.description || '',
+                              stage: data.stage || 'Unknown',
+                              progress: data.progress || 0,
+                              isPrivate: data.isPrivate ?? false,
+                              team: Array.isArray(data.team) ? data.team : [],
+                              tasks: data.tasks || { completed: 0, total: 0 },
+                              ownerId: data.ownerId,
+                              ownerInfo: data.ownerInfo || {},
+                              tags: Array.isArray(data.tags) ? data.tags : [],
+                              fundingStage: data.fundingStage || '',
+                              mvpStatus: data.mvpStatus || '',
+                              milestones: milestonesArray, // Use the processed milestones array
+                              documents: Array.isArray(data.documents) ? data.documents : [],
+                              createdAt: data.createdAt || null,
+                              updatedAt: data.updatedAt || null,
+                         };
+
+                         // Only set for editing if the current user is the owner
+                         if (user.uid === projectData.ownerId) {
+                            console.log("Opening edit form for project:", editProjectId);
+                            setEditingProject(projectData);
+                            setIsFormOpen(true);
+                         } else {
+                             console.warn("Attempted to edit project not owned by current user:", editProjectId);
+                              toast({
+                                title: "Permission Denied",
+                                description: "You can only edit projects you own.",
+                                variant: "destructive",
+                            });
+                         }
+
+                     } else {
+                         console.warn("Project not found for editing:", editProjectId);
+                         toast({
+                            title: "Error",
+                            description: "Project to edit not found.",
+                            variant: "destructive",
+                        });
+                     }
+                 } catch (err) {
+                     console.error("Error fetching project for editing:", err);
+                     toast({
+                        title: "Error",
+                        description: "Failed to load project for editing.",
+                        variant: "destructive",
+                    });
+                 } finally {
+                     // Clean up the query parameter from the URL after processing
+                     navigate(location.pathname, { replace: true });
+                 }
+            };
+
+            fetchProjectForEdit();
+        }
+
+    }, [location.search, user, loading, userLoading, navigate, toast]); // Depend on these values
 
 
   useEffect(() => {
@@ -115,7 +203,7 @@ const MyProjects = () => {
             // ADDED: Read new fields from Firestore data
             fundingStage: data.fundingStage || '',
             mvpStatus: data.mvpStatus || '',
-            milestones: data.milestones || '',
+            milestones: Array.isArray(data.milestones) ? data.milestones.map((m: any) => String(m)) : (typeof data.milestones === 'string' && data.milestones.trim() !== '' ? [data.milestones] : []), // Ensure milestones is an array of strings
             documents: Array.isArray(data.documents) ? data.documents : [], // Ensure documents is an array
             createdAt: data.createdAt || null, // Read createdAt
             updatedAt: data.updatedAt || null, // Read updatedAt
@@ -156,7 +244,8 @@ const MyProjects = () => {
                            project.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
                            project.fundingStage.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            project.mvpStatus.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           project.milestones.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           // Search within milestones array
+                           project.milestones.some(milestone => milestone.toLowerCase().includes(searchTerm.toLowerCase())) ||
                            project.documents.some(doc =>
                                doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                               (doc.description || '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -222,7 +311,9 @@ const MyProjects = () => {
        console.log("Project form submitted successfully. Closing form.");
        setIsFormOpen(false);
        setEditingProject(null); // Clear editing state
-        // The onSnapshot listener will automatically update the projects list
+       // The onSnapshot listener will automatically update the projects list
+       // Also remove the query parameter from the URL if it was set
+        navigate(location.pathname, { replace: true });
    };
 
    // Function to navigate to Project Details page
@@ -367,8 +458,8 @@ const MyProjects = () => {
                   {project.mvpStatus && (
                       <div className="text-sm text-slate-600 flex items-center"><Rocket className="h-4 w-4 mr-1 text-slate-500" /> MVP Status: {project.mvpStatus}</div>
                   )}
-                   {project.milestones && (
-                      <div className="text-sm text-slate-600 flex items-center"><Calendar className="h-4 w-4 mr-1 text-slate-500" /> Milestone: {project.milestones}</div>
+                   {project.milestones && project.milestones.length > 0 && ( // Check if it's an array before mapping
+                      <div className="text-sm text-slate-600 flex items-center"><Calendar className="h-4 w-4 mr-1 text-slate-500" /> Milestone: {project.milestones.join(', ')}</div>
                    )}
                    {project.tags && project.tags.length > 0 && (
                        <div className="flex flex-wrap gap-1">

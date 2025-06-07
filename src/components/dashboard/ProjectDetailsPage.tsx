@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { db } from '@/lib/firebase'; // Assuming db is initialized here
 import { doc, getDoc, DocumentData } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Rocket, Lock, Globe, Briefcase } from 'lucide-react';
+import { Rocket, Lock, Globe, Briefcase, ArrowLeft, Edit2 } from 'lucide-react'; // Import ArrowLeft and Edit2
+import { Button } from "@/components/ui/button"; // Import Button
+import { useUser } from '@/contexts/UserContext'; // Import useUser context
+
 
 // Assuming you have a config file or env variable for Firebase Project ID / Storage Bucket Name
 // You might need to adjust this based on your project setup
@@ -61,6 +64,9 @@ interface Project {
 
 const ProjectDetailsPage = () => {
   const { projectId } = useParams<{ projectId: string }>(); // This projectId is the Document ID of the project
+  const navigate = useNavigate(); // Initialize navigate hook
+  const { user, loading: userLoading } = useUser(); // Get user and loading state from context
+
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -125,7 +131,7 @@ const ProjectDetailsPage = () => {
                 id: docData.id || Math.random().toString(36).substring(2, 15), // Ensure ID exists (fallback)
                 name: docData.name || 'Unnamed File',
                 description: docData.description || undefined, // Keep description as undefined if empty
-                url: docData.url || undefined, // Keep any existing URL but we will build it
+                url: docData.url === undefined ? null : docData.url, // Keep any existing URL but we will build it
                 token: docData.token || undefined, // Include token if stored
                 uploadError: docData.uploadError || undefined, // Include upload error if stored
             }))
@@ -192,7 +198,29 @@ const ProjectDetailsPage = () => {
   }, [projectId, toast]); // Depend on projectId and toast
 
 
-  if (loading) {
+    // Handle navigation back to the dashboard projects list
+    const handleBackToProjects = () => {
+        console.log("Navigating back to /dashboard/projects");
+        navigate('/dashboard/projects'); // Assuming this is the route for the projects list
+        // Or navigate(-1) if you want to go back to the previous page in history
+    };
+
+    // Handle navigation to edit the project
+    const handleEditProject = () => {
+        if (project) {
+             console.log("Navigating to edit project:", project.id);
+             // Assuming your ProjectForm is triggered from the dashboard route
+             // We navigate back to the dashboard and might need a way to indicate
+             // that the edit modal should open for this project ID.
+             // A simple approach for now is to just navigate back to the dashboard.
+             // A more integrated approach would involve a dedicated edit page route
+             // or state management to control the dashboard modal.
+             navigate(`/dashboard?editProjectId=${project.id}`); // Example: Navigate back and add a query param
+        }
+    };
+
+
+  if (loading || userLoading) { // Also consider userLoading
     return <div className="text-center text-slate-600 mt-8">Loading project details...</div>;
   }
 
@@ -205,9 +233,36 @@ const ProjectDetailsPage = () => {
        return <div className="text-center text-slate-600 mt-8">No project data available.</div>;
   }
 
+    // Check if the current user is the owner of the project
+    const isOwner = user && project.ownerId === user.uid;
+
 
   return (
     <div className="container mx-auto py-8">
+        {/* Back Button and Edit Button (if owner) */}
+        <div className="flex items-center justify-between mb-6">
+            <Button
+                variant="outline"
+                onClick={handleBackToProjects}
+                className="flex items-center gap-1"
+            >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Projects
+            </Button>
+
+            {isOwner && (
+                <Button
+                     variant="outline"
+                     onClick={handleEditProject}
+                     className="flex items-center gap-1"
+                >
+                     <Edit2 className="h-4 w-4" />
+                     Edit Project
+                </Button>
+            )}
+        </div>
+
+
       {/* Project Header */}
       <h1 className="text-3xl font-bold mb-4 text-slate-800">{project.name}</h1>
       <p className="text-lg text-slate-700 mb-6">{project.description}</p>

@@ -27,7 +27,7 @@ interface DocumentsInputProps {
 }
 
 export interface DocumentsInputRef {
-  uploadDocuments: (projectId: string) => Promise<Document[]>;
+  uploadDocuments: (projectId: string | null) => Promise<Document[]>; // Allow projectId to be null for new projects
 }
 
 
@@ -90,28 +90,37 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
         }]);
     };
 
-    const handleRemoveDocument = (id: string) => {
+    const handleRemoveDocument = async (id: string) => { // Make the function async
          // Find the document to potentially delete from storage
          const docToRemove = documents.find(doc => doc.id === id);
 
          // Remove the document from the state immediately for responsiveness
         setDocuments(documents.filter(doc => doc.id !== id));
 
-        // TODO: Implement Firebase Storage deletion for the associated file if URL exists
-        // This requires knowing the storage path from the URL or storing it with the document.
-        // For now, we only remove the reference in the document list.
-        // You would add logic here to call deleteObject from firebase/storage
-        // based on docToRemove.url and projectId.
+        // Implement Firebase Storage deletion for the associated file if URL exists
         if (docToRemove?.url && projectId) {
              console.log("Attempting to delete file from storage for document ID:", id);
-             // Example (requires knowing the exact storage path format used during upload):
-             // const storagePath = `project-documents/${projectId}/${docToRemove.url.split('/').pop()?.split('?')[0]}`; // This path parsing might need adjustment
-             // const fileRef = ref(storage, storagePath);
-             // deleteObject(fileRef).then(() => {
-             //     console.log("File deleted from storage successfully.");
-             // }).catch((error) => {
-             //     console.error("Error deleting file from storage:", error);
-             // });
+             try {
+                 // Extract the path from the download URL
+                 // This parsing is crucial and needs to be robust
+                 const url = new URL(docToRemove.url);
+                 const storagePath = decodeURIComponent(url.pathname.split('/o/')[1]).split('?')[0];
+
+                 const fileRef = ref(storage, storagePath);
+                 await deleteObject(fileRef); // Use await for the async operation
+                 console.log("File deleted from storage successfully.");
+                 toast({
+                     title: "Success",
+                     description: `File "${docToRemove.name}" deleted from storage.`,
+                 });
+             } catch (error) {
+                 console.error("Error deleting file from storage:", error);
+                  toast({
+                      title: "Error",
+                      description: `Failed to delete file "${docToRemove.name}" from storage.`,
+                      variant: "destructive",
+                  });
+             }
         } else {
              console.log("Document had no URL or projectId, skipping storage deletion for ID:", id);
         }
@@ -133,45 +142,54 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
     };
 
 
-    const handleInputChange = (id: string, field: 'name' | 'description', value: string) => {
-        setDocuments(prevDocs => prevDocs.map(doc =>
-            doc.id === id ? { ...doc, [field]: value } : doc
-        ));
-        // Note: handleDocumentChange is more comprehensive and could replace this
-        // handleDocumentChange(id, field, value); // Using the more general handler
-    };
+    // This function is now redundant and can be removed.
+    // const handleInputChange = (id: string, field: 'name' | 'description', value: string) => {
+    //     setDocuments(prevDocs => prevDocs.map(doc =>
+    //         doc.id === id ? { ...doc, [field]: value } : doc
+    //     ));
+    //     // Note: handleDocumentChange is more comprehensive and could replace this
+    //     // handleDocumentChange(id, field, value); // Using the more general handler
+    // };
 
 
     // Exported function to trigger uploads
     useImperativeHandle(ref, () => ({
-      uploadDocuments: async (currentProjectId: string) => {
+      uploadDocuments: async (currentProjectId: string | null) => { // Allow null projectId
         if (!currentProjectId) {
             console.error("Cannot trigger uploads without a project ID.");
-            // Return current documents state, filtering out temporary fields
-            return documents.map(({ file, uploadProgress, uploadError, ...rest }) => rest);
+            // Ensure returned documents have null URL if undefined
+            return documents.map(({ file, uploadProgress, uploadError, ...rest }) => ({
+                ...rest,
+                url: rest.url === undefined ? null : rest.url,
+            }));
         }
 
         // Filter documents that have a file selected but no URL yet
         const documentsToUpload = documents.filter(doc => doc.file && !doc.url);
-        console.log(`Found ${documentsToUpload.length} documents to upload.`);
+        console.log(`Found ${documentsToUpload.length} documents to upload.\nDocuments to upload details:`, documentsToUpload);
+
 
         if (documentsToUpload.length === 0) {
              console.log("No new documents to upload.");
-             // If no documents to upload, return the current state, filtering out temporary fields
-            return documents.map(({ file, uploadProgress, uploadError, ...rest }) => rest);
+             // Ensure returned documents have null URL if undefined
+            return documents.map(({ file, uploadProgress, uploadError, ...rest }) => ({
+                ...rest,
+                url: rest.url === undefined ? null : rest.url,
+            }));
         }
 
         const uploadPromises = documentsToUpload.map(async (docToUpload) => {
              if (!docToUpload.file) {
                  // This case should theoretically not be reached due to the filter
                  console.warn("Skipping upload for document with no file (unexpected):", docToUpload);
-                 return Promise.resolve({ ...docToUpload, uploadError: 'No file provided' }); // Resolve with an error state
+                 return Promise.resolve({ ...docToUpload, uploadError: 'No file provided', url: null }); // Ensure url is null on error
              }
 
             // Construct storage path using project ID and a unique identifier + filename
             // Using a unique ID helps prevent conflicts if files have the same name
              const uniqueFileName = `${docToUpload.id}_${docToUpload.file.name}`;
-            const storagePath = `project-documents/${currentProjectId}/${uniqueFileName}`;
+            const storagePath = `projects/${currentProjectId}/documents/${docToUpload.id}/${uniqueFileName}`; // Corrected storage path
+
 
             console.log(`Starting upload for document: ${docToUpload.name} to path: ${storagePath}`);
 
@@ -190,7 +208,7 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
                         console.error("Upload failed for document:", docToUpload.name, error);
                         // Update error in state
                          // Using function form of setDocuments to ensure latest state
-                        setDocuments(prevDocs => prevDocs.map(d => d.id === docToUpload.id ? { ...d, uploadError: error.message || 'Upload failed', uploadProgress: undefined } : d));
+                        setDocuments(prevDocs => prevDocs.map(d => d.id === docToUpload.id ? { ...d, uploadError: error.message || 'Upload failed', uploadProgress: undefined, url: null } : d)); // Ensure url is null on upload error
                          reject(error); // Reject the promise on error
                     },
                     () => {
@@ -208,7 +226,7 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
                              console.error("Failed to get download URL for document:", docToUpload.name, err);
                              // Update error in state if getting URL fails
                              // Using function form of setDocuments to ensure latest state
-                             setDocuments(prevDocs => prevDocs.map(d => d.id === docToUpload.id ? { ...d, uploadError: err.message || 'Failed to get URL', uploadProgress: undefined } : d));
+                             setDocuments(prevDocs => prevDocs.map(d => d.id === docToUpload.id ? { ...d, uploadError: err.message || 'Failed to get URL', uploadProgress: undefined, url: null } : d)); // Ensure url is null on get URL error
                              reject(err); // Reject if getting URL fails
                          });
                     }
@@ -228,8 +246,8 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
              // This list should include:
              // 1. Documents that were successfully uploaded (with their new URLs).
              // 2. Documents that already had URLs and were not re-uploaded.
-             // 3. Documents that failed to upload (keeping their error status, filtering out the temporary file).
-             // 4. Documents that were newly added but had no file selected (should be filtered out by parent save logic, but good to handle here too).
+             // 3. Documents that failed to upload (keeping their error status, filtering out the temporary file, with url explicitly null).
+             // 4. Documents that were newly added but had no file selected (should be filtered out by parent save logic, but good to handle here too, with url explicitly null).
 
 
              // Get the final state after all async updates *should* have processed.
@@ -239,11 +257,11 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
              const finalDocumentsState = documents.map(doc => {
                  // Filter out temporary fields (file, uploadProgress, uploadError)
                  const { file, uploadProgress, uploadError, ...rest } = doc;
-                 // Ensure URL is explicitly null if it was undefined
+                 // Ensure URL is explicitly null if it was undefined, including for failed uploads or documents with no selected file
                  return { ...rest, url: rest.url === undefined ? null : rest.url };
              });
 
-             console.log("Final documents state after uploads (filtered temporary fields):", finalDocumentsState);
+             console.log("Final documents state after uploads (filtered temporary fields and null URLs):", finalDocumentsState);
 
 
             // The onUploadsComplete callback was defined in the interface but not used.
@@ -338,7 +356,7 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
                         <Input
                             id={`doc-name-${doc.id}`}
                             value={doc.name}
-                            onChange={(e) => handleInputChange(doc.id, 'name', e.target.value)}
+                            onChange={(e) => handleDocumentChange(doc.id, 'name', e.target.value)} // Use handleDocumentChange
                             placeholder="Document Name"
                         />
                     </div>
@@ -368,7 +386,20 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
                                  <div className="text-sm text-green-600 mt-1">
                                      Uploaded: <a href={doc.url} target="_blank" rel="noopener noreferrer" className="underline hover:no-underline break-all">
                                          {/* Attempt to get filename from URL, fallback to 'View File' */}
-                                         {doc.url.split('/').pop()?.split('?')[0] || 'View File'}
+                                         {/* Refined parsing for filename from URL */}
+                                          {(() => {
+                                              try {
+                                                  const url = new URL(doc.url);
+                                                  // Decode the path to handle spaces and other characters
+                                                  const decodedPath = decodeURIComponent(url.pathname);
+                                                  // Extract filename after the last '/' and before any '?'
+                                                  const fileName = decodedPath.split('/').pop()?.split('?')[0];
+                                                  return fileName || 'View File';
+                                              } catch (e) {
+                                                  console.error("Error parsing document URL for filename:", e);
+                                                  return 'View File'; // Fallback on error
+                                              }
+                                          })()}
                                      </a>
                                  </div>
                              ) : doc.file ? (
@@ -386,7 +417,7 @@ const DocumentsInput = forwardRef<DocumentsInputRef, DocumentsInputProps>(({ ini
                         <Textarea
                             id={`doc-description-${doc.id}`}
                             value={doc.description || ''}
-                            onChange={(e) => handleInputChange(doc.id, 'description', e.target.value)}
+                            onChange={(e) => handleDocumentChange(doc.id, 'description', e.target.value)} // Use handleDocumentChange
                             placeholder="Document Description"
                             rows={2}
                         />
