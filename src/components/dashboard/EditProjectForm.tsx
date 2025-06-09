@@ -6,23 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUser } from '@/contexts/UserContext';
 import { db, auth } from '@/lib/firebase';
-import { collection, updateDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'; // Removed addDoc as we'll use setDoc for new projects
+import { collection, updateDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import TagsInput from 'react-tagsinput';
 import 'react-tagsinput/react-tagsinput.css';
 import { Label } from "@/components/ui/label";
-import DocumentsInput, { DocumentsInputRef } from './DocumentsInput';
+import DocumentsInput, { DocumentsInputRef, Document } from './DocumentsInput'; // Import Document interface from DocumentsInput
 
 // Define interfaces (Assuming these are correct and match your Firestore structure)
-interface Document {
-    id: string;
-    name: string;
-    url?: string | null; // Explicitly allow null
-    description?: string;
-    file?: File; // Temporary, not saved to Firestore directly
-    uploadProgress?: number; // Temporary
-    uploadError?: string; // Temporary
-}
+// Removed the local Document interface as it's now imported from DocumentsInput
 
 interface ProjectFormData {
   name: string;
@@ -33,7 +25,7 @@ interface ProjectFormData {
   mvpStatus: string;
   milestones: string; // Ensure this field is always in the form data
   tags: string[]; // Add tags to formData interface for consistency
-  documents: Document[];
+  documents: Document[]; // Use the imported Document interface
   progress: number; // Add progress to formData
 }
 
@@ -59,7 +51,7 @@ interface Project {
   mvpStatus: string;
   tags: string[];
   milestones: string; // Ensure this field is in the Project interface
-  documents: Document[];
+  documents: Document[]; // Use the imported Document interface
 }
 
 interface ProjectFormProps {
@@ -154,9 +146,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
   const [projectTags, setProjectTags] = useState<string[]>([]);
 
   const [isSaving, setIsSaving] = useState(false);
+  // Added state to track if documents are uploading
+  const [isDocumentsUploading, setIsDocumentsUploading] = useState(false);
   const { user, loading } = useUser();
   const { toast } = useToast();
 
+  // Create a ref for the DocumentsInput component
   const documentsInputRef = useRef<DocumentsInputRef>(null);
 
   useEffect(() => {
@@ -167,13 +162,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
               description: initialData.description || '',
               stage: initialData.stage || '',
               isPrivate: initialData.isPrivate ?? false,
-              // Ensure these fields are initialized from initialData
               fundingStage: initialData.fundingStage || '',
               mvpStatus: initialData.mvpStatus || '',
               documents: Array.isArray(initialData.documents) ? initialData.documents : [],
-              milestones: initialData.milestones || '', // Ensure milestones is populated
-              tags: Array.isArray(initialData.tags) ? initialData.tags : [], // Initialize tags from initialData
-              progress: initialData.progress ?? 0, // Initialize progress from initialData, default to 0
+              milestones: initialData.milestones || '',
+              tags: Array.isArray(initialData.tags) ? initialData.tags : [],
+              progress: initialData.progress ?? 0,
           });
           console.log('ProjectForm useEffect - Setting projectTags from initialData.tags:', initialData.tags);
           setProjectTags(Array.isArray(initialData.tags) ? initialData.tags : []);
@@ -186,16 +180,31 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
              isPrivate: false,
              fundingStage: '',
              mvpStatus: '',
-             milestones: '', // Initialize milestones with an empty string for new projects
-             tags: [], // Clear tags for new project
+             milestones: '',
+             tags: [],
              documents: [],
-             progress: 0, // Initialize progress to 0 for new project
+             progress: 0,
            });
            console.log('ProjectForm useEffect - Clearing projectTags for new project');
            setProjectTags([]);
            console.log('ProjectForm useEffect - projectTags state after clearing:', projectTags);
       }
+      // Reset document uploading status when initialData changes (e.g., switching between projects or creating new)
+      setIsDocumentsUploading(false);
+
   }, [initialData]);
+
+    // Effect to listen for changes in formData.documents and update isDocumentsUploading state
+    // This is triggered by the onDocumentsChange callback in DocumentsInput
+    useEffect(() => {
+        console.log('ProjectForm useEffect - formData.documents changed:', formData.documents);
+         if (documentsInputRef.current) {
+             const currentlyUploading = documentsInputRef.current.isUploading();
+             console.log('DocumentsInput is currently uploading:', currentlyUploading);
+             setIsDocumentsUploading(currentlyUploading);
+         }
+     }, [formData.documents]); // Depend on formData.documents
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | React.HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -214,12 +223,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
         setProjectTags(tags);
     };
 
-    const handleDocumentsChange = (updatedDocuments: Document[]) => {
-         // The DocumentsInput component should return documents with 'url' as string or null,
-         // and exclude temporary fields like 'file', 'uploadProgress', 'uploadError'.
-         // We can directly update the formData documents state with this cleaned array.
-        setFormData(prev => ({ ...prev, documents: updatedDocuments }));
-    };
+     const handleDocumentsChange = (updatedDocuments: Document[]) => {
+          // This callback is triggered by DocumentsInput when its internal document state changes,
+          // including when uploads complete and URLs are available.
+          console.log("ProjectForm - handleDocumentsChange triggered:", updatedDocuments);
+          // The DocumentsInput component should return documents with 'url' as string or null,
+          // and exclude temporary fields like 'file', 'uploadProgress', 'uploadError'.
+          // We can directly update the formData documents state with this cleaned array.
+         setFormData(prev => ({ ...prev, documents: updatedDocuments }));
+     };
+
 
     const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value, 10);
@@ -228,7 +241,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
         } else if (e.target.value === '') {
             setFormData(prev => ({ ...prev, progress: 0 })); // Allow clearing the input
         }
-        // Optional: Provide feedback to the user if input is invalid
     };
 
 
@@ -239,6 +251,19 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
       console.log("Current user state:", user);
       console.log("Loading state:", loading);
 
+       // --- Check if documents are still uploading ---
+      if (documentsInputRef.current && documentsInputRef.current.isUploading()) {
+          toast({
+              title: "Upload in Progress",
+              description: "Please wait for document uploads to complete before saving.",
+              variant: "info", // Use info variant for non-blocking message
+          });
+          console.log("Blocked save due to ongoing document uploads.");
+          return; // Prevent form submission
+      }
+       console.log("No documents are currently uploading. Proceeding with save.");
+
+
       if (typeof setDoc !== 'function' || typeof updateDoc !== 'function') {
           console.error("Firebase Error: setDoc or updateDoc is not a function. Check Firebase SDK initialization.");
           toast({
@@ -246,7 +271,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
               description: "Firebase write functions are not available. Please contact support.",
               variant: "destructive",
           });
-          setIsSaving(false);
+          setIsSaving(false); // Ensure saving state is reset
           return;
       }
 
@@ -256,7 +281,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
               description: "Authentication state is not ready. Please try again.",
               variant: "destructive",
           });
-          setIsSaving(false);
+          setIsSaving(false); // Ensure saving state is reset
           return;
       }
 
@@ -268,7 +293,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
               description: "Please fill in all required fields (Name, Description, Stage).",
               variant: "destructive",
            });
-           setIsSaving(false);
+           setIsSaving(false); // Ensure saving state is reset
            return;
       }
 
@@ -279,7 +304,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
                description: "Progress must be a number between 0 and 100.",
                variant: "destructive",
            });
-           setIsSaving(false);
+           setIsSaving(false); // Ensure saving state is reset
            return;
        }
 
@@ -287,6 +312,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
       try {
           let currentProjectId = initialData?.id;
           let projectRef;
+
+          // --- Get the final documents list from the DocumentsInput component ---
+          const finalDocumentsToSave: Document[] = documentsInputRef.current ? documentsInputRef.current.getDocuments() : [];
+          console.log("Final documents list obtained from DocumentsInput:", finalDocumentsToSave);
+
 
           if (!initialData) {
                // --- Single write operation to CREATE NEW project first ---
@@ -306,8 +336,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
                    mvpStatus: formData.mvpStatus,
                    milestones: formData.milestones,
                    tags: projectTags,
-                   // Do NOT include documents here initially for new projects
-                   documents: [], // Initialize with an empty array
+                   // Include the final documents list here for new projects
+                   documents: finalDocumentsToSave,
                    progress: formData.progress,
                    tasks: { completed: 0, total: 0 },
                    ownerInfo: {
@@ -342,48 +372,21 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
                    tags: projectTags,
                    progress: formData.progress,
                    updatedAt: serverTimestamp(),
-                   // Do NOT include ownerId, createdAt, or documents here for update initially
+                   // Include the final documents list here for existing projects
+                   documents: finalDocumentsToSave,
+                   // Do NOT include ownerId, createdAt, or tasks here for update
                };
 
                const cleanedUpdatedProjectData = removeUndefined(updatedProjectData);
-               console.log('Data being sent to Firestore for existing project initial update:', cleanedUpdatedProjectData);
+               console.log('Data being sent to Firestore for existing project update:', cleanedUpdatedProjectData);
 
                await updateDoc(projectRef, cleanedUpdatedProjectData);
                console.log("Existing project document updated successfully:", currentProjectId);
 
            }
 
-           // --- Handle Document Uploads AFTER project document is created/updated ---
-           let finalDocumentsToSave: Omit<Document, 'file' | 'uploadProgress' | 'uploadError'>[] = initialData?.documents || []; // Start with existing docs
-
-           if (documentsInputRef.current && currentProjectId) {
-                console.log(`Handling document uploads for project ID: ${currentProjectId}`);
-                // The DocumentsInput component should manage uploads/deletes and return the final list
-                // Pass the actual project ID
-                finalDocumentsToSave = await documentsInputRef.current.uploadDocuments(currentProjectId);
-                console.log("Document uploads completed. Final documents list:", finalDocumentsToSave);
-
-                // Update the project document in Firestore with the final documents list
-                console.log("Updating project document with final documents list:", finalDocumentsToSave);
-                await updateDoc(projectRef, {
-                    documents: finalDocumentsToSave
-                });
-                 console.log("Project document updated with documents.");
-
-           } else if (documentsInputRef.current && !currentProjectId) {
-               // This case should ideally not happen with the new flow, but included for safety
-               console.error("Attempted to upload documents without a valid project ID after initial save.");
-               toast({
-                   title: "Upload Error",
-                   description: "Failed to upload documents due to missing project ID.",
-                   variant: "destructive",
-               });
-               // We can still proceed with the project creation/update even if docs fail
-           } else {
-               console.log("No new documents to upload or documentsInputRef is not available.");
-               // If no documentsInputRef or no files selected initially, the project document is already correct
-               // based on initialData (for edits) or initialized empty (for new). No further update needed for docs.
-           }
+            // Note: Document uploads are now handled by DocumentsInput component
+            // We no longer need the separate logic for handling uploads here.
 
 
            // --- Final Success/Error Handling ---
@@ -396,16 +399,19 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
 
 
       } catch (error) {
-          console.error(`Error ${initialData ? 'updating' : 'creating'} project or uploading documents:`, error);
+          console.error(`Error ${initialData ? 'updating' : 'creating'} project:`, error); // Removed "or uploading documents" from message
           toast({
               title: "Error",
-              description: `Failed to ${initialData ? 'update' : 'create'} project or upload documents. Please try again. ${(error as Error).message}`,
+              description: `Failed to ${initialData ? 'update' : 'create'} project. Please try again. ${(error as Error).message}`, // Removed "or upload documents" from message
               variant: "destructive",
           });
       } finally {
           setIsSaving(false);
       }
     };
+
+    // Determine if the form should be disabled (saving or documents uploading)
+    const isFormDisabled = isSaving || isDocumentsUploading;
 
 
   return (
@@ -419,6 +425,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
             value={formData.name}
             onChange={handleInputChange}
             required
+             disabled={isFormDisabled} // Disable input when form is disabled
           />
         </div>
 
@@ -431,13 +438,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
             onChange={handleInputChange}
             rows={4}
             required
+             disabled={isFormDisabled} // Disable textarea when form is disabled
           />
         </div>
 
         {/* Project Stage */}
          <div>
            <Label htmlFor="stage">Stage</Label>
-           <Select onValueChange={(value) => handleSelectChange('stage', value)} value={formData.stage} required>
+           <Select onValueChange={(value) => handleSelectChange('stage', value)} value={formData.stage} required disabled={isFormDisabled}> {/* Disable select */}
              <SelectTrigger id="stage">
                <SelectValue placeholder="Select Stage" />
              </SelectTrigger>
@@ -450,10 +458,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
          </div>
 
         {/* MVP Status (Conditional Display) */}
-        {/* Modified to use CSS for visibility instead of conditional rendering */}
         <div style={{ display: formData.stage === 'MVP' ? 'block' : 'none' }}>
             <Label htmlFor="mvpStatus">MVP Status</Label>
-            <Select onValueChange={(value) => handleSelectChange('mvpStatus', value)} value={formData.mvpStatus}>
+            <Select onValueChange={(value) => handleSelectChange('mvpStatus', value)} value={formData.mvpStatus} disabled={isFormDisabled}> {/* Disable select */}
                 <SelectTrigger id="mvpStatus">
                     <SelectValue placeholder="Select MVP Status" />
                 </SelectTrigger>
@@ -468,7 +475,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
         {/* Milestones - ALWAYS Display */}
         <div>
            <Label htmlFor="milestones">Milestone</Label>
-           <Select onValueChange={(value) => handleSelectChange('milestones', value)} value={formData.milestones}>
+           <Select onValueChange={(value) => handleSelectChange('milestones', value)} value={formData.milestones} disabled={isFormDisabled}> {/* Disable select */}
                <SelectTrigger id="milestones">
                    <SelectValue placeholder="Select Milestone" />
                </SelectTrigger>
@@ -480,11 +487,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
            </Select>
         </div>
 
-
         {/* Funding Stage */}
          <div>
             <Label htmlFor="fundingStage">Funding Stage</Label>
-            <Select onValueChange={(value) => handleSelectChange('fundingStage', value)} value={formData.fundingStage}>
+            <Select onValueChange={(value) => handleSelectChange('fundingStage', value)} value={formData.fundingStage} disabled={isFormDisabled}> {/* Disable select */}
                 <SelectTrigger id="fundingStage">
                     <SelectValue placeholder="Select Funding Stage" />
                 </SelectTrigger>
@@ -504,12 +510,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
                 onChange={handleTagsChange}
                  tagProps={{ className: 'react-tagsinput-tag bg-black text-white rounded px-2 py-1 mr-1 text-sm' }}
                  inputProps={{ placeholder: 'Add tags (press Enter or Tab)' }}
-                 className="react-tagsinput border border-gray-300 rounded-md p-2 w-full focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm"
+                 className={`react-tagsinput border rounded-md p-2 w-full sm:text-sm ${isFormDisabled ? 'opacity-50 cursor-not-allowed' : 'border-gray-300 focus-within:ring-blue-500 focus-within:border-blue-500'}`}
                  key={initialData?.id || 'new'}
+                 disabled={isFormDisabled} // Disable tags input
             />
         </div>
 
-        {/* Progress Input - NEW FIELD */}
+        {/* Progress Input */}
         <div>
             <Label htmlFor="progress">Progress (%)</Label>
             <Input
@@ -520,14 +527,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
                 min="0"
                 max="100"
                 required
+                 disabled={isFormDisabled} // Disable input
             />
         </div>
 
 
-         {/* Documents Input */}
+         {/* Documents Input - Connected via ref */}
         <div>
             <Label>Documents</Label>
-            {/* Pass projectTags to DocumentsInput if it needs them */}
             <DocumentsInput ref={documentsInputRef} initialDocuments={formData.documents} onDocumentsChange={handleDocumentsChange} projectId={initialData?.id} />
         </div>
 
@@ -538,12 +545,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, initialData }) => 
               id="isPrivate"
               checked={formData.isPrivate}
               onCheckedChange={(checked: boolean) => handleCheckboxChange('isPrivate', checked)}
+               disabled={isFormDisabled} // Disable checkbox
            />
            <Label htmlFor="isPrivate">Private Project</Label>
         </div>
 
-        <Button type="submit" disabled={isSaving}>
-          {isSaving ? (initialData ? 'Saving Changes...' : 'Creating...') : (initialData ? 'Save Changes' : 'Create Project')}
+        {/* Save Button - Disabled when saving or documents are uploading */}
+        <Button type="submit" disabled={isFormDisabled}>
+          {isSaving ? (initialData ? 'Saving Changes...' : 'Creating...') : (isDocumentsUploading ? 'Uploading Files...' : (initialData ? 'Save Changes' : 'Create Project'))}
         </Button>
       </form>
     </div>

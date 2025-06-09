@@ -1,441 +1,370 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
-import { db } from '@/lib/firebase'; // Assuming db is initialized here
-import { doc, getDoc, DocumentData } from 'firebase/firestore';
-import { useToast } from '@/hooks/use-toast';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { db } from '@/lib/firebase';
+// Import onSnapshot along with doc, getDoc, etc.
+import { doc, getDoc, DocumentData, updateDoc, onSnapshot } from 'firebase/firestore';
+import { useUser } from '@/contexts/UserContext';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Rocket, Lock, Globe, Briefcase, ArrowLeft, Edit2 } from 'lucide-react'; // Import ArrowLeft and Edit2
-import { Button } from "@/components/ui/button"; // Import Button
-import { useUser } from '@/contexts/UserContext'; // Import useUser context
+import { ChevronLeft, Rocket, Lock, Globe, Briefcase, Calendar, Edit, Link as LinkIcon } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import EditProjectForm from './EditProjectForm'; // Import EditProjectForm
 
-
-// Assuming you have a config file or env variable for Firebase Project ID / Storage Bucket Name
-// You might need to adjust this based on your project setup
-// Example:
-// import { firebaseConfig } from '@/lib/firebase';
-// const FIREBASE_STORAGE_BUCKET = firebaseConfig.storageBucket; // Or get it from process.env
-
-// IMPORTANT: Replace with your actual Firebase Storage Bucket Name.
-// This is usually found in your Firebase project settings -> Project settings -> General -> Your project's Firebase services -> Storage -> Bucket URL (without the gs:// prefix).
-// Example: "your-firebase-project-id.appspot.com"
-// It's highly recommended to store this in an environment variable (e.g., REACT_APP_FIREBASE_STORAGE_BUCKET)
-// and access it using process.env.REACT_APP_FIREBASE_STORAGE_BUCKET
-const FIREBASE_STORAGE_BUCKET = "hamfounder-demo-2025.firebasestorage.app";
-
-
-// Define the Document interface
-interface ProjectDocument {
-    id: string; // Document ID in the documents array
-    name: string; // File name
-    url?: string | null; // Optional URL (saved after upload - now we prioritize building from ID)
-    description?: string;
-    token?: string; // Optional token (if needed for public access and stored)
-    uploadError?: string; // Optional field to indicate upload errors during form submission
+// Moved Document interface here or ensure it's consistently imported
+interface Document {
+    id: string; // Unique ID for the document within the project
+    name: string; // Display name of the document
+    url?: string | null; // Firebase Storage download URL, null while uploading or if not uploaded
+    description?: string; // Optional description of the document
 }
 
 interface Project {
-    id: string; // Document ID of the project in 'projects' collection
+    id: string;
     name: string;
     description: string;
     stage: string;
     progress: number;
     isPrivate: boolean;
-    ownerId: string;
-    ownerInfo?: {
-        displayName?: string;
-        profileImageUrl?: string;
-    };
-    createdAt: any;
-    updatedAt: any;
+    team?: { id: string; name: string; image?: string }[]; // Assuming this structure might still be in old data
     tasks: {
         completed: number;
         total: number;
     };
-    milestones?: string[];
-    documents?: ProjectDocument[]; // Use the specific ProjectDocument interface
-    fundingStage?: string;
-    mvpStatus?: string;
-    team?: any[];
-    tags?: string[];
+    ownerId: string;
+     ownerInfo: {
+        displayName?: string;
+        profileImageUrl?: string;
+     };
+    fundingStage: string;
+    mvpStatus: string;
+    milestones: string; // Confirmed as string based on form and latest rules
+    tags: string[];
+    documents: Document[];
+    createdAt?: any; // Use any for Firebase Timestamp type flexibility
+    updatedAt?: any; // Use any for Firebase Timestamp type flexibility
 }
 
 
 const ProjectDetailsPage = () => {
-  const { projectId } = useParams<{ projectId: string }>(); // This projectId is the Document ID of the project
-  const navigate = useNavigate(); // Initialize navigate hook
-  const { user, loading: userLoading } = useUser(); // Get user and loading state from context
+    const { projectId } = useParams<{ projectId?: string }>();
+    const navigate = useNavigate();
+    const { user, loading: userLoading } = useUser();
+    const { toast } = useToast();
 
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
-
-  // Function to construct the download URL
-  const getDownloadUrl = (projectDocumentId: string, docId: string, docName: string, token?: string): string | null => {
-      if (!FIREBASE_STORAGE_BUCKET) {
-          console.error("Firebase Storage Bucket is not configured.");
-          // Consider showing a user-friendly message or error in the UI
-          return null;
-      }
-       if (!projectDocumentId || !docId || !docName) {
-           console.warn("Missing information to construct download URL:", { projectDocumentId, docId, docName });
-           return null;
-       }
+    const [project, setProject] = useState<Project | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isEditFormOpen, setIsEditFormOpen] = useState(false);
 
 
-      // Encode the file path in the bucket
-      // Path structure: projects/<projectDocumentId>/documents/<docId>/<docName>
-      // projectDocumentId here is the ID of the document in the 'projects' collection
-      const encodedFilePath = encodeURIComponent(`projects/${projectDocumentId}/documents/${docId}/${docName}`);
-
-      // Construct the base URL
-      let downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedFilePath}?alt=media`;
-
-      // Add token if it exists and is needed
-      if (token) {
-          downloadUrl += `&token=${token}`;
-      } else {
-          // Optional: Log a warning if no token but public access might be required
-          // This depends on your Firebase Storage Rules
-          // console.warn(`No token available for document ${docName}. Public access required in Storage Rules.`);
-      }
-
-      return downloadUrl;
-  };
-
-
-  useEffect(() => {
-    const fetchProject = async () => {
-      console.log("Fetching project details for projectId:", projectId);
-      if (!projectId) {
-        setError("Project ID is missing.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const projectRef = doc(db, 'projects', projectId);
-        const projectSnap = await getDoc(projectRef);
-
-        if (projectSnap.exists()) {
-          const data = projectSnap.data() as DocumentData;
-          console.log("Project data fetched:", data);
-
-
-          // Map documents to ensure they conform to ProjectDocument interface
-          // We will prioritize using the ID and name to construct the URL
-          const documents: ProjectDocument[] = Array.isArray(data.documents)
-            ? data.documents.map((docData: any) => ({
-                id: docData.id || Math.random().toString(36).substring(2, 15), // Ensure ID exists (fallback)
-                name: docData.name || 'Unnamed File',
-                description: docData.description || undefined, // Keep description as undefined if empty
-                url: docData.url === undefined ? null : docData.url, // Keep any existing URL but we will build it
-                token: docData.token || undefined, // Include token if stored
-                uploadError: docData.uploadError || undefined, // Include upload error if stored
-            }))
-            : []; // Default to empty array if documents field is missing or not an array
-
-            // Ensure milestones is treated as an array of strings
-            let milestonesArray: string[] = [];
-            if (data.milestones) {
-                if (Array.isArray(data.milestones)) {
-                    milestonesArray = data.milestones.map((m: any) => String(m)); // Ensure elements are strings
-                } else if (typeof data.milestones === 'string' && data.milestones.trim() !== '') {
-                    milestonesArray = [data.milestones]; // Treat non-empty string as single milestone
-                }
-            }
-
-
-          const fetchedProject: Project = {
-            id: projectSnap.id, // This is the Project Document ID
-            name: data.name || 'Unnamed Project',
-            description: data.description || 'No description provided.',
-            stage: data.stage || 'Unknown',
-            progress: data.progress || 0,
-            isPrivate: data.isPrivate ?? false, // Use nullish coalescing for boolean
-            ownerId: data.ownerId || '',
-            ownerInfo: data.ownerInfo,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
-            tasks: data.tasks || { completed: 0, total: 0 },
-            milestones: milestonesArray, // Use the processed milestones array
-            documents: documents, // Use the mapped documents array
-            fundingStage: data.fundingStage || '',
-            mvpStatus: data.mvpStatus || '',
-            team: Array.isArray(data.team) ? data.team : [], // Ensure team is an array
-            tags: Array.isArray(data.tags) ? data.tags : [], // Ensure tags is an array
-          };
-
-          console.log("Processed Project Object:", fetchedProject);
-          setProject(fetchedProject);
-          setLoading(false);
-
-        } else {
-          setError("Project not found.");
-          setLoading(false);
-           toast({
-               title: "Error",
-               description: "Project not found.",
-               variant: "destructive",
-           });
+    useEffect(() => {
+        if (!projectId) {
+            setError("Project ID is missing.");
+            setLoading(false);
+            return;
         }
-      } catch (err) {
-        console.error("Error fetching project details:", err);
-        setError("Failed to load project details.");
-        setLoading(false);
-         toast({
-             title: "Error",
-             description: "Failed to load project details. Please try again.",
-             variant: "destructive",
-         });
-      }
+
+        setLoading(true); // Set loading true when starting to fetch/listen
+
+        const projectRef = doc(db, 'projects', projectId);
+
+        // Use onSnapshot to listen for real-time updates
+        const unsubscribe = onSnapshot(projectRef, (projectSnap) => {
+            if (projectSnap.exists()) {
+                const data = projectSnap.data() as DocumentData;
+
+                 // Ensure milestones is treated as a string based on current form/rules
+                 const milestonesValue = typeof data.milestones === 'string' ? data.milestones : '';
+
+                 // Ensure tags is an array of strings
+                 const tagsArray = Array.isArray(data.tags) ? data.tags.map((tag: any) => String(tag)) : [];
+
+
+                 // Ensure documents is an array of Document interface
+                 const documentsArray: Document[] = Array.isArray(data.documents)
+                     ? data.documents.map((doc: any) => ({
+                           id: doc.id || '', // Ensure id exists or provide default
+                           name: doc.name || 'Unnamed Document',
+                           url: doc.url || null,
+                           description: doc.description || '',
+                           // Exclude temporary upload fields
+                       }))
+                     : [];
+
+
+                const projectData: Project = {
+                    id: projectSnap.id,
+                    name: data.name || 'Unnamed Project',
+                    description: data.description || 'No description provided.',
+                    stage: data.stage || 'Unknown',
+                    progress: data.progress ?? 0, // Use nullish coalescing for number default
+                    isPrivate: data.isPrivate ?? false, // Use nullish coalescing for boolean default
+                    team: Array.isArray(data.team) ? data.team : [], // Keep team structure if it exists
+                    tasks: data.tasks || { completed: 0, total: 0 },
+                    ownerId: data.ownerId,
+                    ownerInfo: data.ownerInfo || {},
+                    fundingStage: data.fundingStage || '',
+                    mvpStatus: data.mvpStatus || '',
+                    milestones: milestonesValue, // Use the processed string value
+                    tags: tagsArray, // Use the processed array
+                    documents: documentsArray, // Use the processed array
+                     createdAt: data.createdAt || null,
+                     updatedAt: data.updatedAt || null,
+                };
+                setProject(projectData);
+                setError(null); // Clear any previous errors on successful fetch
+                console.log("Project data fetched/updated by onSnapshot:", projectData);
+
+            } else {
+                // Document does not exist (e.g., deleted)
+                setProject(null);
+                setError("Project not found or has been deleted.");
+                console.log("Project document not found by onSnapshot:", projectId);
+            }
+            setLoading(false); // Set loading false once the initial snapshot is received
+        }, (err) => { // Error callback for onSnapshot
+            console.error("Error fetching project with onSnapshot:", err);
+            setError("Failed to load project details.");
+            setProject(null);
+            setLoading(false); // Set loading false on error
+        });
+
+        // Cleanup function: Unsubscribe from the listener when the component unmounts
+        return () => unsubscribe();
+
+    }, [projectId, toast]); // Depend on projectId and toast
+
+
+    const handleGoBack = () => {
+        navigate('/dashboard');
     };
 
-    fetchProject();
-
-  }, [projectId, toast]); // Depend on projectId and toast
-
-
-    // Handle navigation back to the dashboard projects list
-    const handleBackToProjects = () => {
-        console.log("Navigating back to /dashboard");
-        navigate('/dashboard/'); // Assuming this is the route for the projects list
-        // Or navigate(-1) if you want to go back to the previous page in history
-    };
-
-    // Handle navigation to edit the project
     const handleEditProject = () => {
         if (project) {
-             console.log("Navigating to edit project:", project.id);
-             // Assuming your ProjectForm is triggered from the dashboard route
-             // We navigate back to the dashboard and might need a way to indicate
-             // that the edit modal should open for this project ID.
-             // A simple approach for now is to just navigate back to the dashboard.
-             // A more integrated approach would involve a dedicated edit page route
-             // or state management to control the dashboard modal.
-             navigate(`/dashboard?editProjectId=${project.id}`); // Example: Navigate back and add a query param
+             console.log("Opening edit form dialog for project:", project.id);
+             setIsEditFormOpen(true);
         }
     };
 
 
-  if (loading || userLoading) { // Also consider userLoading
-    return <div className="text-center text-slate-600 mt-8">Loading project details...</div>;
-  }
+    if (loading) {
+        return (
+            <div className="container mx-auto px-4 py-8">
+                <div className="text-center text-slate-600">Loading project details...</div>
+            </div>
+        );
+    }
 
-  if (error) {
-    return <div className="text-center text-red-600 mt-8">Error: {error}</div>;
-  }
+    if (error) {
+        return (
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex items-center mb-6">
+                     <Button variant="ghost" onClick={handleGoBack} className="mr-2">
+                        <ChevronLeft className="h-5 w-5 mr-1" /> Back
+                     </Button>
+                     <h1 className="text-2xl font-bold text-slate-900">Project Details</h1>
+                </div>
+                <div className="text-center text-red-600 mt-8">Error: {error}</div>
+            </div>
+        );
+    }
 
-  if (!project) {
-       // This case might be redundant if error is set, but good for clarity
-       return <div className="text-center text-slate-600 mt-8">No project data available.</div>;
-  }
+    if (!project) {
+        return (
+            <div className="container mx-auto px-4 py-8">
+                 <div className="flex items-center mb-6">
+                     <Button variant="ghost" onClick={handleGoBack} className="mr-2">
+                        <ChevronLeft className="h-5 w-5 mr-1" /> Back
+                     </Button>
+                     <h1 className="text-2xl font-bold text-slate-900">Project Details</h1>
+                </div>
+                <div className="text-center text-slate-600 mt-8">Project not found.</div>
+            </div>
+        );
+    }
 
-    // Check if the current user is the owner of the project
     const isOwner = user && project.ownerId === user.uid;
 
 
-  return (
-    <div className="container mx-auto py-8">
-        {/* Back Button and Edit Button (if owner) */}
-        <div className="flex items-center justify-between mb-6">
-            <Button
-                variant="outline"
-                onClick={handleBackToProjects}
-                className="flex items-center gap-1"
-            >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Projects
-            </Button>
-
-            {isOwner && (
-                <Button
-                     variant="outline"
-                     onClick={handleEditProject}
-                     className="flex items-center gap-1"
-                >
-                     <Edit2 className="h-4 w-4" />
-                     Edit Project
-                </Button>
-            )}
-        </div>
-
-
-      {/* Project Header */}
-      <h1 className="text-3xl font-bold mb-4 text-slate-800">{project.name}</h1>
-      <p className="text-lg text-slate-700 mb-6">{project.description}</p>
-
-      {/* Project Details Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Stage */}
-          <div>
-              <h2 className="text-xl font-semibold mb-2 text-slate-700">Stage</h2>
-               <Badge
-                     variant="outline"
-                     className={`
-                       ${project.stage === 'Idea' ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}
-                       ${project.stage === 'Prototype' ? 'bg-cyan-50 text-cyan-600 border-cyan-200' : ''}
-                       ${project.stage === 'MVP' ? 'bg-purple-50 text-purple-600 border-purple-200' : ''}
-                       ${project.stage === 'Early Stage' ? 'bg-green-50 text-green-600 border-green-200' : ''}
-                       ${project.stage === 'Growth Stage' ? 'bg-amber-50 text-amber-600 border-amber-200' : ''}
-                       ${project.stage === 'Mature' ? 'bg-gray-50 text-gray-600 border-gray-200' : ''}
-                       ${!project.stage || project.stage === 'Unknown' ? 'bg-gray-50 text-gray-600 border-gray-200' : ''}
-                       text-base px-3 py-1
-                       flex items-center
-                     `}
-                   >
-                     <Rocket className="h-4 w-4 mr-2" />
-                     {project.stage || 'Unknown'} Stage
-                   </Badge>
-          </div>
-
-           {/* Visibility */}
-           <div>
-               <h2 className="text-xl font-semibold mb-2 text-slate-700">Visibility</h2>
-               <Badge variant="outline" className="text-base px-3 py-1 flex items-center">
-                    {project.isPrivate ? (
-                        <Lock className="h-4 w-4 mr-2" />
-                    ) : (
-                        <Globe className="h-4 w-4 mr-2" />
-                    )}
-                   {project.isPrivate ? 'Private' : 'Public'}
-               </Badge>
-           </div>
-
-            {/* Progress */}
-            <div>
-               <h2 className="text-xl font-semibold mb-2 text-slate-700">Progress</h2>
-                <div className="flex items-center gap-3">
-                    {/* Assuming progress is stored as a number between 0 and 100 */}
-                    <Progress value={project.progress} className="h-2 w-3/4" />
-                    <span className="font-medium text-slate-800">{project.progress || 0}%</span>
-                </div>
-           </div>
-
-           {/* Tasks */}
-           <div>
-               <h2 className="text-xl font-semibold mb-2 text-slate-700">Tasks</h2>
-                <div className="text-slate-600">
-                   {project.tasks?.completed || 0} of {project.tasks?.total || 0} tasks completed
-                </div>
-           </div>
-
-           {/* Owner */}
-           <div>
-               <h2 className="text-xl font-semibold mb-2 text-slate-700">Owner</h2>
-                <div className="flex items-center gap-3">
-                   {project.ownerInfo && (
-                       <Avatar className="h-10 w-10">
-                           <AvatarImage src={project.ownerInfo.profileImageUrl} />
-                            <AvatarFallback>
-                                {project.ownerInfo.displayName ? project.ownerInfo.displayName.charAt(0).toUpperCase() : project.ownerId.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                       </Avatar>
-                   )}
-                   {/* Display owner name or default */}
-                   <span className="text-slate-700">{project.ownerInfo?.displayName || 'Unknown User'}</span>
-                </div>
-           </div>
-
-            {/* Funding Stage - Added based on Project interface */}
-             {project.fundingStage && project.fundingStage.trim() !== '' && (
-                 <div>
-                    <h2 className="text-xl font-semibold mb-2 text-slate-700">Funding Stage</h2>
-                    <div className="text-slate-600">{project.fundingStage}</div>
+    return (
+        <div className="container mx-auto px-4 py-8">
+             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                 <div className="flex items-center">
+                     <Button variant="ghost" onClick={handleGoBack} className="mr-2">
+                         <ChevronLeft className="h-5 w-5 mr-1" /> Back
+                     </Button>
+                      <h1 className="text-2xl font-bold text-slate-900">{project.name}</h1>
+                      {project.isPrivate && <Badge variant="secondary" className="ml-2"><Lock className="h-3 w-3 mr-1" /> Private</Badge>}
                  </div>
-             )}
 
-             {/* MVP Status - Added based on Project interface */}
-              {project.mvpStatus && project.mvpStatus.trim() !== '' && (
-                  <div>
-                     <h2 className="text-xl font-semibold mb-2 text-slate-700">MVP Status</h2>
-                     <div className="text-slate-600">{project.mvpStatus}</div>
-                  </div>
-              )}
-
-               {/* Milestones - Using the processed milestonesArray */}
-                {project.milestones && project.milestones.length > 0 && ( // Check if the processed array has items
-                     <div>
-                        <h2 className="text-xl font-semibold mb-2 text-slate-700">Milestones</h2>
-                         <ul className="list-disc list-inside text-slate-600">
-                             {project.milestones.map((milestone, idx) => ( // Now we are sure we are mapping over an array
-                                 <li key={idx}>{milestone}</li>
-                             ))}
-                         </ul>
-                     </div>
-                )}
+                 {isOwner && (
+                     <Button onClick={handleEditProject} className="flex items-center gap-1 w-full sm:w-auto">
+                         <Edit className="h-4 w-4" /> Edit Project
+                     </Button>
+                 )}
+             </div>
 
 
-               {/* Team - Added based on Project interface (assuming simple display) */}
-                {project.team && project.team.length > 0 && (
-                    <div>
-                        <h2 className="text-xl font-semibold mb-2 text-slate-700">Team</h2>
-                        {/* Display team members simply, adjust as needed */}
-                        <div className="text-slate-600">
-                            {/* Assuming team is an array of user IDs or objects */}
-                             {/* You might need to adjust how team members are displayed based on their structure */}
-                             {Array.isArray(project.team) ? project.team.join(', ') : 'N/A'} {/* Basic display */}
-                        </div>
-                    </div>
-                )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">Description</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-slate-700">{project.description}</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                         <CardHeader>
+                             <CardTitle className="text-lg">Additional Details</CardTitle>
+                         </CardHeader>
+                         <CardContent className="space-y-4">
+                             {project.fundingStage && (
+                                  <div className="text-slate-700 flex items-center">
+                                       <Briefcase className="h-5 w-5 mr-2 text-slate-500" />
+                                       <strong>Funding Stage:</strong> {project.fundingStage}
+                                  </div>
+                             )}
+                             {project.mvpStatus && (
+                                  <div className="text-slate-700 flex items-center">
+                                       <Rocket className="h-5 w-5 mr-2 text-slate-500" />
+                                       <strong>MVP Status:</strong> {project.mvpStatus}
+                                  </div>
+                             )}
+                             {project.milestones && ( // Check if milestones string is not empty
+                                  <div className="text-slate-700 flex items-center">
+                                       <Calendar className="h-5 w-5 mr-2 text-slate-500" />
+                                       <strong>Milestone:</strong> {project.milestones} {/* Display as single string */}
+                                  </div>
+                             )}
+                             {project.tags && project.tags.length > 0 && (
+                                 <div>
+                                     <strong>Tags:</strong>
+                                     <div className="flex flex-wrap gap-2 mt-2">
+                                         {project.tags.map(tag => (
+                                              <Badge key={tag} variant="secondary">{tag}</Badge>
+                                         ))}
+                                     </div>
+                                 </div>
+                             )}
+                         </CardContent>
+                    </Card>
 
 
-      </div> {/* End of Project Details Grid */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">Documents</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {project.documents && project.documents.length > 0 ? (
+                                <ul className="list-disc list-inside space-y-2">
+                                    {project.documents.map(doc => (
+                                        <li key={doc.id} className="text-slate-700 break-words">
+                                            <strong>{doc.name}:</strong> {doc.description}
+                                            {doc.url && (
+                                                 <a
+                                                     href={doc.url}
+                                                     target="_blank"
+                                                     rel="noopener noreferrer"
+                                                     className="text-blue-600 hover:underline ml-2 flex items-center inline-flex"
+                                                 >
+                                                     <LinkIcon className="h-4 w-4 mr-1" /> View File
+                                                 </a>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-slate-600">No documents uploaded yet.</p>
+                            )}
+                        </CardContent>
+                    </Card>
 
-      {/* Tags Section */}
-      {project.tags && project.tags.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2 text-slate-700">Tags</h2>
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag, index) => (
-              <Badge key={index} variant="secondary" className="text-sm px-2 py-1">
-                {tag}
-              </Badge>
-            ))}
-          </div>
+
+                </div>
+
+                <div className="lg:col-span-1 space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">Overview</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="text-slate-700 flex items-center">
+                                <Rocket className="h-5 w-5 mr-2 text-slate-500" />
+                                <strong>Stage:</strong> {project.stage}
+                            </div>
+                             <div>
+                                 <div className="flex justify-between text-sm mb-1 text-slate-700">
+                                     <span>Project Progress</span>
+                                     <span className="font-medium">{project.progress}%</span>
+                                 </div>
+                                 <Progress value={project.progress} className="h-2" />
+                             </div>
+                        </CardContent>
+                    </Card>
+
+                     <Card>
+                         <CardHeader>
+                             <CardTitle className="text-lg">Owner</CardTitle>
+                         </CardHeader>
+                         <CardContent className="flex items-center space-x-4">
+                             <Avatar className="h-10 w-10">
+                                 <AvatarImage src={project.ownerInfo?.profileImageUrl} />
+                                 <AvatarFallback>
+                                     {project.ownerInfo?.displayName ? project.ownerInfo.displayName.charAt(0) : project.ownerId.charAt(0)}
+                                 </AvatarFallback>
+                             </Avatar>
+                             <div>
+                                 <p className="font-semibold text-slate-800">{project.ownerInfo?.displayName || 'Unknown User'}</p>
+                             </div>
+                         </CardContent>
+                     </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">Tasks</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-slate-700">{project.tasks.completed} out of {project.tasks.total} tasks completed.</p>
+                        </CardContent>
+                    </Card>
+
+
+                </div>
+            </div>
+
+            {/* Edit Project Dialog */}
+            {project && ( // Render dialog only if project data is loaded
+                 <Dialog open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
+                     <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto flex flex-col">
+                         <DialogTitle>Edit Project: {project.name}</DialogTitle>
+                         <DialogDescription>
+                             Update the details of your project below.
+                         </DialogDescription>
+                         {/* Pass the LATEST fetched project data from onSnapshot */}
+                         {/* This ensures the form is initialized with the most recent data */}
+                         <EditProjectForm
+                             initialData={project}
+                             onSuccess={() => {
+                                 setIsEditFormOpen(false);
+                                 // Note: Since we are using onSnapshot, the project data
+                                 // in ProjectDetailsPage will automatically update when
+                                 // the save operation in EditProjectForm completes.
+                                 // No manual re-fetch needed here.
+                             }}
+                         />
+                     </DialogContent>
+                 </Dialog>
+            )}
+
         </div>
-      )}
-
-      {/* Uploaded Files Section */}
-      {project.documents && project.documents.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2 text-slate-700">Uploaded Files</h2>
-          <ul className="list-disc list-inside text-slate-700">
-            {project.documents.map((doc: ProjectDocument, index) => {
-                // Use the Project Document ID (project.id), Document ID (doc.id), and file name (doc.name)
-                // to construct the download URL.
-                const fileDownloadUrl = project.id && doc.id && doc.name
-                    ? getDownloadUrl(project.id, doc.id, doc.name, doc.token) // Pass token if stored
-                    : null;
-
-                return (
-                    <li key={doc.id || index}> {/* Prefer doc.id as key if available, fallback to index */}
-                      {fileDownloadUrl ? ( // Check if a download URL could be constructed
-                        <a href={fileDownloadUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                          {doc.name || 'Unnamed File'} {/* Display document name as link text */}
-                        </a>
-                      ) : (
-                        // If no URL could be constructed or doc.url was null/undefined
-                        <span>{doc.name || 'Unnamed File'}</span>
-                      )}
-                      {/* Display description if available and not empty */}
-                      {doc.description && doc.description.trim() !== '' && (
-                          <span className="ml-2 text-sm text-slate-500">({doc.description})</span>
-                      )}
-                      {/* Display upload error if it exists */}
-                      {doc.uploadError && (
-                           <span className="ml-2 text-sm text-red-500">(Upload Failed: {doc.uploadError})</span>
-                      )}
-                    </li>
-                 );
-            })}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default ProjectDetailsPage;

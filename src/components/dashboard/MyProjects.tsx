@@ -26,9 +26,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUser } from '@/contexts/UserContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot, DocumentData, deleteDoc, doc, getDoc } from 'firebase/firestore'; // Import getDoc
+import { collection, query, where, onSnapshot, DocumentData, deleteDoc, doc } from 'firebase/firestore'; // Import getDoc, doc, deleteDoc
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import ProjectForm from './ProjectForm';
+import CreateProjectForm from './CreateProjectForm'; // Import CreateProjectForm
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
 
@@ -76,8 +76,9 @@ const MyProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false); // Renamed state for clarity
+  // editingProject state is no longer needed for opening the form from this page
+  // const [editingProject, setEditingProject] = useState<Project | null>(null); // Removed
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
@@ -87,96 +88,13 @@ const MyProjects = () => {
   const { toast } = useToast();
 
 
-    // Effect to check for editProjectId query parameter on load
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const editProjectId = params.get('editProjectId');
-
-        if (editProjectId && user && !loading && !userLoading) {
-            console.log("Found editProjectId in URL:", editProjectId);
-            // Fetch the project data and open the edit form
-            const fetchProjectForEdit = async () => {
-                 try {
-                    const projectRef = doc(db, 'projects', editProjectId);
-                    const projectSnap = await getDoc(projectRef);
-
-                     if (projectSnap.exists()) {
-                         const data = projectSnap.data() as DocumentData;
-
-                         // Ensure milestones is treated as an array of strings
-                        let milestonesArray: string[] = [];
-                        if (data.milestones) {
-                            if (Array.isArray(data.milestones)) {
-                                milestonesArray = data.milestones.map((m: any) => String(m)); // Ensure elements are strings
-                            } else if (typeof data.milestones === 'string' && data.milestones.trim() !== '') {
-                                milestonesArray = [data.milestones]; // Treat non-empty string as single milestone
-                            }
-                        }
-
-                         const projectData: Project = {
-                              id: projectSnap.id,
-                              name: data.name || 'Unnamed Project',
-                              description: data.description || '',
-                              stage: data.stage || 'Unknown',
-                              progress: data.progress || 0,
-                              isPrivate: data.isPrivate ?? false,
-                              team: Array.isArray(data.team) ? data.team : [],
-                              tasks: data.tasks || { completed: 0, total: 0 },
-                              ownerId: data.ownerId,
-                              ownerInfo: data.ownerInfo || {},
-                              tags: Array.isArray(data.tags) ? data.tags : [],
-                              fundingStage: data.fundingStage || '',
-                              mvpStatus: data.mvpStatus || '',
-                              milestones: milestonesArray, // Use the processed milestones array
-                              documents: Array.isArray(data.documents) ? data.documents : [],
-                              createdAt: data.createdAt || null,
-                              updatedAt: data.updatedAt || null,
-                         };
-
-                         // Only set for editing if the current user is the owner
-                         if (user.uid === projectData.ownerId) {
-                            console.log("Opening edit form for project:", editProjectId);
-                            setEditingProject(projectData);
-                            setIsFormOpen(true);
-                         } else {
-                             console.warn("Attempted to edit project not owned by current user:", editProjectId);
-                              toast({
-                                title: "Permission Denied",
-                                description: "You can only edit projects you own.",
-                                variant: "destructive",
-                            });
-                         }
-
-                     } else {
-                         console.warn("Project not found for editing:", editProjectId);
-                         toast({
-                            title: "Error",
-                            description: "Project to edit not found.",
-                            variant: "destructive",
-                        });
-                     }
-                 } catch (err) {
-                     console.error("Error fetching project for editing:", err);
-                     toast({
-                        title: "Error",
-                        description: "Failed to load project for editing.",
-                        variant: "destructive",
-                    });
-                 } finally {
-                     // Clean up the query parameter from the URL after processing
-                     navigate(location.pathname, { replace: true });
-                 }
-            };
-
-            fetchProjectForEdit();
-        }
-
-    }, [location.search, user, loading, userLoading, navigate, toast]); // Depend on these values
+    // Removed the useEffect block that checked for editProjectId query parameter
 
 
   useEffect(() => {
     if (!userLoading && user) {
       const projectsCollectionRef = collection(db, 'projects');
+      // Query only for projects owned by the current user
       const q = query(projectsCollectionRef, where('ownerId', '==', user.uid));
 
       console.log("Setting up Firestore listener for user:", user.uid);
@@ -186,6 +104,17 @@ const MyProjects = () => {
         const projectsData: Project[] = snapshot.docs.map(doc => {
            const data = doc.data() as DocumentData;
             console.log(`Processing document ${doc.id}:`, data); // Log document data
+
+            // Ensure milestones is treated as an array of strings during mapping
+            let milestonesArray: string[] = [];
+            if (data.milestones) {
+                if (Array.isArray(data.milestones)) {
+                    milestonesArray = data.milestones.map((m: any) => String(m)); // Ensure elements are strings
+                } else if (typeof data.milestones === 'string' && data.milestones.trim() !== '') {
+                    milestonesArray = [data.milestones]; // Treat non-empty string as single milestone
+                }
+            }
+
 
            return {
             id: doc.id,
@@ -203,7 +132,7 @@ const MyProjects = () => {
             // ADDED: Read new fields from Firestore data
             fundingStage: data.fundingStage || '',
             mvpStatus: data.mvpStatus || '',
-            milestones: Array.isArray(data.milestones) ? data.milestones.map((m: any) => String(m)) : (typeof data.milestones === 'string' && data.milestones.trim() !== '' ? [data.milestones] : []), // Ensure milestones is an array of strings
+            milestones: milestonesArray, // Use the processed milestones array
             documents: Array.isArray(data.documents) ? data.documents : [], // Ensure documents is an array
             createdAt: data.createdAt || null, // Read createdAt
             updatedAt: data.updatedAt || null, // Read updatedAt
@@ -258,15 +187,11 @@ const MyProjects = () => {
 
    const handleCreateNewProject = () => {
        console.log("Opening form for new project.");
-       setEditingProject(null);
-       setIsFormOpen(true);
+       setIsCreateFormOpen(true); // Open the create form dialog
    };
 
-   const handleEditProject = (project: Project) => {
-       console.log("Opening form to edit project:", project.id);
-       setEditingProject(project);
-       setIsFormOpen(true);
-   };
+   // handleEditProject is removed as editing starts from the details page
+
 
    const handleDeleteClick = (project: Project) => {
        console.log("Confirming deletion for project:", project.id);
@@ -284,6 +209,7 @@ const MyProjects = () => {
        console.log("Proceeding with deletion for project:", projectToDelete.id);
 
        try {
+           // Assuming deleteDoc and doc are imported from 'firebase/firestore'
            const projectRef = doc(db, 'projects', projectToDelete.id);
            await deleteDoc(projectRef);
 
@@ -306,14 +232,11 @@ const MyProjects = () => {
        }
    };
 
-
-   const handleFormSuccess = () => {
-       console.log("Project form submitted successfully. Closing form.");
-       setIsFormOpen(false);
-       setEditingProject(null); // Clear editing state
+    // Renamed handleFormSuccess to handleCreateFormSuccess for clarity
+   const handleCreateFormSuccess = () => {
+       console.log("Create project form submitted successfully. Closing form.");
+       setIsCreateFormOpen(false); // Close the create form dialog
        // The onSnapshot listener will automatically update the projects list
-       // Also remove the query parameter from the URL if it was set
-        navigate(location.pathname, { replace: true });
    };
 
    // Function to navigate to Project Details page
@@ -360,7 +283,8 @@ const MyProjects = () => {
             />
           </div>
 
-          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          {/* Dialog for creating a new project */}
+          <Dialog open={isCreateFormOpen} onOpenChange={setIsCreateFormOpen}>
             <DialogTrigger asChild>
                 <Button className="flex items-center gap-1 w-full sm:w-auto" onClick={handleCreateNewProject}>
                   <Plus className="h-4 w-4" />
@@ -368,12 +292,12 @@ const MyProjects = () => {
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto flex flex-col">
-              <DialogTitle>{editingProject ? 'Edit Project' : 'Create New Project'}</DialogTitle>
+              <DialogTitle>Create New Project</DialogTitle> {/* Title updated */}
               <DialogDescription>
-                {editingProject ? 'Edit the details of your project.' : 'Fill in the details below to create a new project.'}
+                Fill in the details below to create a new project. {/* Description updated */}
               </DialogDescription>
-              {/* Pass editingProject as initialData */}
-              <ProjectForm initialData={editingProject} onSuccess={handleFormSuccess} />
+              {/* Use CreateProjectForm for creation */}
+              <CreateProjectForm onSuccess={handleCreateFormSuccess} /> {/* Pass onSuccess */}
             </DialogContent>
           </Dialog>
 
@@ -435,7 +359,7 @@ const MyProjects = () => {
                        <DropdownMenuItem onClick={() => handleViewProject(project.id)}>
                            View Project
                        </DropdownMenuItem>
-                       <DropdownMenuItem onClick={() => handleEditProject(project)}>Edit Details</DropdownMenuItem>
+                       {/* Removed Edit Details dropdown item */}
                        <DropdownMenuItem>Manage Team</DropdownMenuItem>
                        <DropdownMenuSeparator />
                        <DropdownMenuItem
@@ -527,6 +451,7 @@ const MyProjects = () => {
          </div>
       )}
 
+      {/* Dialog for confirming project deletion */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent>
               <DialogTitle>Confirm Deletion</DialogTitle>

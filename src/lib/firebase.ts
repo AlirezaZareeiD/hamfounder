@@ -1,6 +1,7 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, Auth, getAuth, OAuthProvider, User, setPersistence, browserLocalPersistence, getIdTokenResult } from "firebase/auth";
-import { getStorage, ref, uploadBytes, getDownloadURL, StorageReference } from "firebase/storage";
+// Import ref as well
+import { getStorage, ref, uploadBytes, getDownloadURL, StorageReference, uploadBytesResumable, deleteObject, UploadTaskSnapshot } from "firebase/storage";
 import { initializeAppCheck, ReCaptchaV3Provider, AppCheck } from "firebase/app-check"; // Import AppCheck type
 import { getFirestore, Firestore, doc, setDoc, getDoc } from "firebase/firestore";
 
@@ -36,13 +37,6 @@ try {
 
   console.log("initializeAppCheck call finished.");
   console.log("Firebase App Check initialized successfully.");
-
-  // Removed the immediate appCheck.getToken().then(...) block
-  // as this might be causing the TypeError if called too early.
-  // Firebase SDKs will handle token management internally once App Check is initialized.
-  // If you specifically need to manually get a token elsewhere, you should
-  // do so by importing the appCheck instance (if exported) and calling getToken there,
-  // potentially with checks for its readiness.
 
 } catch (error) {
   console.error("Error initializing Firebase App Check:", error);
@@ -101,7 +95,10 @@ export const signInWithLinkedInPlaceholder = () => {
   console.log("LinkedIn login feature coming soon.");
 };
 
-export const storage = getStorage(app); // Initialize and export storage
+// Initialize and export storage AND ref
+export const storage = getStorage(app);
+export { ref }; // Export the ref function as well
+
 
 // Function to upload an image to Firebase Storage with a specified type
 export const uploadImage = async (file: File, userId: string, type: 'profile' | 'companyLogo'): Promise<string> => {
