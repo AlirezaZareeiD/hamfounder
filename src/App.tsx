@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
+import PricingPage from "./pages/PricingPage"; // Import PricingPage
 import { UserProvider } from "./contexts/UserProvider"; // Import UserProvider
 
 // وارد کردن کامپوننت های داشبورد از فولدر جدید
@@ -30,6 +31,9 @@ const App = () => (
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           {/* مسیر اصلی داشبورد */} {/* Fix: Ensure Dashboard is a child of Routes */}
+
+          {/* Route for the Pricing Page */}
+          <Route path="/pricing" element={<PricingPage />} />
           {/* از کامپوننت Dashboard به عنوان یک Layout برای مسیرهای داخلی آن استفاده کنید */}
           {/* یا هر مسیر داخلی داشبورد را مستقیم در اینجا تعریف کنید */}
           <Route path="/dashboard" element={<Dashboard />} /> {/* مسیر اصلی داشبورد */}

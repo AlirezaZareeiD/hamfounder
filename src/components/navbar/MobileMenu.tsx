@@ -1,94 +1,78 @@
-import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { navigation } from '../../constants/navigation'; // Import the navigation constant
 
 interface MobileMenuProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean; // Now controlled by parent
+  onClose: () => void; // Function to close menu, provided by parent
   scrollToSection: (sectionId: string) => void;
+  isIndex: boolean; // Add the new prop
 }
 
-const MobileMenu = ({ isOpen, onClose, scrollToSection }: MobileMenuProps) => {
+const MobileMenu: React.FC<MobileMenuProps> = ({
+  isOpen, // Destructure the prop
+  onClose, // Destructure the prop
+  scrollToSection,
+  isIndex, // Destructure the prop
+}) => {
+  const location = useLocation();
+  // Remove local isOpen state
+  // const [isOpen, setIsOpen] = useState(false);
 
-  // Handler to prevent event bubbling
-  const handleClick = (e: React.MouseEvent, sectionId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    scrollToSection(sectionId);
+  // Remove local toggleMenu function
+  // const toggleMenu = () => {
+  //   setIsOpen(!isOpen);
+  // };
+
+  const handleLinkClick = (item: {
+    id: string;
+    href: string;
+    isInternalLink: boolean;
+  }) => {
+    if (isIndex && item.isInternalLink) {
+      scrollToSection(item.id);
+    } else {
+      // For external links or internal links on other pages,
+      // navigation will be handled by react-router-dom
+    }
+    // Close the menu after clicking a link by calling the onClose prop
     onClose();
   };
 
   return (
-    <div 
-      className={`md:hidden fixed inset-0 top-16 bg-background/95 backdrop-blur-md z-50 overflow-auto transition-all duration-300 ease-in-out min-h-screen w-screen ${
- isOpen ? 'opacity-100 translate-y-0 animate-fade-in' : 'opacity-0 -translate-y-full pointer-events-none'
- }`}
-      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-    >
-      <div className="px-2 pt-2 pb-3 space-y-3 sm:px-3">
+    // Add a single parent div here to wrap the conditional rendering
+    <div>
+      {/* The mobile menu button is now rendered in Navbar.tsx */}
 
-        <a
-          href="#mission"
-          onClick={(e) => handleClick(e, 'mission')}
-          className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium border-b border-border/40 shadow-sm"
-        >
-          Our Mission
-        </a>
-
-        <a
-          href="#how-it-works"
-          onClick={(e) => handleClick(e, 'how-it-works')}
-          className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium border-b border-border/40 shadow-sm"
-        >
-          The Blueprint
-        </a>
-
-        <a
-          href="#global-network"
-          onClick={(e) => handleClick(e, 'global-network')}
-          className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium border-b border-border/40 shadow-sm"
-        >
-          Global Network
-        </a>
-
-        <a
-          href="#startups"
-          onClick={(e) => handleClick(e, 'startups')}
-          className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium border-b border-border/40 shadow-sm"
-        >
-          Spotlight
-        </a>
-
-        <a
-          href="#join"
-          onClick={(e) => handleClick(e, 'join')}
-          className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium border-b border-border/40 shadow-sm"
-        >
-          Find a CoFounder
-        </a>
-
-      </div>
-
-      <div className="pb-8 border-t border-border/40">
-        <div className="px-2 space-y-3">
-
-          <Link
-            to="/login"
-            onClick={() => onClose()}
-            className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium border-b border-border/40 shadow-sm"
-          >
-            Login
-          </Link>
-
-          <Link
-            to="/signup"
-            onClick={() => onClose()}
-            className="text-muted-foreground hover:text-foreground block px-3 py-4 rounded-md text-base font-medium"
-          >
-            Sign Up
-          </Link>
-
+      {/* Conditionally render the menu content based on the isOpen prop */}
+      {isOpen && (
+        // The positioning and styling of this div are important for the overlay
+        <div className="absolute top-16 left-0 w-full bg-background shadow-md z-50">
+          <nav className="flex flex-col items-center py-4 space-y-2">
+            {navigation.map((item) => (
+              <a
+                key={item.id}
+                href={isIndex && item.isInternalLink ? `#${item.id}` : item.href}
+                onClick={() => handleLinkClick(item)}
+                className={`block px-3 py-2 rounded-md text-base font-medium transition ${
+                  isIndex && item.isInternalLink
+                    ? // You might need to manage active section state in MobileMenu as well if you want highlighting
+                      // For now, I'll remove the activeSection check as it's not managed locally
+                      // activeSection === item.id
+                      // ? 'text-foreground'
+                      // :
+                      'text-muted-foreground hover:text-foreground'
+                    : location.pathname === item.href
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
         </div>
-      </div>
-    </div>
+      )}
+    </div> // Close the parent div here
   );
 };
 
