@@ -6,9 +6,9 @@ export const navigation = [
     isInternalLink: true,
   },
   {
-    id: 'spotlight',
-    label: 'Spotlight',
-    href: '#spotlight', // Assuming internal for now
+    id: 'TheBluePrint',
+    label: 'The Blueprint',
+    href: '#how-it-works',
     isInternalLink: true,
   },
   {
