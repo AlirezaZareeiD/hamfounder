@@ -2,19 +2,19 @@ export const navigation = [
   {
     id: 'mission',
     label: 'Our Mission',
-    href: '#mission',
+    href: '/#mission', // Corrected href for internal link
     isInternalLink: true,
   },
   {
-    id: 'TheBluePrint',
+    id: 'how-it-works',
     label: 'The Blueprint',
-    href: '#how-it-works',
+    href: '/#how-it-works', // Corrected href for internal link
     isInternalLink: true,
   },
   {
     id: 'global-network',
     label: 'Global Network',
-    href: '#global-network', // Assuming internal for now
+    href: '/#global-network', // Corrected href for internal link
     isInternalLink: true,
   },
   {

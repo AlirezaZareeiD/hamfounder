@@ -93,7 +93,7 @@ const Navbar: React.FC<NavbarProps> = ({
   return (
     <nav
       ref={navbarRef}
-      className={`bg-background/90 backdrop-blur-md z-50 sticky top-0 transition-all duration-300 ${
+      className={`bg-background/90 backdrop-blur-md z-50 fixed top-0 left-0 right-0 transition-all duration-300 ${
         isScrolled ? 'shadow-md border-b border-border/40' : 'border-b border-border/40'
       }`}
     >

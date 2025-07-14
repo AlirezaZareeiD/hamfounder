@@ -49,12 +49,17 @@ const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
       {navigation.map((item) => (
         <a
           key={item.id}
-          href={isIndexPage && item.isInternalLink ? `#${item.id}` : item.href}
+          // Modified the href to always include '/' for internal links
+          href={item.isInternalLink ? `/#${item.id}` : item.href}
           onClick={(e) => {
+            // Keep the onClick logic for smooth scrolling on the index page
             if (isIndexPage && item.isInternalLink) {
               e.preventDefault();
               scrollToSection(item.id);
             }
+            // If not on the index page, the default link behavior will navigate
+            // to the index page and then the browser's default fragment
+            // handling will scroll to the section.
           }}
           className={`text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium transition ${
             isIndexPage && item.isInternalLink

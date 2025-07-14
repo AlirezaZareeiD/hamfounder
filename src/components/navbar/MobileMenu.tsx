@@ -16,9 +16,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 }) => {
   const location = useLocation();
   // Remove local isOpen state
-  // const [isOpen, setIsOpen] = useState(false);
-
-  // Remove local toggleMenu function
+  // const [isOpen, setIsOpen] = useState(false);\n\n  // Remove local toggleMenu function
   // const toggleMenu = () => {
   //   setIsOpen(!isOpen);
   // };
@@ -51,15 +49,16 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             {navigation.map((item) => (
               <a
                 key={item.id}
-                href={isIndex && item.isInternalLink ? `#${item.id}` : item.href}
+                // Modified the href to always include '/' for internal links
+                href={item.isInternalLink ? `/#${item.id}` : item.href}
                 onClick={() => handleLinkClick(item)}
                 className={`block px-3 py-2 rounded-md text-base font-medium transition ${
                   isIndex && item.isInternalLink
                     ? // You might need to manage active section state in MobileMenu as well if you want highlighting
-                      // For now, I'll remove the activeSection check as it's not managed locally
+                      // For now, I\'ll remove the activeSection check as it\'s not managed locally
                       // activeSection === item.id
-                      // ? 'text-foreground'
-                      // :
+                      // ? \'text-foreground\'
+                      // :\n
                       'text-muted-foreground hover:text-foreground'
                     : location.pathname === item.href
                     ? 'text-foreground'
