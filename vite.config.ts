@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@/dashboard/find-cofounder/": path.resolve(__dirname, "./src/components/dashboard/find-cofounder"), // <-- این خط اضافه شده است
     },
   },
 }));

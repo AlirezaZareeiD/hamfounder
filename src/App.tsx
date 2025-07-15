@@ -13,7 +13,7 @@ import { UserProvider } from "./contexts/UserProvider"; // Import UserProvider
 // وارد کردن کامپوننت های داشبورد از فولدر جدید
 import Dashboard from "./pages/dashboard/Dashboard";
 import EditProfilePage from "./pages/dashboard/EditProfilePage"; // وارد کردن صفحه ویرایش پروفایل
-import FindCofounderPage from "./pages/dashboard/FindCofounderPage"; // وارد کردن صفحه جستجوی کوفاندر
+import FindCofounderPage from "./pages/dashboard/find-cofounder/FindCofounderPage"; // وارد کردن صفحه جستجوی کوفاندر
 import NotificationsPage from "./pages/dashboard/NotificationsPage"; // وارد کردن صفحه نوتیفیکیشن ها
 import ProjectDetailsPage from './components/dashboard/ProjectDetailsPage'; // Import ProjectDetailsPage
 
