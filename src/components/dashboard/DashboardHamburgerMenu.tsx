@@ -59,7 +59,7 @@ export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ 
           {/* Dashboard Home Link */}
           <Link to="/dashboard" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
             <Home className="h-5 w-5 mr-3 text-gray-600" /> {/* می‌توانید از آیکون خانه استفاده کنید */}
- Dashboard Home
+            Your Dashboard
  </Link>
           <Link to="/dashboard/edit-profile" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
             <User className="h-5 w-5 mr-3 text-gray-600" />

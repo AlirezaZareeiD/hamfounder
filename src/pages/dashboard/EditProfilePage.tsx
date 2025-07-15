@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 // import { useUser } from '@/contexts/UserContext';
 
 const EditProfilePage: React.FC = () => {
-  // State for user profile image and company logo URL
+  // State for user profile image and Your Startup Logo URL
   const [userProfileImage, setUserProfileImage] = useState<string | undefined>(undefined);
   const [companyLogoUrl, setCompanyLogoUrl] = useState<string | undefined>(undefined);
 
@@ -22,7 +22,7 @@ const EditProfilePage: React.FC = () => {
   // isSavingCompanyLogo state is now likely managed within ProfileImageUploader when type="companyLogo"
   // const [isSavingCompanyLogo, setIsSavingCompanyLogo] = useState(false);
 
-  // Personal Information states
+  // Founder Profile states
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [displayName, setDisplayName] = useState(''); // Added displayName state
@@ -33,7 +33,7 @@ const EditProfilePage: React.FC = () => {
   const [twitterUrl, setTwitterUrl] = useState('');
   const [personalSummary, setPersonalSummary] = useState('');
 
-  // Professional Information states
+  // Professional Background states
   const [role, setRole] = useState('');
   const [lookingFor, setLookingFor] = useState('');
   const [businessStage, setBusinessStage] = useState('');
@@ -60,7 +60,7 @@ const EditProfilePage: React.FC = () => {
         try {
           const profile = await getUserProfile(userId);
           if (profile) {
-            // Populate personal information states
+            // Populate Founder Profile states
             setFirstName(profile.firstName || '');
             setLastName(profile.lastName || '');
             setDisplayName(profile.displayName || ''); // Populate displayName state
@@ -71,7 +71,7 @@ const EditProfilePage: React.FC = () => {
             setTwitterUrl(profile.twitterUrl || '');
             setPersonalSummary(profile.personalSummary || '');
 
-            // Populate professional information states
+            // Populate Professional Background states
             setRole(profile.role || '');
             setLookingFor(profile.lookingFor || '');
             setBusinessStage(profile.businessStage || '');
@@ -105,7 +105,7 @@ const EditProfilePage: React.FC = () => {
   };
 
   const handleCompanyLogoUpdate = (imageUrl: string) => {
-    setCompanyLogoUrl(imageUrl); // Update the state for the company logo URL
+    setCompanyLogoUrl(imageUrl); // Update the state for the Your Startup Logo URL
   };
 
   // Handlers for saving different sections
@@ -153,11 +153,11 @@ const EditProfilePage: React.FC = () => {
       await updateUserProfile(userId, personalInfoData);
       toast({
         title: "Success",
-        description: "Personal information updated successfully.",
+        description: "Founder Profile updated successfully.",
       });
     } catch (error) {
-      console.error('Error saving personal information:', error);
-      toast({ title: "Error", description: "Failed to save personal information.", variant: "destructive" });
+      console.error('Error saving Founder Profile:', error);
+      toast({ title: "Error", description: "Failed to save Founder Profile.", variant: "destructive" });
     } finally {
       setIsSavingPersonalInfo(false);
     }
@@ -179,11 +179,11 @@ const EditProfilePage: React.FC = () => {
       await updateUserProfile(userId, personalSummaryData);
       toast({
         title: "Success",
-        description: "Personal summary updated successfully.",
+        description: "My Entrepreneurial Journey updated successfully.",
       });
     } catch (error) {
-      console.error('Error saving personal summary:', error);
-      toast({ title: "Error", description: "Failed to save personal summary.", variant: "destructive" });
+      console.error('Error saving My Entrepreneurial Journey:', error);
+      toast({ title: "Error", description: "Failed to save My Entrepreneurial Journey.", variant: "destructive" });
     } finally { setIsSavingPersonalSummary(false); }
   };
 
@@ -195,11 +195,11 @@ const EditProfilePage: React.FC = () => {
       return;
     }
 
-     // Basic URL validation for company website URL
+     // Basic URL validation for Startup website URL
      if (companyWebsiteUrl && !urlPattern.test(companyWebsiteUrl)) {
         toast({
             title: "Invalid URL",
-            description: "Please enter a valid Company Website URL (starting with http:// or https://)",
+            description: "Please enter a valid Startup Website URL (starting with http:// or https://)",
             variant: "destructive",
         });
         setIsSavingProfessionalInfo(false);
@@ -218,12 +218,12 @@ const EditProfilePage: React.FC = () => {
       companyWebsiteUrl,
     };
 
-    console.log('Professional information data being saved:', professionalInfoData);
+    console.log('Professional Background data being saved:', professionalInfoData);
     try {
       await updateUserProfile(userId, professionalInfoData);
       toast({
         title: "Success",
-        description: "Professional information updated successfully.",
+        description: "Professional Background updated successfully.",
       });
        // After successful save, refetch profile data to update the state if needed (e.g., for skills/interests)
        // However, since state is updated directly by input changes, refetching might not be strictly necessary unless server-side processing affects these fields.
@@ -237,8 +237,8 @@ const EditProfilePage: React.FC = () => {
 
 
     } catch (error) {
-      console.error('Error saving professional information:', error);
-      toast({ title: "Error", description: "Failed to save professional information.", variant: "destructive" });
+      console.error('Error saving Professional Background:', error);
+      toast({ title: "Error", description: "Failed to save Professional Background.", variant: "destructive" });
     } finally {
       setIsSavingProfessionalInfo(false);
     }
@@ -255,7 +255,7 @@ const EditProfilePage: React.FC = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto p-4 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6">Edit Profile</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">Customize Your Profile</h1>
 
         {/* Profile Image Uploader Section */}
         <div className="mb-8">
@@ -268,9 +268,9 @@ const EditProfilePage: React.FC = () => {
             />
         </div>
 
-        {/* Personal Information Section */}
+        {/* Founder Profile Section */}
         <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4">Personal Information</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-4">Founder Profile</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             {/* First Name */}
             <div>
@@ -294,16 +294,16 @@ const EditProfilePage: React.FC = () => {
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
               />
             </div>
-            {/* Display Name - Added new input field */}
+            {/* Your Public Identity - Added new input field */}
             <div>
-              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">Your Public Identity</label>
               <input
                 type="text"
                 id="displayName"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-                placeholder="e.g. John Doe or Your Company Name" // Added a placeholder for guidance
+                placeholder="e.g. John Doe or Your Startup Name" // Added a placeholder for guidance
               />
             </div>
             {/* Pronouns */}
@@ -379,11 +379,11 @@ const EditProfilePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Personal Summary Section */}
+        {/* My Entrepreneurial Journey Section */}
         <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4">Personal Summary</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-4">My Entrepreneurial Journey</h2>
           <div>
-            <label htmlFor="personalSummary" className="block text-sm font-medium text-gray-700 mb-1">Personal Summary</label>
+            <label htmlFor="My Entrepreneurial Journey" className="block text-sm font-medium text-gray-700 mb-1">Your story can inspire others — share what you've learned on your journey.</label>
             <textarea
               id="personalSummary"
               value={personalSummary}
@@ -398,24 +398,24 @@ const EditProfilePage: React.FC = () => {
               disabled={isSavingPersonalSummary}
               className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
               >
-              {isSavingPersonalSummary ? 'Saving...' : 'Save Personal Summary'}
+              {isSavingPersonalSummary ? 'Saving...' : 'Save My Entrepreneurial Journey'}
             </button>
           </div>
         </div>
 
 
-        {/* Professional Information Section */}
+        {/* Professional Background Section */}
         <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4">Professional Information</h2>
-           {/* Company Logo Uploader Section */}
+          <h2 className="text-xl md:text-2xl font-semibold mb-4">Professional Background</h2>
+           {/* Your Startup Logo Uploader Section */}
             <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Company Logo</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Your Startup Logo</h3>
                 {/* Pass companyLogoUrl state and set type="companyLogo" */}
                 <ProfileImageUploader
-                  userProfileImage={companyLogoUrl} // Pass the current company logo URL
+                  userProfileImage={companyLogoUrl} // Pass the current Your Startup Logo URL
                   userId={auth.currentUser?.uid || ''}
                   onImageUpdate={handleCompanyLogoUpdate} // Callback to update companyLogoUrl state
-                  type="companyLogo" // <-- Specify that this is for the company logo
+                  type="companyLogo" // <-- Specify that this is for the Your Startup Logo
                 />
             </div>
 
@@ -525,9 +525,9 @@ const EditProfilePage: React.FC = () => {
               )}
             </div>
 
-             {/* Company Name */}
+             {/* Startup Name */}
              <div>
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">Startup Name</label>
                 <input
                     type="text"
                     id="companyName"
@@ -536,9 +536,9 @@ const EditProfilePage: React.FC = () => {
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
                 />
              </div>
-             {/* Company Website URL */}
+             {/* Startup Website URL */}
              <div>
-                <label htmlFor="companyWebsiteUrl" className="block text-sm font-medium text-gray-700 mb-1">Company Website URL</label>
+                <label htmlFor="companyWebsiteUrl" className="block text-sm font-medium text-gray-700 mb-1">Startup Website URL</label>
                 <input
                     type="text"
                     id="companyWebsiteUrl"

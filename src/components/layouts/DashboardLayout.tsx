@@ -42,16 +42,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => { // R
     return <div>Loading...</div>; // Replace with a proper loading component
   }
 
-  // The redirect logic is now handled by useEffect, so we don't need this check here anymore
+  // The redirect logic is now handled by useEffect, so we don\'t need this check here anymore
   // if (!user) {
-  //   return null;
-  // }
+  //   return null;\n  // }
 
 
   return (
-      <div className="min-h-screen bg-slate-50">
-        {/* Header */}
-        <header className="bg-white shadow-sm py-4 px-4 sm:px-6">
+      // Removed the outer div and added padding-top to main
+      <>
+        {/* Header - Made fixed */}
+        <header className="bg-white shadow-sm py-4 px-4 sm:px-6 fixed top-0 left-0 right-0 z-10">
           <div className="container max-w-7xl mx-auto flex justify-between items-center">
             <Logo />
             {/* Pass userEmail and userProfileImage from Context */}
@@ -64,15 +64,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => { // R
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="py-8 px-4 sm:px-6">
+        {/* Main Content - Added padding-top */}
+        {/* The padding-top pt-16 is added to account for the fixed header */}
+        <main className="py-8 px-4 sm:px-6 pt-16">
           <div className="container max-w-7xl mx-auto">
             {children} {/* محتوای صفحه خاص در اینجا رندر می شود */}
           </div>
         </main>
 
         {/* می توانید فوتر را نیز در اینجا اضافه کنید */}
-      </div>
+      </>
     );
   };
 

@@ -140,7 +140,7 @@ const Dashboard = () => {
     <DashboardLayout> {/* استفاده از لایه‌بندی داشبورد */}
       {/* محتوای اصلی داشبورد (تب ها و سکشن ها) - profileImageURL passed implicitly via DashboardLayout */}
       <div className="bg-white shadow rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-slate-900 mb-6 text-center sm:text-left"> Welcome to Your Personal Dashboard!</h1> {/* Centered heading on mobile */}
+        <h1 className="text-2xl font-bold text-slate-900 mb-6 text-center sm:text-left"> Welcome - Every founder’s journey begins here!</h1> {/* Centered heading on mobile */}
 
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
            <div className="relative"> {/* Added relative positioning for fades */}
@@ -191,8 +191,7 @@ const Dashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
-
-      <div className="mt-8"><TrustBuildingSection /></div> {/* Added margin top for spacing */}
+      
       <div className="mt-8"><FounderRoadmapSection /></div> {/* Added margin top for spacing */}
     </DashboardLayout>
   );
