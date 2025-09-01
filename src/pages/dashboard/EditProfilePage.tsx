@@ -1,57 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import { ProfileImageUploader } from '@/components/dashboard/ProfileImageUploader';
-import { getUserProfile, auth, updateUserProfile } from '@/lib/firebase';
-import TagsInput from 'react-tagsinput';
-// Removed unused CSS import
-// import './EditProfilePage.css';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  User,
+  Briefcase,
+  Lightbulb,
+  Target,
+  Upload,
+  Camera,
+  Star,
+  MapPin,
+  Link as LinkIcon,
+  Twitter,
+  Linkedin,
+  Globe,
+  Plus,
+  X,
+  Save,
+  Sparkles,
+  Rocket,
+  TrendingUp,
+  Loader2
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-// Removed unused UserContext import
-// import { useUser } from '@/contexts/UserContext';
+import { getUserProfile, auth, updateUserProfile } from '@/lib/firebase';
+import { ProfileImageUploader } from '@/components/dashboard/ProfileImageUploader';
+import TagsInput from 'react-tagsinput';
+import 'react-tagsinput/react-tagsinput.css';
 
 const EditProfilePage: React.FC = () => {
-  // State for user profile image and Your Startup Logo URL
-  const [userProfileImage, setUserProfileImage] = useState<string | undefined>(undefined);
-  const [companyLogoUrl, setCompanyLogoUrl] = useState<string | undefined>(undefined);
-
-  // Loading states for different sections
+  const [activeTab, setActiveTab] = useState("personal");
   const [loading, setLoading] = useState(true);
-  const [isSavingPersonalInfo, setIsSavingPersonalInfo] = useState(false);
-  const [isSavingPersonalSummary, setIsSavingPersonalSummary] = useState(false);
-  const [isSavingProfessionalInfo, setIsSavingProfessionalInfo] = useState(false);
-  // isSavingCompanyLogo state is now likely managed within ProfileImageUploader when type="companyLogo"
-  // const [isSavingCompanyLogo, setIsSavingCompanyLogo] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Founder Profile states
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [displayName, setDisplayName] = useState(''); // Added displayName state
-  const [pronouns, setPronouns] = useState('');
-  const [tagline, setTagline] = useState('');
-  const [location, setLocation] = useState('');
-  const [linkedinUrl, setLinkedinUrl] = useState('');
-  const [twitterUrl, setTwitterUrl] = useState('');
-  const [personalSummary, setPersonalSummary] = useState('');
+  const [profileData, setProfileData] = useState({
+    firstName: '',
+    lastName: '',
+    displayName: '',
+    pronouns: '',
+    tagline: '',
+    location: '',
+    linkedinUrl: '',
+    twitterUrl: '',
+    personalSummary: '',
+    role: '',
+    lookingFor: '',
+    businessStage: '',
+    skills: [] as string[],
+    interests: [] as string[],
+    companyName: '',
+    companyWebsiteUrl: '',
+    profileImageUrl: '',
+    companyLogoUrl: ''
+  });
 
-  // Professional Background states
-  const [role, setRole] = useState('');
-  const [lookingFor, setLookingFor] = useState('');
-  const [businessStage, setBusinessStage] = useState('');
-  const [skills, setSkills] = useState<string[]>([]);
-  const [interests, setInterests] = useState<string[]>([]);
-  const [companyName, setCompanyName] = useState('');
-  const [companyWebsiteUrl, setCompanyWebsiteUrl] = useState('');
-
-  // Tooltip states for TagsInput
-  const [showSkillsTooltip, setShowSkillsTooltip] = useState(false);
-  const [showInterestsTooltip, setShowInterestsTooltip] = useState(false);
-
-  const urlPattern = /^(https?:\/\/).+$/; // Basic URL pattern check
-
-  // Initialize useToast hook
   const { toast } = useToast();
+  const urlPattern = /^(https?:\/\/).+$/;
 
-  // useEffect to fetch user profile data on component mount
   useEffect(() => {
     const fetchUserProfile = async () => {
       setLoading(true);
@@ -60,30 +74,26 @@ const EditProfilePage: React.FC = () => {
         try {
           const profile = await getUserProfile(userId);
           if (profile) {
-            // Populate Founder Profile states
-            setFirstName(profile.firstName || '');
-            setLastName(profile.lastName || '');
-            setDisplayName(profile.displayName || ''); // Populate displayName state
-            setPronouns(profile.pronouns || '');
-            setTagline(profile.tagline || '');
-            setLocation(profile.location || '');
-            setLinkedinUrl(profile.linkedinUrl || '');
-            setTwitterUrl(profile.twitterUrl || '');
-            setPersonalSummary(profile.personalSummary || '');
-
-            // Populate Professional Background states
-            setRole(profile.role || '');
-            setLookingFor(profile.lookingFor || '');
-            setBusinessStage(profile.businessStage || '');
-            setSkills(profile.skills || []);
-            setInterests(profile.interests || []);
-            setCompanyName(profile.companyName || '');
-            setCompanyWebsiteUrl(profile.companyWebsiteUrl || '');
-
-            // Populate image URLs
-            setUserProfileImage(profile.profileImageUrl || undefined);
-            setCompanyLogoUrl(profile.companyLogoUrl || undefined);
-
+            setProfileData({
+              firstName: profile.firstName || '',
+              lastName: profile.lastName || '',
+              displayName: profile.displayName || '',
+              pronouns: profile.pronouns || '',
+              tagline: profile.tagline || '',
+              location: profile.location || '',
+              linkedinUrl: profile.linkedinUrl || '',
+              twitterUrl: profile.twitterUrl || '',
+              personalSummary: profile.personalSummary || '',
+              role: profile.role || '',
+              lookingFor: profile.lookingFor || '',
+              businessStage: profile.businessStage || '',
+              skills: profile.skills || [],
+              interests: profile.interests || [],
+              companyName: profile.companyName || '',
+              companyWebsiteUrl: profile.companyWebsiteUrl || '',
+              profileImageUrl: profile.profileImageUrl || '',
+              companyLogoUrl: profile.companyLogoUrl || ''
+            });
           }
         } catch (error) {
           console.error('Error fetching user profile:', error);
@@ -98,464 +108,541 @@ const EditProfilePage: React.FC = () => {
     fetchUserProfile();
   }, []);
 
-  // Handlers for image updates from ProfileImageUploader
-  // These functions are called by ProfileImageUploader after successful upload and database update
   const handleProfileImageUpdate = (imageUrl: string) => {
-    setUserProfileImage(imageUrl); // Update the state for the profile image URL
+    setProfileData(prev => ({ ...prev, profileImageUrl: imageUrl }));
   };
 
   const handleCompanyLogoUpdate = (imageUrl: string) => {
-    setCompanyLogoUrl(imageUrl); // Update the state for the Your Startup Logo URL
+    setProfileData(prev => ({ ...prev, companyLogoUrl: imageUrl }));
   };
 
-  // Handlers for saving different sections
-  const handleSavePersonalInfo = async () => {
-    setIsSavingPersonalInfo(true);
+  const handleInputChange = (field: keyof typeof profileData, value: string) => {
+    setProfileData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSave = async (section: string) => {
+    setIsSaving(true);
     const userId = auth.currentUser?.uid;
     if (!userId) {
-        setIsSavingPersonalInfo(false);
-        return;
-    }
-
-    // Basic URL validation
-    if (linkedinUrl && !urlPattern.test(linkedinUrl)) {
-      toast({
-        title: "Invalid URL",
-        description: "Please enter a valid LinkedIn URL (starting with http:// or https://)",
-        variant: "destructive",
-      });
-      setIsSavingPersonalInfo(false);
-      return;
-    }
-    if (twitterUrl && !urlPattern.test(twitterUrl)) {
-      toast({
-        title: "Invalid URL",
-        description: "Please enter a valid Twitter URL (starting with http:// or https://)",
-        variant: "destructive",
-      });
-      setIsSavingPersonalInfo(false);
+      setIsSaving(false);
       return;
     }
 
-    const personalInfoData = {
-      firstName,
-      lastName,
-      displayName, // Added displayName to the data being saved
-      pronouns,
-      tagline,
-      location,
-      linkedinUrl,
-      twitterUrl,
-      // profileImageUrl is now handled by ProfileImageUploader directly
-    };
+    let dataToSave = {};
+    let successMessage = "";
+    let errorMessage = "";
 
     try {
-      await updateUserProfile(userId, personalInfoData);
-      toast({
-        title: "Success",
-        description: "Founder Profile updated successfully.",
-      });
+      if (section === 'personal') {
+        if ((profileData.linkedinUrl && !urlPattern.test(profileData.linkedinUrl)) ||
+          (profileData.twitterUrl && !urlPattern.test(profileData.twitterUrl))) {
+          toast({ title: "Invalid URL", description: "Please enter a valid URL (starting with http:// or https://)", variant: "destructive" });
+          setIsSaving(false);
+          return;
+        }
+        dataToSave = {
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
+          displayName: profileData.displayName,
+          pronouns: profileData.pronouns,
+          tagline: profileData.tagline,
+          location: profileData.location,
+          linkedinUrl: profileData.linkedinUrl,
+          twitterUrl: profileData.twitterUrl,
+        };
+        successMessage = "Founder Profile updated successfully.";
+        errorMessage = "Failed to save Founder Profile.";
+      } else if (section === 'journey') {
+        dataToSave = {
+          personalSummary: profileData.personalSummary,
+        };
+        successMessage = "My Entrepreneurial Journey updated successfully.";
+        errorMessage = "Failed to save My Entrepreneurial Journey.";
+      } else if (section === 'professional') {
+        if (profileData.companyWebsiteUrl && !urlPattern.test(profileData.companyWebsiteUrl)) {
+          toast({ title: "Invalid URL", description: "Please enter a valid Startup Website URL (starting with http:// or https://)", variant: "destructive" });
+          setIsSaving(false);
+          return;
+        }
+        dataToSave = {
+          role: profileData.role,
+          lookingFor: profileData.lookingFor,
+          businessStage: profileData.businessStage,
+          skills: profileData.skills,
+          interests: profileData.interests,
+          companyName: profileData.companyName,
+          companyWebsiteUrl: profileData.companyWebsiteUrl,
+        };
+        successMessage = "Professional Background updated successfully.";
+        errorMessage = "Failed to save Professional Background.";
+      }
+
+      await updateUserProfile(userId, dataToSave);
+      toast({ title: "Success", description: successMessage, variant: "default" });
     } catch (error) {
-      console.error('Error saving Founder Profile:', error);
-      toast({ title: "Error", description: "Failed to save Founder Profile.", variant: "destructive" });
+      console.error(`Error saving ${section} info:`, error);
+      toast({ title: "Error", description: errorMessage, variant: "destructive" });
     } finally {
-      setIsSavingPersonalInfo(false);
+      setIsSaving(false);
     }
   };
 
-  const handleSavePersonalSummary = async () => {
-    setIsSavingPersonalSummary(true);
-    const userId = auth.currentUser?.uid;
-    if (!userId) {
-      setIsSavingPersonalSummary(false);
-      return;
-    }
-
-    const personalSummaryData = {
-      personalSummary,
-    };
-
-    try {
-      await updateUserProfile(userId, personalSummaryData);
-      toast({
-        title: "Success",
-        description: "My Entrepreneurial Journey updated successfully.",
-      });
-    } catch (error) {
-      console.error('Error saving My Entrepreneurial Journey:', error);
-      toast({ title: "Error", description: "Failed to save My Entrepreneurial Journey.", variant: "destructive" });
-    } finally { setIsSavingPersonalSummary(false); }
+  const getProfileCompletion = () => {
+    const fields = [
+      'firstName', 'lastName', 'tagline', 'location', 'personalSummary',
+      'role', 'lookingFor', 'businessStage', 'companyName'
+    ];
+    const completedFields = fields.filter(field =>
+      profileData[field as keyof typeof profileData] &&
+      String(profileData[field as keyof typeof profileData]).trim() !== ''
+    ).length;
+    const skillsBonus = profileData.skills.length > 0 ? 1 : 0;
+    const interestsBonus = profileData.interests.length > 0 ? 1 : 0;
+    
+    return Math.round(((completedFields + skillsBonus + interestsBonus) / (fields.length + 2)) * 100);
   };
 
-  const handleSaveProfessionalInfo = async () => {
-    setIsSavingProfessionalInfo(true);
-    const userId = auth.currentUser?.uid;
-    if (!userId) {
-      setIsSavingProfessionalInfo(false);
-      return;
-    }
-
-     // Basic URL validation for Startup website URL
-     if (companyWebsiteUrl && !urlPattern.test(companyWebsiteUrl)) {
-        toast({
-            title: "Invalid URL",
-            description: "Please enter a valid Startup Website URL (starting with http:// or https://)",
-            variant: "destructive",
-        });
-        setIsSavingProfessionalInfo(false);
-        return;
-     }
-
-
-    const professionalInfoData = {
-      role,
-      lookingFor,
-      businessStage,
-      skills,
-      interests,
-      companyName,
-      // companyLogoUrl is now handled by ProfileImageUploader directly
-      companyWebsiteUrl,
-    };
-
-    console.log('Professional Background data being saved:', professionalInfoData);
-    try {
-      await updateUserProfile(userId, professionalInfoData);
-      toast({
-        title: "Success",
-        description: "Professional Background updated successfully.",
-      });
-       // After successful save, refetch profile data to update the state if needed (e.g., for skills/interests)
-       // However, since state is updated directly by input changes, refetching might not be strictly necessary unless server-side processing affects these fields.
-       // Leaving the refetch logic here just in case, but it might be redundant now.
-       const updatedProfile = await getUserProfile(userId);
-
-       if (updatedProfile) {
-           setSkills(updatedProfile.skills || []);
-           setInterests(updatedProfile.interests || []);
-       }
-
-
-    } catch (error) {
-      console.error('Error saving Professional Background:', error);
-      toast({ title: "Error", description: "Failed to save Professional Background.", variant: "destructive" });
-    } finally {
-      setIsSavingProfessionalInfo(false);
-    }
-  };
-
-  // Show loading indicator while fetching initial profile data
   if (loading) {
-      return (
+    return (
       <DashboardLayout>
-        <div className="container mx-auto py-8 text-center">Loading Profile...</div>
+        <div className="container mx-auto py-8 text-center flex justify-center items-center h-screen">
+          <Loader2 className="h-8 w-8 animate-spin mr-2" />
+          <span className="text-xl font-medium">Loading Profile...</span>
+        </div>
       </DashboardLayout>
-      );
+    );
   }
+
   return (
     <DashboardLayout>
-      <div className="container mx-auto p-4 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6">Customize Your Profile</h1>
-
-        {/* Profile Image Uploader Section */}
-        <div className="mb-8">
-            {/* Pass userProfileImage state and set type="profile" */}
-            <ProfileImageUploader
-              userProfileImage={userProfileImage} // Pass the current user profile image URL
-              userId={auth.currentUser?.uid || ''}
-              onImageUpdate={handleProfileImageUpdate} // Callback to update userProfileImage state
-              type="profile" // <-- Specify that this is for the user's profile image
-            />
-        </div>
-
-        {/* Founder Profile Section */}
-        <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4">Founder Profile</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            {/* First Name */}
-            <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-              <input
-                type="text"
-                id="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              />
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-purple-50/20">
+        <div className="container mx-auto py-8 px-4 max-w-5xl">
+          
+          {/* Header Section */}
+          <div className="text-center mb-12">
+            <div className="relative inline-block">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent mb-4">
+                ✨ Customize Your Profile
+              </h1>
+              <div className="absolute -top-2 -right-2 text-2xl animate-bounce">🚀</div>
             </div>
-            {/* Last Name */}
-            <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-              <input
-                type="text"
-                id="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              />
-            </div>
-            {/* Your Public Identity - Added new input field */}
-            <div>
-              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">Your Public Identity</label>
-              <input
-                type="text"
-                id="displayName"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-                placeholder="e.g. John Doe or Your Startup Name" // Added a placeholder for guidance
-              />
-            </div>
-            {/* Pronouns */}
-            <div>
-              <label htmlFor="pronouns" className="block text-sm font-medium text-gray-700 mb-1">Pronouns</label>
-              <select
-                id="pronouns"
-                value={pronouns}
-                onChange={(e) => setPronouns(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              >
-                <option value="">Select Pronouns</option>
-                <option value="She/Her">She/Her</option>
-                <option value="He/Him">He/Him</option>
-                <option value="They/Them">They/Them</option>
-                <option value="Don't Want To Share">Don't Want To Share</option>
-              </select>
-            </div>
-            {/* Tagline */}
-            <div>
-              <label htmlFor="tagline" className="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
-              <input
-                type="text"
-                id="tagline"
-                value={tagline}
-                onChange={(e) => setTagline(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              />
-            </div>
-            {/* Location */}
-            <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-              <input
-                type="text"
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Start typing to search for a city"
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              />
-            </div>
-            {/* LinkedIn URL */}
-            <div>
-              <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 mb-1">LinkedIn Url</label>
-              <input
-                type="text"
-                id="linkedinUrl"
-                value={linkedinUrl}
-                onChange={(e) => setLinkedinUrl(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              />
-            </div>
-            {/* Twitter URL */}
-            <div>
-              <label htmlFor="twitterUrl" className="block text-sm font-medium text-gray-700 mb-1">Twitter Url</label>
-              <input
-                type="text"
-                id="twitterUrl"
-                value={twitterUrl}
-                onChange={(e) => setTwitterUrl(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              />
+            <p className="text-xl text-muted-foreground mb-6">
+              Tell your entrepreneurial story and connect with your ideal co-founders
+            </p>
+            
+            {/* Progress Bar */}
+            <div className="max-w-md mx-auto">
+              <div className="flex items-center gap-3 mb-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="text-sm font-medium">Profile Progress</span>
+                <span className="text-sm font-bold text-primary">{getProfileCompletion()}%</span>
+              </div>
+              <Progress value={getProfileCompletion()} className="h-3" />
             </div>
           </div>
-          <div className="mt-6 flex justify-end">
-            <button
-              onClick={handleSavePersonalInfo}
-              disabled={isSavingPersonalInfo}
-              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
-              >
-              {isSavingPersonalInfo ? 'Saving...' : 'Save Personal Info'}
-            </button>
-          </div>
-        </div>
 
-        {/* My Entrepreneurial Journey Section */}
-        <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4">My Entrepreneurial Journey</h2>
-          <div>
-            <label htmlFor="My Entrepreneurial Journey" className="block text-sm font-medium text-gray-700 mb-1">Your story can inspire others — share what you've learned on your journey.</label>
-            <textarea
-              id="personalSummary"
-              value={personalSummary}
-              onChange={(e) => setPersonalSummary(e.target.value)}
-              rows={6}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-            ></textarea>
-          </div>
-          <div className="mt-6 flex justify-end">
-            <button
-              onClick={handleSavePersonalSummary}
-              disabled={isSavingPersonalSummary}
-              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
-              >
-              {isSavingPersonalSummary ? 'Saving...' : 'Save My Entrepreneurial Journey'}
-            </button>
-          </div>
-        </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            {/* --- START OF MODIFIED SECTION ---
+            Modified TabsList to handle mobile responsiveness
+            - Added `md:grid-cols-3` to use a 3-column grid on medium screens and larger
+            - Added `flex-wrap` to allow items to wrap to the next line on small screens
+            - Adjusted `TabsTrigger` to hide the long text on smaller screens and show a shorter version
+            */}
+            <TabsList className="flex flex-wrap md:grid md:grid-cols-3 w-full mb-8 bg-gradient-to-r from-primary/10 to-purple-100/50 p-1">
+              <TabsTrigger value="personal" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md flex-1">
+                <User className="h-4 w-4" />
+                <span className="md:hidden">Personal</span>
+                <span className="hidden md:inline">Personal Info</span>
+              </TabsTrigger>
+              <TabsTrigger value="journey" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md flex-1">
+                <Rocket className="h-4 w-4" />
+                <span className="md:hidden">Journey</span>
+                <span className="hidden md:inline">Entrepreneurial Journey</span>
+              </TabsTrigger>
+              <TabsTrigger value="professional" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md flex-1">
+                <TrendingUp className="h-4 w-4" />
+                <span className="md:hidden">Professional</span>
+                <span className="hidden md:inline">Professional Background</span>
+              </TabsTrigger>
+            </TabsList>
+            {/* --- END OF MODIFIED SECTION ---
+            */}
+            <TabsContent value="personal" className="space-y-6">
+              <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-primary">
+                <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-full">
+                      <User className="h-5 w-5 text-primary" />
+                    </div>
+                    Founder Identity
+                  </CardTitle>
+                  <CardDescription>
+                    Enter your key information so others can get to know you
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                  
+                  <ProfileImageUploader
+                    userProfileImage={profileData.profileImageUrl}
+                    userId={auth.currentUser?.uid || ''}
+                    onImageUpdate={handleProfileImageUpdate}
+                    type="profile"
+                  />
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
+                      <Input
+                        id="firstName"
+                        value={profileData.firstName}
+                        onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="Your first name"
+                      />
+                    </div>
 
-        {/* Professional Background Section */}
-        <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4">Professional Background</h2>
-           {/* Your Startup Logo Uploader Section */}
-            <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Your Startup Logo</h3>
-                {/* Pass companyLogoUrl state and set type="companyLogo" */}
-                <ProfileImageUploader
-                  userProfileImage={companyLogoUrl} // Pass the current Your Startup Logo URL
-                  userId={auth.currentUser?.uid || ''}
-                  onImageUpdate={handleCompanyLogoUpdate} // Callback to update companyLogoUrl state
-                  type="companyLogo" // <-- Specify that this is for the Your Startup Logo
-                />
-            </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
+                      <Input
+                        id="lastName"
+                        value={profileData.lastName}
+                        onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="Your last name"
+                      />
+                    </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            {/* Role */}
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-              <input
-                type="text"
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              />
-            </div>
-            {/* Looking For */}
-            <div>
-              <label htmlFor="lookingFor" className="block text-sm font-medium text-gray-700 mb-1">Looking For</label>
-              <select
-                id="lookingFor"
-                value={lookingFor}
-                onChange={(e) => setLookingFor(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              >
-                <option value="">Select What You're Looking For</option>
-                <option value="Co-founder">Co-founder</option>
-                <option value="Mentorship">Mentorship</option>
-                <option value="Investment">Investment</option>
-                <option value="Talent">Talent</option>
-                <option value="Networking">Networking</option>
-                <option value="Advisory">Advisory</option>
-                <option value="Collaboration">Collaboration</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-             {/* Business Stage */}
-            <div>
-              <label htmlFor="businessStage" className="block text-sm font-medium text-gray-700 mb-1">Business Stage</label>
-               <select
-                id="businessStage"
-                value={businessStage}
-                onChange={(e) => setBusinessStage(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-              >
-                <option value="">Select Business Stage</option>
-                <option value="Idea">Idea</option>
-                <option value="Prototype">Prototype</option>
-                <option value="MVP">MVP</option>
-                <option value="Early Stage">Early Stage</option>
-                <option value="Growth Stage">Growth Stage</option>
-                <option value="Mature">Mature</option>
-              </select>
-            </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="publicIdentity" className="text-sm font-medium">Your Public Identity</Label>
+                      <Input
+                        id="publicIdentity"
+                        value={profileData.displayName}
+                        onChange={(e) => handleInputChange('displayName', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="e.g. John Doe or Your Startup Name"
+                      />
+                    </div>
 
-             {/* Empty div for alignment in grid */}
-            <div></div>
+                    <div className="space-y-2">
+                      <Label htmlFor="pronouns" className="text-sm font-medium">Pronouns</Label>
+                      <Select
+                        value={profileData.pronouns}
+                        onValueChange={(value) => handleInputChange('pronouns', value)}
+                      >
+                        <SelectTrigger className="transition-all duration-300 hover:scale-105">
+                          <SelectValue placeholder="Select Pronouns" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="She/Her">She/Her</SelectItem>
+                          <SelectItem value="He/Him">He/Him</SelectItem>
+                          <SelectItem value="They/Them">They/Them</SelectItem>
+                          <SelectItem value="Don't Want To Share">Don't Want To Share</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-            {/* Skills */}
-            <div className="col-span-1 md:col-span-2">
-              <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-1">
-                Skills
-                <span
-                  className="ml-2 text-gray-400 cursor-pointer"
-                  onMouseEnter={() => setShowSkillsTooltip(true)}
-                  onMouseLeave={() => setShowSkillsTooltip(false)}
-                  title="Add skills relevant to your expertise."
-                >
-                  (i)
-                </span>
-              </label>
-               <TagsInput
-                value={skills}
-                onChange={setSkills}
-                tagProps={{ className: 'react-tagsinput-tag bg-black text-white rounded px-2 py-1 mr-1 text-sm' }}
-                inputProps={{ placeholder: 'Add a skill' }}
-                className="react-tagsinput border border-gray-300 rounded-md p-2 w-full focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm"
-              />
-              {/* Tooltip */}
-              {showSkillsTooltip && (
-                <div className="mt-1 text-xs text-gray-500">Add skills relevant to your expertise. Press Enter after each skill.</div>
-              )}
-            </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Location
+                      </Label>
+                      <Input
+                        id="location"
+                        value={profileData.location}
+                        onChange={(e) => handleInputChange('location', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="City, Country"
+                      />
+                    </div>
 
-             {/* Interests */}
-            <div className="col-span-1 md:col-span-2">
-              <label htmlFor="interests" className="block text-sm font-medium text-gray-700 mb-1">
-                Interests
-                 <span
-                  className="ml-2 text-gray-400 cursor-pointer"
-                  onMouseEnter={() => setShowInterestsTooltip(true)}
-                  onMouseLeave={() => setShowInterestsTooltip(false)}
-                  title="Add your interests related to business, technology, or collaboration."
-                >
-                  (i)
-                </span>
-              </label>
-               <TagsInput
-                value={interests}
-                onChange={setInterests}
-                tagProps={{ className: 'react-tagsinput-tag bg-black text-white rounded px-2 py-1 mr-1 text-sm' }}
-                inputProps={{ placeholder: 'Add an interest' }}
-                 className="react-tagsinput border border-gray-300 rounded-md p-2 w-full focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm"
-              />
-                {/* Tooltip */}
-              {showInterestsTooltip && (
-                <div className="mt-1 text-xs text-gray-500">Add your interests related to business, technology, or collaboration. Press Enter after each interest.</div>
-              )}
-            </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="tagline" className="text-sm font-medium flex items-center gap-2">
+                        <Star className="h-4 w-4" />
+                        Tagline
+                      </Label>
+                      <Input
+                        id="tagline"
+                        value={profileData.tagline}
+                        onChange={(e) => handleInputChange('tagline', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="Describe yourself in one sentence..."
+                      />
+                    </div>
 
-             {/* Startup Name */}
-             <div>
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">Startup Name</label>
-                <input
-                    type="text"
-                    id="companyName"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-                />
-             </div>
-             {/* Startup Website URL */}
-             <div>
-                <label htmlFor="companyWebsiteUrl" className="block text-sm font-medium text-gray-700 mb-1">Startup Website URL</label>
-                <input
-                    type="text"
-                    id="companyWebsiteUrl"
-                    value={companyWebsiteUrl}
-                    onChange={(e) => setCompanyWebsiteUrl(e.target.value)}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2"
-                />
-             </div>
-          </div>
-          <div className="mt-6 flex justify-end">
-            <button
-              onClick={handleSaveProfessionalInfo}
-              disabled={isSavingProfessionalInfo}
-              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
-              >
-              {isSavingProfessionalInfo ? 'Saving...' : 'Save Professional Info'}
-            </button>
+                    <div className="space-y-2">
+                      <Label htmlFor="linkedinUrl" className="text-sm font-medium flex items-center gap-2">
+                        <Linkedin className="h-4 w-4" />
+                        LinkedIn
+                      </Label>
+                      <Input
+                        id="linkedinUrl"
+                        value={profileData.linkedinUrl}
+                        onChange={(e) => handleInputChange('linkedinUrl', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="https://linkedin.com/in/username"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="twitterUrl" className="text-sm font-medium flex items-center gap-2">
+                        <Twitter className="h-4 w-4" />
+                        Twitter
+                      </Label>
+                      <Input
+                        id="twitterUrl"
+                        value={profileData.twitterUrl}
+                        onChange={(e) => handleInputChange('twitterUrl', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="https://twitter.com/username"
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => handleSave('personal')}
+                    disabled={isSaving}
+                    className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700 transition-all duration-300 hover:scale-105 shadow-lg"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Personal Info
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="journey" className="space-y-6">
+              <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-orange-500">
+                <CardHeader className="bg-gradient-to-r from-orange-50 to-transparent">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 bg-orange-100 rounded-full">
+                      <Rocket className="h-5 w-5 text-orange-600" />
+                    </div>
+                    Your Entrepreneurial Journey
+                  </CardTitle>
+                  <CardDescription>
+                    Tell your story - how did you start your entrepreneurial path? What experiences have you had?
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <Label htmlFor="entrepreneurialJourney" className="text-sm font-medium flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4" />
+                      Your story can inspire others
+                    </Label>
+                    <Textarea
+                      id="entrepreneurialJourney"
+                      value={profileData.personalSummary}
+                      onChange={(e) => handleInputChange('personalSummary', e.target.value)}
+                      className="min-h-[200px] transition-all duration-300 focus:scale-[1.02] resize-none"
+                      placeholder="Tell your entrepreneurial story here... What challenges have you faced? What successes have you achieved? What drives you to continue on this path?"
+                    />
+                    <div className="text-xs text-muted-foreground text-left">
+                      {profileData.personalSummary.length} characters
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => handleSave('journey')}
+                    disabled={isSaving}
+                    className="w-full mt-6 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 transition-all duration-300 hover:scale-105 shadow-lg"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Entrepreneurial Journey
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="professional" className="space-y-6">
+              <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-green-500">
+                <CardHeader className="bg-gradient-to-r from-green-50 to-transparent">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 bg-green-100 rounded-full">
+                      <TrendingUp className="h-5 w-5 text-green-600" />
+                    </div>
+                    Professional Background
+                  </CardTitle>
+                  <CardDescription>
+                    Complete your startup info, skills and professional interests
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                  
+                  <ProfileImageUploader
+                    userProfileImage={profileData.companyLogoUrl}
+                    userId={auth.currentUser?.uid || ''}
+                    onImageUpdate={handleCompanyLogoUpdate}
+                    type="companyLogo"
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="role" className="text-sm font-medium">Your Role</Label>
+                      <Input
+                        id="role"
+                        value={profileData.role}
+                        onChange={(e) => handleInputChange('role', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="e.g. Founder, CEO, CTO"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="lookingFor" className="text-sm font-medium">Looking For</Label>
+                      <Select
+                        value={profileData.lookingFor}
+                        onValueChange={(value) => handleInputChange('lookingFor', value)}
+                      >
+                        <SelectTrigger className="transition-all duration-300 hover:scale-105">
+                          <SelectValue placeholder="Select What You're Looking For" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Co-founder">Co-founder</SelectItem>
+                          <SelectItem value="Mentorship">Mentorship</SelectItem>
+                          <SelectItem value="Investment">Investment</SelectItem>
+                          <SelectItem value="Talent">Talent</SelectItem>
+                          <SelectItem value="Networking">Networking</SelectItem>
+                          <SelectItem value="Advisory">Advisory</SelectItem>
+                          <SelectItem value="Collaboration">Collaboration</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="businessStage" className="text-sm font-medium">Business Stage</Label>
+                      <Select
+                        value={profileData.businessStage}
+                        onValueChange={(value) => handleInputChange('businessStage', value)}
+                      >
+                        <SelectTrigger className="transition-all duration-300 hover:scale-105">
+                          <SelectValue placeholder="Select Business Stage" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Idea">Idea</SelectItem>
+                          <SelectItem value="Prototype">Prototype</SelectItem>
+                          <SelectItem value="MVP">MVP</SelectItem>
+                          <SelectItem value="Early Stage">Early Stage</SelectItem>
+                          <SelectItem value="Growth Stage">Growth Stage</SelectItem>
+                          <SelectItem value="Mature">Mature</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="companyName" className="text-sm font-medium">Startup Name</Label>
+                      <Input
+                        id="companyName"
+                        value={profileData.companyName}
+                        onChange={(e) => handleInputChange('companyName', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="Your startup name"
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="companyWebsiteUrl" className="text-sm font-medium flex items-center gap-2">
+                        <Globe className="h-4 w-4" />
+                        Startup Website URL
+                      </Label>
+                      <Input
+                        id="companyWebsiteUrl"
+                        value={profileData.companyWebsiteUrl}
+                        onChange={(e) => handleInputChange('companyWebsiteUrl', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="https://your-startup.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <Target className="h-4 w-4" />
+                      Skills ({profileData.skills.length})
+                    </Label>
+                    <TagsInput
+                      value={profileData.skills}
+                      onChange={(tags) => setProfileData(prev => ({ ...prev, skills: tags }))}
+                      tagProps={{ className: 'bg-black text-white rounded px-2 py-1 mr-1 text-sm' }}
+                      inputProps={{ placeholder: 'Add a skill' }}
+                      className="border border-gray-300 rounded-md p-2 w-full focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm"
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4" />
+                      Interests ({profileData.interests.length})
+                    </Label>
+                    <TagsInput
+                      value={profileData.interests}
+                      onChange={(tags) => setProfileData(prev => ({ ...prev, interests: tags }))}
+                      tagProps={{ className: 'bg-black text-white rounded px-2 py-1 mr-1 text-sm' }}
+                      inputProps={{ placeholder: 'Add an interest' }}
+                      className="border border-gray-300 rounded-md p-2 w-full focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={() => handleSave('professional')}
+                    disabled={isSaving}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transition-all duration-300 hover:scale-105 shadow-lg"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Professional Info
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+
+          <div className="text-center mt-12 p-6 bg-gradient-to-r from-primary/10 to-purple-100/50 rounded-xl">
+            <h3 className="text-xl font-bold mb-2">Your profile is {getProfileCompletion()}% complete!</h3>
+            <p className="text-muted-foreground mb-4">
+              The more complete your profile, the better your chances of finding the right co-founder
+            </p>
+            <Button
+              className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700 transition-all duration-300 hover:scale-105 shadow-lg"
+              onClick={() => {
+                toast({
+                  title: "Profile Saved! 🎉",
+                  description: "You can now start searching for your ideal co-founder.",
+                });
+              }}
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              View My Profile
+            </Button>
           </div>
         </div>
       </div>
