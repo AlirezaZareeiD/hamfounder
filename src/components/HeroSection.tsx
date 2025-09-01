@@ -64,7 +64,7 @@ const HeroSection = () => {
             ref={headerRef}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 opacity-0 translate-y-8 transition-all duration-700 ease-out px-2 leading-tight"
           >
-            Global Innovators Converge to<br className="hidden sm:block" /> Build the Future.
+            United by Roots, Driven by Vision
           </h1>
          
           <p

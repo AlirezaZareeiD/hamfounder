@@ -19,13 +19,12 @@ const useCounter = (end: number, duration: number): number => {
 
       let currentCount;
       if (end === 404.6) {
-          currentCount = startCount + easedProgress * (end - startCount);
-           setCount(parseFloat(currentCount.toFixed(1)));
+        currentCount = startCount + easedProgress * (end - startCount);
+        setCount(parseFloat(currentCount.toFixed(1)));
       } else {
-           currentCount = Math.round(startCount + easedProgress * (end - startCount));
-           setCount(currentCount);
+        currentCount = Math.round(startCount + easedProgress * (end - startCount));
+        setCount(currentCount);
       }
-
 
       if (progress < totalDuration) {
         requestAnimationFrame(stepFunc);
@@ -69,21 +68,46 @@ const EconomicPotentialSection: React.FC = () => {
   const targetGdpAnimated = useCounter(3, 3000);
   const growthMultiplierAnimated = useCounter(7, 2500);
 
-
   return (
     <section className="py-16 bg-gray-50 dark:bg-slate-800 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Main Titles - Centered and with Gradient Color */}
         <div className="text-center mb-12">
-             <h2 className="text-3xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-900 to-blue-400 dark:from-blue-700 dark:to-blue-300 leading-tight">
-                United by Roots, Driven by Vision
-             </h2>
-             <h3 className="text-xl md:text-2xl font-semibold text-gray-700 dark:text-gray-300">
-                Where Global Founders Ignite a Nation’s Future
-             </h3>
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-900 to-blue-400 dark:from-blue-700 dark:to-blue-300 leading-tight">
+          Global Innovators Converge to Build the Future.
+          </h2>
+          <h3 className="text-xl md:text-2xl font-semibold text-gray-700 dark:text-gray-300">
+            Where Global Founders Ignite a Nation’s Future
+          </h3>
         </div>
 
+        {/* --- START OF MOVED SECTION --- */}
+        {/* Vision and Movement Section - Corrected Styles */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 text-left">
+          {/* The Vision Card - Light Background */}
+          <div className="bg-white dark:bg-slate-700 p-8 rounded-lg shadow-xl border border-gray-200 dark:border-slate-600">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our North Star</h3>
+            <p className="text-gray-700 dark:text-gray-200 mb-4">
+              We’ve set our sights on a bold destination: elevating Iran’s GDP from $404 billion to ${targetGdpAnimated} trillion within the next decade. It’s an ambitious leap—but not an impossible one. The real question isn’t it's achievable—it's how.
+            </p>
+            <p className="text-gray-700 dark:text-gray-200">
+              At Hamfounder, we believe the answer begins with us: connecting visionary Iranian minds across continents, sparking deep collaboration, and building ventures that can shape a stronger, more prosperous future for all.
+            </p>
+          </div>
+
+          {/* The Movement Card - Darker Background */}
+          <div className="bg-slate-900 text-white p-8 rounded-lg shadow-xl border border-gray-200 dark:border-slate-600">
+            <h3 className="text-2xl font-bold mb-4 text-blue-300 dark:text-blue-300">The Movement</h3>
+            <p className="text-slate-300 mb-4">
+              Our diaspora holds some of the brightest minds, boldest builders, and most resilient innovators. When united under one shared vision, we have the power to ignite a generational movement.
+            </p>
+            <p className="text-slate-300">
+              That's why Hamfounder isn’t just about finding co-founders or building startups. It’s about building economic transformation through entrepreneurship. We’re aligning the power of our global community with 10 strategic drivers of GDP growth:
+            </p>
+          </div>
+        </div>
+        {/* --- END OF MOVED SECTION --- */}
 
         {/* GDP Numbers Section */}
         <div className="flex flex-wrap justify-center gap-6 mb-12">
@@ -96,15 +120,15 @@ const EconomicPotentialSection: React.FC = () => {
 
           {/* Vision Target Card - with Gradient Background */}
           <div className="relative flex-1 min-w-[280px] max-w-xs overflow-hidden rounded-lg shadow-xl border border-gray-200 dark:border-slate-600 text-center">
-             <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-90"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-90"></div>
             <div className="relative z-10 p-6 text-white">
-                <p className="text-lg text-blue-100">VISION TARGET</p>
-                <p className="text-5xl font-bold">${targetGdpAnimated} Trillion</p>
-                <p className="text-md text-blue-100">Within the next decade</p>
-             </div>
+              <p className="text-lg text-blue-100">VISION TARGET</p>
+              <p className="text-5xl font-bold">${targetGdpAnimated} Trillion</p>
+              <p className="text-md text-blue-100">Within the next decade</p>
+            </div>
           </div>
 
-            {/* Growth Multiplier Card */}
+          {/* Growth Multiplier Card */}
           <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-xl flex-1 min-w-[280px] max-w-xs border border-gray-200 dark:border-slate-600 text-center">
             <p className="text-lg text-gray-600 dark:text-gray-300">GROWTH MULTIPLIER</p>
             <p className="text-6xl font-bold text-gray-900 dark:text-white">{growthMultiplierAnimated}x</p>
@@ -114,55 +138,27 @@ const EconomicPotentialSection: React.FC = () => {
 
         {/* Call to Action Section (New Section) - with Gradient Background */}
         <div className="mb-12 max-w-5xl mx-auto p-8 rounded-lg shadow-xl text-left bg-gradient-to-r from-blue-400 to-blue-900 text-white">
-             <div className="flex flex-col md:flex-row justify-between items-center">
-                 <div className="mb-4 md:mb-0 md:mr-8 flex-grow">
-                     <h3 className="text-2xl font-bold mb-2">We're not just building companies.<br/>We're shaping history.</h3>
-                      <p className="text-blue-100">
-                        Join the movement. Help shape the next chapter of Iran's economic story.
-                      </p>
-                 </div>
-                 <a href="/signup" className="inline-block bg-white hover:bg-gray-200 text-blue-800 font-bold py-3 px-8 rounded-lg text-lg transition duration-300 flex-shrink-0">
-                    Join the movement
-                 </a>
-             </div>
-        </div>
-
-
-        {/* Vision and Movement Section - Corrected Styles */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 text-left"> {/* Changed gap to gap-6 for consistency */}
-            {/* The Vision Card - Light Background */}
-            <div className="bg-white dark:bg-slate-700 p-8 rounded-lg shadow-xl border border-gray-200 dark:border-slate-600">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our North Star</h3>
-                 <p className="text-gray-700 dark:text-gray-200 mb-4">
-                    We’ve set our sights on a bold destination: elevating Iran’s GDP from $404 billion to ${targetGdpAnimated} trillion within the next decade. It’s an ambitious leap—but not an impossible one. The real question isn’t it's achievable—it's how.
-                </p>
-                 <p className="text-gray-700 dark:text-gray-200">
-                    At Hamfounder, we believe the answer begins with us: connecting visionary Iranian minds across continents, sparking deep collaboration, and building ventures that can shape a stronger, more prosperous future for all.
-                </p>
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0 md:mr-8 flex-grow">
+              <h3 className="text-2xl font-bold mb-2">We're not just building companies.<br/>We're shaping history.</h3>
+              <p className="text-blue-100">
+                Join the movement. Help shape the next chapter of Iran's economic story.
+              </p>
             </div>
-
-            {/* The Movement Card - Darker Background */}
-            <div className="bg-slate-900 text-white p-8 rounded-lg shadow-xl border border-gray-200 dark:border-slate-600"> {/* Used bg-slate-900 for darker background */}
-                <h3 className="text-2xl font-bold mb-4 text-blue-300 dark:text-blue-300">The Movement</h3> {/* Adjusted title color */}
-                 <p className="text-slate-300 mb-4">
-                    Our diaspora holds some of the brightest minds, boldest builders, and most resilient innovators. When united under one shared vision, we have the power to ignite a generational movement.
-                 </p>
-                 <p className="text-slate-300">
-                     That's why Hamfounder isn’t just about finding co-founders or building startups. It’s about building economic transformation through entrepreneurship. We’re aligning the power of our global community with 10 strategic drivers of GDP growth:
-                 </p>
-             </div>
+            <a href="/signup" className="inline-block bg-white hover:bg-gray-200 text-blue-800 font-bold py-3 px-8 rounded-lg text-lg transition duration-300 flex-shrink-0">
+              Join the movement
+            </a>
+          </div>
         </div>
-
 
         {/* 10 Strategic Drivers Title - Centered with lines */}
         <div className="flex items-center justify-center mb-8">
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-600 mr-4"></div>
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex-shrink-0">
-                10 Strategic Drivers
-            </h3>
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-600 ml-4"></div>
+          <div className="flex-grow border-t border-gray-300 dark:border-gray-600 mr-4"></div>
+          <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex-shrink-0">
+            10 Strategic Drivers
+          </h3>
+          <div className="flex-grow border-t border-gray-300 dark:border-gray-600 ml-4"></div>
         </div>
-
 
         {/* Strategic Drivers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -172,9 +168,8 @@ const EconomicPotentialSection: React.FC = () => {
               className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow transform transition duration-300 hover:shadow-xl text-left border border-gray-200 dark:border-slate-600 group"
             >
               <div className="flex items-start space-x-4 cursor-pointer" onClick={() => handleToggle(driver.id)}>
-                {/* Icon Container with Background and Hover Effect */}
                 <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-lg font-bold transition-colors duration-300 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 group-hover:text-blue-700 dark:group-hover:text-blue-200">
-                   {driver.icon}
+                  {driver.icon}
                 </div>
                 <div className="flex-grow">
                   <p className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -186,7 +181,6 @@ const EconomicPotentialSection: React.FC = () => {
                 </div>
               </div>
 
-              {/* Collapsible Content */}
               <div
                 ref={el => contentRefs.current[driver.id] = el}
                 style={{
@@ -201,7 +195,6 @@ const EconomicPotentialSection: React.FC = () => {
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );
