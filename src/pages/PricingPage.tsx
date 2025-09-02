@@ -46,8 +46,8 @@ const Pricing = () => {
         "Market research tools for Global expansion",
         "Pitch deck review and feedback",
         "Priority support in English & Persian"
-      ],
-      popular: true,
+       ],
+       popular: true,
       buttonText: "Start 14-Day Free Trial"
     },
 
@@ -57,7 +57,7 @@ const Pricing = () => {
       description: " Access to Hamfounder's accelerator programs.",
       why: "Why Elevate to Scale? For founders with audacious global ambitions, the Scale tier is your definitive advantage.",
       longDescription: " Why Elevate to Scale? For founders with audacious global ambitions, the Scale tier is your definitive advantage. It provides the elite network, personalized strategy, and direct access needed to transform your startup into an international powerhouse. This is where the true \"Global Iranian Advantage\" is fully realized, enabling you to lead and innovate on a global stage.",
- features: [
+  features: [
         "Everything in Growth plan",
         "1-on-1 strategic consulting with Hamfounder's veterans",
         "Direct investor introductions and warm leads",
@@ -66,14 +66,14 @@ const Pricing = () => {
         "Custom market entry strategies",
         "Dedicated account manager",
         "24/7 priority support"
-      ],
-      popular: false,
-      buttonText: "Contact Sales"
+       ],
+       popular: false,
+       buttonText: "Contact Sales"
     }
   ];
 
   const mentorPlans = [
-    {
+   {
       name: "Community Mentor",
       price: { monthly: 0, annual: 0 },
       description: "Give back to the Iranian entrepreneurial community",
@@ -82,11 +82,11 @@ const Pricing = () => {
         "Access to entrepreneur network",
         "Community recognition",
         "Monthly mentor meetups",
-      ],
+     ],
       popular: false,
       buttonText: "Join as Mentor"
-    },
-    {
+     },
+     {
       name: "Expert Mentor",
       price: { monthly: 199, annual: 1980 },
       description: "Professional mentoring with revenue sharing",
@@ -98,41 +98,38 @@ const Pricing = () => {
         "Priority matching with high-potential startups",
         "Exclusive mentor-only events and workshops",
         "Professional development courses"
-      ],
+     ],
       popular: true,
       buttonText: "Become Expert Mentor"
-    }
+     }
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar scrollToSection={() => {}} isIndexPage={false} />
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-16">
-        {/* Hero Section */}
+        <main className="container mx-auto px-4 pt-24 pb-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
           Unlock Your Potentials
-            <span className="text-primary"> with Hamfounder's Curated Network</span>
+             <span className="text-primary"> with Hamfounder's Curated Network</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
           Experience the power of Trust, Exclusivity, and the Global Iranian Advantage </p>
-          
+           
           <PricingToggle isAnnual={isAnnual} setIsAnnual={setIsAnnual} />
         </div>
 
-        {/* Entrepreneurs Section */}
         <section className="mb-16">
-          <div className="text-center mb-12">
+           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-2 mb-4">
               <TrendingUp className="h-6 w-6 text-primary" />
               <h2 className="text-3xl font-bold">For Entrepreneurs</h2>
             </div>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              From idea to IPO - everything Iranian entrepreneurs need to succeed in Global Markets!
+             <p className="text-muted-foreground max-w-2xl mx-auto">
+               From idea to IPO - everything Iranian entrepreneurs need to succeed in Global Markets!
             </p>
           </div>
-          
+           
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {entrepreneurPlans.map((plan, index) => (
               <PricingCard 
@@ -140,14 +137,13 @@ const Pricing = () => {
                 plan={plan} 
                 isAnnual={isAnnual}
                 category="entrepreneur"
-              />
-            ))}
-          </div>
+               />
+           ))}
+         </div>
         </section>
 
-        {/* Mentors Section */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
+         <section className="mb-16">
+         <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Users className="h-6 w-6 text-primary" />
               <h2 className="text-3xl font-bold">For Mentors</h2>
@@ -155,23 +151,21 @@ const Pricing = () => {
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Share your experience with the next generation of Iranian entrepreneurs
             </p>
-          </div>
+         </div>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {mentorPlans.map((plan, index) => (
-              <PricingCard 
+         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+           {mentorPlans.map((plan, index) => (
+             <PricingCard 
                 key={index} 
                 plan={plan} 
                 isAnnual={isAnnual}
                 category="mentor"
               />
-            ))}
-          </div>
+              ))}
+           </div>
         </section>
-
-        {/* Investors CTA */}
         <section className="mb-16">
-          <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-2xl p-8 md:p-12 text-center">
+           <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-2xl p-8 md:p-12 text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Crown className="h-8 w-8 text-primary" />
               <h2 className="text-3xl font-bold">Investor?</h2>
@@ -179,14 +173,14 @@ const Pricing = () => {
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Get exclusive access to vetted Iranian startups and high-potential deals in Hamfounder's Startup Ecosystem
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" className="text-lg px-8">
-                Request Investor Access
-              </Button>
+                  Request Investor Access
+               </Button>
               <p className="text-sm text-muted-foreground">
                 Minimum investment: $50K+
               </p>
-            </div>
+             </div>
           </div>
         </section>
 

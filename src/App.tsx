@@ -9,6 +9,8 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import PricingPage from "./pages/PricingPage"; // Import PricingPage
 import { UserProvider } from "./contexts/UserProvider"; // Import UserProvider
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 // وارد کردن کامپوننت های داشبورد از فولدر جدید
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -30,6 +32,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           {/* مسیر اصلی داشبورد */} {/* Fix: Ensure Dashboard is a child of Routes */}
 
           {/* Route for the Pricing Page */}

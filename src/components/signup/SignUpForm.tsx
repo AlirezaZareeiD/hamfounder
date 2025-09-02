@@ -231,9 +231,9 @@ export const SignUpForm: React.FC<SignupFormProps> = ({
 
       <div className="mt-6 text-center text-sm">
         <p className="text-slate-600">
-          By signing up, you agree to our{" "}
+          By using Hamfounder, you agree to our {" "}
           <Link to="/terms" className="underline text-primary hover:text-primary/90">
-            Terms of Service
+            Terms of Services
           </Link>{" "}
           and{" "}
           <Link
