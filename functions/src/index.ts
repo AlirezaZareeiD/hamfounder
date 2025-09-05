@@ -1,77 +1,170 @@
+
 import * as admin from 'firebase-admin';
 import { onDocumentUpdated, Change, QueryDocumentSnapshot, FirestoreEvent } from 'firebase-functions/v2/firestore';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
 
 if (admin.apps.length === 0) {
- console.log('Initializing Firebase Admin SDK...');
- try {
- admin.initializeApp({
- projectId: process.env.GCLOUD_PROJECT,
- });
- console.log('Firebase Admin SDK initialized successfully.');
+  console.log('Initializing Firebase Admin SDK...');
+  try {
+    admin.initializeApp({
+      projectId: process.env.GCLOUD_PROJECT,
+    });
+    console.log('Firebase Admin SDK initialized successfully.');
   } catch (error) {
- console.error('Error initializing Firebase Admin SDK:', error); // Corrected error logging
+    console.error('Error initializing Firebase Admin SDK:', error);
   }
 }
 
-// We no longer need to get hamfounderDbId here as we will explicitly set the database ID inside the function
-// const hamfounderDbId = process.env.HAMFOUNDER_DATABASE_ID;
-// if (!hamfounderDbId) {
-//     console.error("HAMFOUNDER_DATABASE_ID environment variable is not set during build time.");
-//     // This warning is for build time, runtime check is below
-// }
+const getDb = () => {
+    const db = admin.firestore();
+    db.settings({
+        databaseId: 'hamfounderdatabase',
+        ignoreUndefinedProperties: true,
+    });
+    return db;
+};
 
-// We no longer need to configure the default Firestore instance here
-// const db = admin.firestore();
-// if (hamfounderDbId) {
-//     db.settings({
-//         databaseId: hamfounderDbId,
-//         ignoreUndefinedProperties: true, // Often useful
-//     });
-//     console.log(`Firestore instance configured for database: ${hamfounderDbId} at build time.`);
-// } else {
-//     console.warn("HAMFOUNDER_DATABASE_ID not set at build time, configuring default Firestore database.");
-// }
+// Recursive function to deeply sanitize data for JSON serialization
+const sanitizeForJSON = (data: any): any => {
+    if (data === null || data === undefined) {
+        return null; // Return null for both null and undefined
+    }
+    // Firestore Timestamps
+    if (data instanceof admin.firestore.Timestamp) {
+        return data.toDate().toISOString();
+    }
+    // Arrays
+    if (Array.isArray(data)) {
+        return data.map(item => sanitizeForJSON(item));
+    }
+    // Objects
+    if (typeof data === 'object') {
+        const sanitizedObject: { [key: string]: any } = {};
+        for (const key in data) {
+            if (Object.prototype.hasOwnProperty.call(data, key)) {
+                const value = data[key];
+                // Firestore can have undefined values, which are not valid in JSON.
+                // We replace them with null.
+                sanitizedObject[key] = sanitizeForJSON(value);
+            }
+        }
+        return sanitizedObject;
+    }
+    // Primitives (string, number, boolean)
+    return data;
+};
 
 
-// The 2nd generation trigger definition - Added explicit database and region definition
+const getProfileCompletionPercentage = (profile: any): number => {
+    if (!profile) return 0;
+
+    const fields = [
+      'firstName', 'lastName', 'tagline', 'location', 'personalSummary',
+      'role', 'lookingFor', 'businessStage', 'companyName'
+    ];
+    
+    const completedFields = fields.filter(field => {
+      const value = profile[field];
+      return typeof value === 'string' && value.trim() !== '';
+    }).length;
+
+    const skillsBonus = (Array.isArray(profile.skills) && profile.skills.length > 0) ? 1 : 0;
+    const interestsBonus = (Array.isArray(profile.interests) && profile.interests.length > 0) ? 1 : 0;
+    
+    const totalPossiblePoints = fields.length + 2;
+    const userScore = completedFields + skillsBonus + interestsBonus;
+
+    if (totalPossiblePoints === 0) return 0;
+
+    return Math.round((userScore / totalPossiblePoints) * 100);
+};
+
+const isProfileConsideredComplete = (percentage: number): boolean => {
+  return percentage === 100;
+};
+
+export const getUserReport = onCall({ region: 'us-central1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'The function must be called while authenticated.');
+  }
+
+  const adminEmail = 'alireza.zareidowlatabadi@gmail.com';
+  if (request.auth.token.email !== adminEmail) {
+    throw new HttpsError('permission-denied', 'You do not have permission to access this resource.');
+  }
+
+  const db = getDb();
+
+  try {
+    const [listUsersResult, profilesSnapshot, projectsSnapshot] = await Promise.all([
+      admin.auth().listUsers(1000),
+      db.collection('userProfiles').get(),
+      db.collection('projects').get()
+    ]);
+
+    const profilesMap = new Map();
+    profilesSnapshot.forEach(doc => {
+      profilesMap.set(doc.id, doc.data());
+    });
+
+    const projectCounts = new Map();
+    projectsSnapshot.forEach(doc => {
+      const ownerId = doc.data().ownerId;
+      if (ownerId) {
+        projectCounts.set(ownerId, (projectCounts.get(ownerId) || 0) + 1);
+      }
+    });
+
+    const userReport = listUsersResult.users.map(user => {
+      const profile = profilesMap.get(user.uid);
+      const projectCount = projectCounts.get(user.uid) || 0;
+      
+      const completionPercentage = getProfileCompletionPercentage(profile);
+      const isComplete = isProfileConsideredComplete(completionPercentage);
+      
+      // Deeply sanitize the profile data to ensure it's fully JSON-serializable
+      const sanitizedProfileData = sanitizeForJSON(profile);
+
+      return {
+        uid: user.uid,
+        email: user.email || 'N/A',
+        isProfileComplete: isComplete,
+        profileCompletionPercentage: completionPercentage,
+        projectCount: projectCount,
+        lastSignInTime: user.metadata.lastSignInTime, // This is already a string
+        profileData: sanitizedProfileData, // Use the fully sanitized, JSON-safe object
+      };
+    });
+
+    return userReport;
+
+  } catch (error) {
+    console.error("Error generating user report:", error);
+    throw new HttpsError('internal', 'An error occurred while generating the report.', error);
+  }
+});
+
 export const denormalizeUserProfileOnUpdate = onDocumentUpdated(
   {
-    document: '/userProfiles/{userId}', // The path to the documents to listen to
-    database: 'hamfounderdatabase', // Explicitly set the database ID
-    region: 'us-central1', // <--- منطقه اجرای تابع تغییر یافته
+    document: '/userProfiles/{userId}',
+    database: 'hamfounderdatabase',
+    region: 'us-central1',
   },
   async (event: FirestoreEvent<Change<QueryDocumentSnapshot> | undefined, { userId: string }>) => {
-
-        // Runtime check for the environment variable is no longer strictly necessary for database access,
-        // but can be kept for logging if desired.
-        // const runtimeHamfounderDbId = process.env.HAMFOUNDER_DATABASE_ID;
-        // if (!runtimeHamfounderDbId) {
-        //     console.error("HAMFOUNDER_DATABASE_ID environment variable is NOT set during runtime execution!");
-        //     return null;
-        // } else {
-        //      console.log(`HAMFOUNDER_DATABASE_ID is set to ${runtimeHamfounderDbId} during runtime execution.\`);
-        // }
-
 
         if (!event.data) {
             console.log("No data found in event.data. Exiting.");
             return null;
         }
 
-        // Explicitly get the Firestore instance for 'hamfounderdatabase' inside the function
-        const specificDb = admin.firestore();
-        specificDb.settings({
-            databaseId: 'hamfounderdatabase', // Explicitly set the database ID
-            ignoreUndefinedProperties: true,
-        });
+        const specificDb = getDb();
 
-        // Verify that the event is indeed from the expected database
         const eventDatabaseId = event.data.after.ref.firestore.databaseId;
-        const expectedDatabaseId = 'hamfounderdatabase'; // Explicitly define the expected database ID
+        const expectedDatabaseId = 'hamfounderdatabase';
 
         if (eventDatabaseId !== expectedDatabaseId) {
             console.warn(`Trigger event is from database ${eventDatabaseId}, but expected ${expectedDatabaseId}. Exiting.`);
-            return null; // Or handle this discrepancy as needed
+            return null;
         }
          console.log(`Trigger event is from the expected database: ${eventDatabaseId}`);
 
@@ -96,7 +189,6 @@ export const denormalizeUserProfileOnUpdate = onDocumentUpdated(
         const updatedDisplayName = newValue.displayName as string | undefined;
         const updatedProfileImageUrl = newValue.profileImageUrl as string | undefined;
 
-        // Use the 'specificDb' instance for all Firestore operations
         const projectsRef: admin.firestore.CollectionReference = specificDb.collection('projects');
 
         const userProjectsSnapshot: admin.firestore.QuerySnapshot = await projectsRef.where('ownerId', '==', userId).get();
