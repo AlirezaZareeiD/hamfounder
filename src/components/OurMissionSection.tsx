@@ -60,46 +60,42 @@ const OurMissionSection = () => {
               </div>
               
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-blue-500">
-                From Shared Journeys to United Future
+                Unlocking the 'Global Iranians Advantage'
               </h2>
             </div>
             
             <div ref={contentRef} className="prose prose-lg text-gray-600 opacity-0 translate-x-[-50px] transition-all duration-700 ease-out delay-200">
               <p className="mb-4">
-                Thousands of miles from home, motivated by dreams, Iranian innovators around the world face unique challenges. Finding the right co-founder, navigating complex ecosystems, accessing global networks... these problems are familiar to us. We've lived them.
+                The Iranian diaspora—a multi-trillion dollar ecosystem of talent, capital, and knowledge—remains fragmented. A persistent trust deficit and lack of a central nexus prevent high-value collaborations. Finding a culturally-aligned co-founder or a trusted investor is a significant challenge.
               </p>
               
               <p className="mb-4">
-                Hamfounder was born from this shared experience. We're more than a platform; we're nurturing a global community rooted in mutual support, shared knowledge, and a firm belief in Iranian potential.
-              </p>
-              
-              <p>
-                Our mission is to empower your journey by connecting you with the people and resources needed to build businesses that not only succeed but inspire.
+                Hamfounder is the solution. We are building a purpose-driven movement and a next-gen platform to empower Iranian-descent entrepreneurs. We are operationalizing trust as our core API to turn the global redistribution of Iranian talent into a strategic asset.
               </p>
             </div>
           </div>
           
           {/* Right Side - Benefits for Iranian Entrepreneurs */}
           <div ref={pillarsRef} className="lg:w-1/2 bg-gray-100 rounded-xl p-8 opacity-0 translate-x-[50px] transition-all duration-700 ease-out delay-300">
-            <h3 className="text-xl font-semibold text-gray-800 mb-6">Why Hamfounder for Iranian Entrepreneurs?</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-6">Our Four Integrated Hubs</h3>
             
             <div className="space-y-5">
               {[
                 {
-                  title: "Deep understanding of shared challenges:",
-                  content: "From visa obstacles and sanctions to cultural differences, we recognize the unique challenges Iranian entrepreneurs face."
+                  title: "Innovation & Co-creation:",
+                  content: "Find co-founders based on skills, values, and cultural compatibility."
                 },
                 {
-                  title: "Targeted networking:",
-                  content: "Connect with individuals who not only have complementary skills but understand shared cultural background and perspective."
+                  title: "Growth & Mentorship:",
+                  content: "Access elite diaspora mentors and high-level operational knowledge."
                 },
                 {
-                  title: "Cultural support:",
-                  content: "Resources, guidance, and tools designed for the unique challenges Iranian entrepreneurs face in the global arena."
+                  title: "Investment & Opportunities:",
+                  content: "Connect with a vetted network of diaspora investors in a trusted marketplace."
                 },
                 {
-                  title: "From diaspora to global impact:",
-                  content: "Turn the worldwide dispersion of Iranians into a powerful advantage, with a network that transcends geographical limitations."
+                  title: "Community & Events:",
+                  content: "Foster trust and belonging through online hubs and offline local chapters."
                 }
               ].map((item, index) => (
                 <div 
