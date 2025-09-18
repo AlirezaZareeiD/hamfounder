@@ -6,25 +6,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   User,
-  Briefcase,
   Lightbulb,
   Target,
-  Upload,
-  Camera,
   Star,
   MapPin,
-  Link as LinkIcon,
   Twitter,
   Linkedin,
   Globe,
-  Plus,
-  X,
   Save,
   Sparkles,
   Rocket,
@@ -36,11 +28,13 @@ import { getUserProfile, auth, updateUserProfile } from '@/lib/firebase';
 import { ProfileImageUploader } from '@/components/dashboard/ProfileImageUploader';
 import TagsInput from 'react-tagsinput';
 import 'react-tagsinput/react-tagsinput.css';
+import MemberModal from '@/components/dashboard/find-cofounder/MemberModal';
 
 const EditProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("personal");
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   const [profileData, setProfileData] = useState({
     firstName: '',
@@ -116,7 +110,7 @@ const EditProfilePage: React.FC = () => {
     setProfileData(prev => ({ ...prev, companyLogoUrl: imageUrl }));
   };
 
-  const handleInputChange = (field: keyof typeof profileData, value: string) => {
+  const handleInputChange = (field: keyof typeof profileData, value: string | string[]) => {
     setProfileData(prev => ({
       ...prev,
       [field]: value
@@ -127,58 +121,59 @@ const EditProfilePage: React.FC = () => {
     setIsSaving(true);
     const userId = auth.currentUser?.uid;
     if (!userId) {
+      toast({ title: "Error", description: "You must be logged in to save.", variant: "destructive" });
       setIsSaving(false);
       return;
     }
 
-    let dataToSave = {};
+    let dataToSave: Partial<typeof profileData> = {};
     let successMessage = "";
     let errorMessage = "";
 
     try {
-      if (section === 'personal') {
-        if ((profileData.linkedinUrl && !urlPattern.test(profileData.linkedinUrl)) ||
-          (profileData.twitterUrl && !urlPattern.test(profileData.twitterUrl))) {
-          toast({ title: "Invalid URL", description: "Please enter a valid URL (starting with http:// or https://)", variant: "destructive" });
-          setIsSaving(false);
-          return;
-        }
-        dataToSave = {
-          firstName: profileData.firstName,
-          lastName: profileData.lastName,
-          displayName: profileData.displayName,
-          pronouns: profileData.pronouns,
-          tagline: profileData.tagline,
-          location: profileData.location,
-          linkedinUrl: profileData.linkedinUrl,
-          twitterUrl: profileData.twitterUrl,
-        };
-        successMessage = "Founder Profile updated successfully.";
-        errorMessage = "Failed to save Founder Profile.";
-      } else if (section === 'journey') {
-        dataToSave = {
-          personalSummary: profileData.personalSummary,
-        };
-        successMessage = "My Entrepreneurial Journey updated successfully.";
-        errorMessage = "Failed to save My Entrepreneurial Journey.";
-      } else if (section === 'professional') {
-        if (profileData.companyWebsiteUrl && !urlPattern.test(profileData.companyWebsiteUrl)) {
-          toast({ title: "Invalid URL", description: "Please enter a valid Startup Website URL (starting with http:// or https://)", variant: "destructive" });
-          setIsSaving(false);
-          return;
-        }
-        dataToSave = {
-          role: profileData.role,
-          lookingFor: profileData.lookingFor,
-          businessStage: profileData.businessStage,
-          skills: profileData.skills,
-          interests: profileData.interests,
-          companyName: profileData.companyName,
-          companyWebsiteUrl: profileData.companyWebsiteUrl,
-        };
-        successMessage = "Professional Background updated successfully.";
-        errorMessage = "Failed to save Professional Background.";
-      }
+        if (section === 'personal') {
+            if ((profileData.linkedinUrl && !urlPattern.test(profileData.linkedinUrl)) ||
+              (profileData.twitterUrl && !urlPattern.test(profileData.twitterUrl))) {
+              toast({ title: "Invalid URL", description: "Please enter a valid URL (starting with http:// or https://)", variant: "destructive" });
+              setIsSaving(false);
+              return;
+            }
+            dataToSave = {
+              firstName: profileData.firstName,
+              lastName: profileData.lastName,
+              displayName: profileData.displayName,
+              pronouns: profileData.pronouns,
+              tagline: profileData.tagline,
+              location: profileData.location,
+              linkedinUrl: profileData.linkedinUrl,
+              twitterUrl: profileData.twitterUrl,
+            };
+            successMessage = "Founder Profile updated successfully.";
+            errorMessage = "Failed to save Founder Profile.";
+          } else if (section === 'journey') {
+            dataToSave = {
+              personalSummary: profileData.personalSummary,
+            };
+            successMessage = "My Entrepreneurial Journey updated successfully.";
+            errorMessage = "Failed to save My Entrepreneurial Journey.";
+          } else if (section === 'professional') {
+            if (profileData.companyWebsiteUrl && !urlPattern.test(profileData.companyWebsiteUrl)) {
+              toast({ title: "Invalid URL", description: "Please enter a valid Startup Website URL (starting with http:// or https://)", variant: "destructive" });
+              setIsSaving(false);
+              return;
+            }
+            dataToSave = {
+              role: profileData.role,
+              lookingFor: profileData.lookingFor,
+              businessStage: profileData.businessStage,
+              skills: profileData.skills,
+              interests: profileData.interests,
+              companyName: profileData.companyName,
+              companyWebsiteUrl: profileData.companyWebsiteUrl,
+            };
+            successMessage = "Professional Background updated successfully.";
+            errorMessage = "Failed to save Professional Background.";
+          }
 
       await updateUserProfile(userId, dataToSave);
       toast({ title: "Success", description: successMessage, variant: "default" });
@@ -195,14 +190,32 @@ const EditProfilePage: React.FC = () => {
       'firstName', 'lastName', 'tagline', 'location', 'personalSummary',
       'role', 'lookingFor', 'businessStage', 'companyName'
     ];
-    const completedFields = fields.filter(field =>
-      profileData[field as keyof typeof profileData] &&
-      String(profileData[field as keyof typeof profileData]).trim() !== ''
-    ).length;
+    const completedFields = fields.filter(field => {
+        const value = profileData[field as keyof typeof profileData];
+        return value && String(value).trim() !== '';
+    }).length;
     const skillsBonus = profileData.skills.length > 0 ? 1 : 0;
     const interestsBonus = profileData.interests.length > 0 ? 1 : 0;
     
     return Math.round(((completedFields + skillsBonus + interestsBonus) / (fields.length + 2)) * 100);
+  };
+  
+  const myProfileForPreview = {
+    id: auth.currentUser?.uid || '',
+    name: profileData.displayName || `${profileData.firstName} ${profileData.lastName}`,
+    avatar: profileData.profileImageUrl,
+    role: profileData.role,
+    skills: profileData.skills,
+    location: profileData.location,
+    bio: profileData.personalSummary,
+    experience: profileData.businessStage,
+    industry: 'N/A',
+    lookingFor: profileData.lookingFor,
+    linkedinUrl: profileData.linkedinUrl,
+    twitterUrl: profileData.twitterUrl,
+    website: profileData.companyWebsiteUrl,
+    achievements: [], 
+    isOnline: true,
   };
 
   if (loading) {
@@ -221,7 +234,6 @@ const EditProfilePage: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-purple-50/20">
         <div className="container mx-auto py-8 px-4 max-w-5xl">
           
-          {/* Header Section */}
           <div className="text-center mb-12">
             <div className="relative inline-block">
               <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent mb-4">
@@ -233,7 +245,6 @@ const EditProfilePage: React.FC = () => {
               Tell your entrepreneurial story and connect with your ideal co-founders
             </p>
             
-            {/* Progress Bar */}
             <div className="max-w-md mx-auto">
               <div className="flex items-center gap-3 mb-2">
                 <Sparkles className="h-5 w-5 text-primary" />
@@ -245,12 +256,6 @@ const EditProfilePage: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            {/* --- START OF MODIFIED SECTION ---
-            Modified TabsList to handle mobile responsiveness
-            - Added `md:grid-cols-3` to use a 3-column grid on medium screens and larger
-            - Added `flex-wrap` to allow items to wrap to the next line on small screens
-            - Adjusted `TabsTrigger` to hide the long text on smaller screens and show a shorter version
-            */}
             <TabsList className="flex flex-wrap md:grid md:grid-cols-3 w-full mb-8 bg-gradient-to-r from-primary/10 to-purple-100/50 p-1">
               <TabsTrigger value="personal" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md flex-1">
                 <User className="h-4 w-4" />
@@ -268,8 +273,7 @@ const EditProfilePage: React.FC = () => {
                 <span className="hidden md:inline">Professional Background</span>
               </TabsTrigger>
             </TabsList>
-            {/* --- END OF MODIFIED SECTION ---
-            */}
+
             <TabsContent value="personal" className="space-y-6">
               <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-primary">
                 <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
@@ -446,7 +450,7 @@ const EditProfilePage: React.FC = () => {
                       value={profileData.personalSummary}
                       onChange={(e) => handleInputChange('personalSummary', e.target.value)}
                       className="min-h-[200px] transition-all duration-300 focus:scale-[1.02] resize-none"
-                      placeholder="Tell your entrepreneurial story here... What challenges have you faced? What successes have you achieved? What drives you to continue on this path?"
+                      placeholder="Tell your entrepreneurial story here..."
                     />
                     <div className="text-xs text-muted-foreground text-left">
                       {profileData.personalSummary.length} characters
@@ -583,10 +587,10 @@ const EditProfilePage: React.FC = () => {
                     </Label>
                     <TagsInput
                       value={profileData.skills}
-                      onChange={(tags) => setProfileData(prev => ({ ...prev, skills: tags }))}
-                      tagProps={{ className: 'bg-black text-white rounded px-2 py-1 mr-1 text-sm' }}
+                      onChange={(tags: string[]) => handleInputChange('skills', tags)}
+                      tagProps={{ className: 'react-tagsinput-tag bg-primary text-primary-foreground' }}
                       inputProps={{ placeholder: 'Add a skill' }}
-                      className="border border-gray-300 rounded-md p-2 w-full focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm"
+                      className="react-tags-input"
                     />
                   </div>
 
@@ -597,10 +601,10 @@ const EditProfilePage: React.FC = () => {
                     </Label>
                     <TagsInput
                       value={profileData.interests}
-                      onChange={(tags) => setProfileData(prev => ({ ...prev, interests: tags }))}
-                      tagProps={{ className: 'bg-black text-white rounded px-2 py-1 mr-1 text-sm' }}
+                      onChange={(tags: string[]) => handleInputChange('interests', tags)}
+                      tagProps={{ className: 'react-tagsinput-tag bg-secondary text-secondary-foreground' }}
                       inputProps={{ placeholder: 'Add an interest' }}
-                      className="border border-gray-300 rounded-md p-2 w-full focus-within:ring-blue-500 focus-within:border-blue-500 sm:text-sm"
+                      className="react-tags-input"
                     />
                   </div>
 
@@ -610,15 +614,9 @@ const EditProfilePage: React.FC = () => {
                     className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transition-all duration-300 hover:scale-105 shadow-lg"
                   >
                     {isSaving ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Saving...
-                      </>
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
                     ) : (
-                      <>
-                        <Save className="h-4 w-4 mr-2" />
-                        Save Professional Info
-                      </>
+                      <><Save className="h-4 w-4 mr-2" /> Save Professional Info</>
                     )}
                   </Button>
                 </CardContent>
@@ -633,12 +631,7 @@ const EditProfilePage: React.FC = () => {
             </p>
             <Button
               className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700 transition-all duration-300 hover:scale-105 shadow-lg"
-              onClick={() => {
-                toast({
-                  title: "Profile Saved! 🎉",
-                  description: "You can now start searching for your ideal co-founder.",
-                });
-              }}
+              onClick={() => setIsPreviewModalOpen(true)}
             >
               <Sparkles className="h-4 w-4 mr-2" />
               View My Profile
@@ -646,6 +639,13 @@ const EditProfilePage: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      <MemberModal
+        isOpen={isPreviewModalOpen}
+        onClose={() => setIsPreviewModalOpen(false)}
+        member={myProfileForPreview}
+        isMyProfile={true}
+      />
     </DashboardLayout>
   );
 };
