@@ -96,7 +96,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
-                    Browse member profiles and find your perfect match.
+                    Browse member profiles and find your perfect match!
                   </CardDescription>
                 </CardContent>
               </Card>
