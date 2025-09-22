@@ -1,102 +1,32 @@
-import { useState, useEffect, useRef } from "react"; // Add useRef
+import { useState, useEffect, useRef } from "react"; 
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-// Remove direct auth import, will get user from context
-// import { auth, getUserProfile } from "@/lib/firebase";
-
-// Import the useUser hook from the context
-// import { useUser } from "@/contexts/UserContext";
-
-// Logo و DashboardHamburgerMenu دیگر در اینجا لازم نیستند چون در DashboardLayout هستند
-// import { Logo } from "@/components/Logo"; // این خط را حذف کنید
-// import { DashboardHamburgerMenu } from "@/components/dashboard/DashboardHamburgerMenu"; // این خط را حذف کنید
-
-// Button, signOut, toast ممکن است در منطق تب ها لازم باشند، می توانید نگه دارید یا اگر فقط در DashboardLayout استفاده می شوند حذف کنید
 import { Button } from "@/components/ui/button";
 import { signOut } from "firebase/auth";
 import { toast } from "@/hooks/use-toast";
-
-
 import MyProjects from "@/components/dashboard/MyProjects";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; 
+import { Edit, Users } from "lucide-react"; 
 import LearningHub from "@/components/dashboard/LearningHub";
 import EventsCommunity from "@/components/dashboard/EventsCommunity";
 import NotificationsPanel from "@/components/dashboard/NotificationsPanel";
 import FounderRoadmapSection from '@/components/FounderRoadmapSection';
-import TrustBuildingSection from '@/components/TrustBuildingSection';
-
-import DashboardLayout from '@/components/layouts/DashboardLayout'; // وارد کردن لایه‌بندی داشبورد
-
+import DashboardLayout from '@/components/layouts/DashboardLayout'; 
 
 const Dashboard = () => {
-  // Get user and loading state from the context
- // const { user, loading } = useUser(); // این خط قبلا حذف شده است
   const [activeTab, setActiveTab] = useState("projects");
-  // Remove userProfileImage state, handled by context and layout
-  // const [userProfileImage, setUserProfileImage] = useState<string | undefined>(undefined); // State to store profile image URL - این خط قبلا کامنت یا حذف شده است
-  const tabsListRef = useRef<HTMLDivElement>(null); // Create a ref for the TabsList
+  const tabsListRef = useRef<HTMLDivElement>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
-  const [showRightFade, setShowRightFade] = useState(true); // Initially show right fade
+  const [showRightFade, setShowRightFade] = useState(true); 
 
-  const navigate = useNavigate(); // useNavigate لازم است اگر useEffect بالا را نگه می دارید - با حذف useEffect بالا ممکن است دیگر لازم نباشد، اما فعلا نگه می داریم
-
-  // REMOVED: useEffect for redirection, which was using user and loading
-  // useEffect(() => {
-  //    // Only redirect if loading is false and user is null
-  //    if (!loading && !user) {
-  //      navigate('/login');
-  //      return;
-  //    }
-  //  }, [user, loading, navigate]); // Added loading to dependency array
-
-  // Remove the effect to fetch user profile image, handled by context and layout
-  // useEffect(() => {
-  //   const fetchUserProfile = async () => {
-  //     console.log("Fetching user profile..."); // Add this log
-  //     console.log("auth.currentUser:", auth.currentUser); // Add this log
-  //     console.log("user variable:", user); // Add this log
-  //     if (user) {
-  //       try {
-  //         const profile = await getUserProfile(user.uid);
-  //         if (profile?.profileImageUrl) {
-  //           setUserProfileImage(profile.profileImageUrl);
-  //         }
-  //       } catch (error) {
-  //         console.error("Error fetching user profile:", error);
-  //       }
-  //     }
-  //   };
-  //   fetchUserProfile();
-  // }, [user]); // Rerun when the user object changes
-
-
-  // handleSignOut دیگر در اینجا مدیریت نمی شود و به DashboardLayout منتقل شده است
-  // const handleSignOut = async () => {
-  //   try {
-  //     await signOut(auth);
-  //     toast({
-  //       title: "Sign Out Successful",
-  //       description: "You have been successfully signed out of your account.",
-  //     });
-  //     navigate('/');
-  //   } catch (error) {
-  //     toast({
-  //       title: "Sign Out Error",
-  //       description: "There was a problem signing out. Please try again.",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
-
-  // بررسی کاربر در DashboardLayout انجام می شود
-  // if (!user) {
-  //   return null; // Loading or redirecting state - در DashboardLayout مدیریت می شود - این هم قبلا کامنت یا حذف شده است
-  // }
+  const navigate = useNavigate();
 
   const checkFadeEffects = () => {
     if (tabsListRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current;
       const atLeftEnd = scrollLeft === 0;
-      const atRightEnd = scrollLeft + clientWidth >= scrollWidth - 1; // Allow for 1px tolerance
+      const atRightEnd = scrollLeft + clientWidth >= scrollWidth - 1;
 
       setShowLeftFade(!atLeftEnd);
       setShowRightFade(!atRightEnd);
@@ -104,17 +34,14 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    // Check fade effects initially and on window resize
     checkFadeEffects();
     const handleResize = () => checkFadeEffects();
     window.addEventListener('resize', handleResize);
 
-    // Check fade effects when tabs are clicked (content changes might affect scrollWidth)
     const observer = new MutationObserver(checkFadeEffects);
     if (tabsListRef.current) {
       observer.observe(tabsListRef.current, { childList: true, subtree: true });
     }
-
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -125,7 +52,6 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    // Re-check fade effects after scroll
     const handleScroll = () => {
       checkFadeEffects();
     };
@@ -133,26 +59,63 @@ const Dashboard = () => {
     return () => {
       tabsListRef.current?.removeEventListener('scroll', handleScroll);
     };
-  }, [activeTab]); // Re-check when activeTab changes
-
+  }, [activeTab]);
 
   return (
-    <DashboardLayout> {/* استفاده از لایه‌بندی داشبورد */}
-      {/* محتوای اصلی داشبورد (تب ها و سکشن ها) - profileImageURL passed implicitly via DashboardLayout */}
+    <DashboardLayout>
       <div className="bg-white shadow rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-slate-900 mb-6 text-center sm:text-left"> Welcome - Every founder’s journey begins here!</h1> {/* Centered heading on mobile */}
+        
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-center mb-2 text-slate-800">
+            <span role="img" aria-label="sparkles" className="mr-2">✨</span>
+            Customize Your Profile
+            <span role="img" aria-label="rocket" className="ml-2">🚀</span>
+          </h2>
+          <p className="text-center text-slate-500 mb-6">
+            Tell your entrepreneurial story and connect with your ideal co-founders
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Link to="/dashboard/edit-profile">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-lg font-medium">Edit Your Profile</CardTitle>
+                  <Edit className="w-5 h-5 text-slate-500" />
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Complete your profile to attract co-founders and investors.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link to="/dashboard/find-cofounder">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-lg font-medium">Find Co-Founder</CardTitle>
+                  <Users className="w-5 h-5 text-slate-500" />
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Browse member profiles and find your perfect match.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
 
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-           <div className="relative"> {/* Added relative positioning for fades */}
-             {/* Left Fade */}
+           <div className="relative">
+          <h1 className="text-2xl font-bold text-slate-900 mb-6 text-center sm:text-left"> Every founder’s journey begins here!</h1>
+
             {showLeftFade && (
-              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 sm:hidden"></div> // Only visible on small screens
+              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 sm:hidden"></div>
             )}
 
             <TabsList
-               ref={tabsListRef} // Attach the ref
-               className="mb-6 w-full max-w-full justify-start overflow-x-auto flex-nowrap scrollbar-hide px-4 sm:px-0" // Added horizontal padding for fades
-               onScroll={checkFadeEffects} // Check fade visibility on scroll
+               ref={tabsListRef}
+               className="mb-6 w-full max-w-full justify-start overflow-x-auto flex-nowrap scrollbar-hide px-4 sm:px-0"
+               onScroll={checkFadeEffects}
             >
              <TabsTrigger value="projects">My Projects</TabsTrigger>
              <TabsTrigger value="learning">Learning Hub</TabsTrigger>
@@ -160,39 +123,30 @@ const Dashboard = () => {
              <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
 
-            {/* Right Fade */}
             {showRightFade && (
-              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 sm:hidden"></div> // Only visible on small screens
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 sm:hidden"></div>
             )}
           </div>
 
           <TabsContent value="projects">
-            {/* Optionally show loading state here if MyProjects depends heavily on user */}
-            {/* {loading ? <div>Loading Projects...</div> : <MyProjects />} */}
             <MyProjects />
           </TabsContent>
 
           <TabsContent value="learning">
-             {/* Optionally show loading state here if LearningHub depends heavily on user */}
-             {/* {loading ? <div>Loading Learning Hub...</div> : <LearningHub />} */}
             <LearningHub />
           </TabsContent>
 
           <TabsContent value="events">
-             {/* Optionally show loading state here if EventsCommunity depends heavily on user */}
-             {/* {loading ? <div>Loading Events & Community...</div> : <EventsCommunity />} */}
             <EventsCommunity />
           </TabsContent>
 
           <TabsContent value="notifications">
-             {/* Optionally show loading state here if NotificationsPanel depends heavily on user */}
-             {/* {loading ? <div>Loading Notifications...</div> : <NotificationsPanel />} */}
             <NotificationsPanel />
           </TabsContent>
         </Tabs>
       </div>
       
-      <div className="mt-8"><FounderRoadmapSection /></div> {/* Added margin top for spacing */}
+      <div className="mt-8"><FounderRoadmapSection /></div>
     </DashboardLayout>
   );
 };

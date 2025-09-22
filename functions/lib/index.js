@@ -37,26 +37,16 @@ exports.denormalizeUserProfileOnUpdate = exports.getUserReport = void 0;
 const admin = __importStar(require("firebase-admin"));
 const firestore_1 = require("firebase-functions/v2/firestore");
 const https_1 = require("firebase-functions/v2/https");
+// Simplified and more robust initialization, done only once.
 if (admin.apps.length === 0) {
-    console.log('Initializing Firebase Admin SDK...');
-    try {
-        admin.initializeApp({
-            projectId: process.env.GCLOUD_PROJECT,
-        });
-        console.log('Firebase Admin SDK initialized successfully.');
-    }
-    catch (error) {
-        console.error('Error initializing Firebase Admin SDK:', error);
-    }
+    admin.initializeApp();
 }
-const getDb = () => {
-    const db = admin.firestore();
-    db.settings({
-        databaseId: 'hamfounderdatabase',
-        ignoreUndefinedProperties: true,
-    });
-    return db;
-};
+// Initialize DB connection once and reuse across function invocations.
+const db = admin.firestore();
+db.settings({
+    databaseId: 'hamfounderdatabase',
+    ignoreUndefinedProperties: true,
+});
 // Recursive function to deeply sanitize data for JSON serialization
 const sanitizeForJSON = (data) => {
     if (data === null || data === undefined) {
@@ -76,8 +66,6 @@ const sanitizeForJSON = (data) => {
         for (const key in data) {
             if (Object.prototype.hasOwnProperty.call(data, key)) {
                 const value = data[key];
-                // Firestore can have undefined values, which are not valid in JSON.
-                // We replace them with null.
                 sanitizedObject[key] = sanitizeForJSON(value);
             }
         }
@@ -108,7 +96,11 @@ const getProfileCompletionPercentage = (profile) => {
 const isProfileConsideredComplete = (percentage) => {
     return percentage === 100;
 };
-exports.getUserReport = (0, https_1.onCall)({ region: 'us-central1' }, async (request) => {
+exports.getUserReport = (0, https_1.onCall)({
+    region: 'us-central1',
+    timeoutSeconds: 300,
+    memory: '1GiB'
+}, async (request) => {
     if (!request.auth) {
         throw new https_1.HttpsError('unauthenticated', 'The function must be called while authenticated.');
     }
@@ -116,7 +108,6 @@ exports.getUserReport = (0, https_1.onCall)({ region: 'us-central1' }, async (re
     if (request.auth.token.email !== adminEmail) {
         throw new https_1.HttpsError('permission-denied', 'You do not have permission to access this resource.');
     }
-    const db = getDb();
     try {
         const [listUsersResult, profilesSnapshot, projectsSnapshot] = await Promise.all([
             admin.auth().listUsers(1000),
@@ -139,7 +130,6 @@ exports.getUserReport = (0, https_1.onCall)({ region: 'us-central1' }, async (re
             const projectCount = projectCounts.get(user.uid) || 0;
             const completionPercentage = getProfileCompletionPercentage(profile);
             const isComplete = isProfileConsideredComplete(completionPercentage);
-            // Deeply sanitize the profile data to ensure it's fully JSON-serializable
             const sanitizedProfileData = sanitizeForJSON(profile);
             return {
                 uid: user.uid,
@@ -147,15 +137,18 @@ exports.getUserReport = (0, https_1.onCall)({ region: 'us-central1' }, async (re
                 isProfileComplete: isComplete,
                 profileCompletionPercentage: completionPercentage,
                 projectCount: projectCount,
-                lastSignInTime: user.metadata.lastSignInTime, // This is already a string
-                profileData: sanitizedProfileData, // Use the fully sanitized, JSON-safe object
+                lastSignInTime: user.metadata.lastSignInTime,
+                profileData: sanitizedProfileData,
             };
         });
         return userReport;
     }
     catch (error) {
         console.error("Error generating user report:", error);
-        throw new https_1.HttpsError('internal', 'An error occurred while generating the report.', error);
+        const errorDetails = error instanceof Error
+            ? { name: error.name, message: error.message, stack: error.stack }
+            : { detail: String(error) };
+        throw new https_1.HttpsError('internal', 'An error occurred while generating the report.', errorDetails);
     }
 });
 exports.denormalizeUserProfileOnUpdate = (0, firestore_1.onDocumentUpdated)({
@@ -168,7 +161,6 @@ exports.denormalizeUserProfileOnUpdate = (0, firestore_1.onDocumentUpdated)({
         console.log("No data found in event.data. Exiting.");
         return null;
     }
-    const specificDb = getDb();
     const eventDatabaseId = event.data.after.ref.firestore.databaseId;
     const expectedDatabaseId = 'hamfounderdatabase';
     if (eventDatabaseId !== expectedDatabaseId) {
@@ -191,7 +183,7 @@ exports.denormalizeUserProfileOnUpdate = (0, firestore_1.onDocumentUpdated)({
     const userId = event.params.userId;
     const updatedDisplayName = newValue.displayName;
     const updatedProfileImageUrl = newValue.profileImageUrl;
-    const projectsRef = specificDb.collection('projects');
+    const projectsRef = db.collection('projects');
     const userProjectsSnapshot = await projectsRef.where('ownerId', '==', userId).get();
     const updatePromises = [];
     userProjectsSnapshot.forEach((doc) => {
