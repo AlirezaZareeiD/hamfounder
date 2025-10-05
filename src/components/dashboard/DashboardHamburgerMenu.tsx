@@ -1,10 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, User, Search, Bell, LogOut, Edit, Home, Briefcase } from 'lucide-react';
+import { Menu, User, Search, Bell, LogOut, Edit, Home, Briefcase, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
+import { useWhitelist } from '@/hooks/useWhitelist';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DashboardHamburgerMenuProps {
   userEmail: string;
@@ -16,6 +18,19 @@ export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ 
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
+
+  // --- THE FIX: Correctly consume the useWhitelist hook ---
+  const { whitelist, loading: whitelistLoading } = useWhitelist();
+
+  // Memoize the check to prevent re-calculation on every render
+  const isUserWhitelisted = useMemo(() => {
+    // If it's loading or there is no user, they are not whitelisted
+    if (whitelistLoading || !user) {
+      return false;
+    }
+    // Otherwise, check if the user's UID is in the array
+    return whitelist.includes(user.uid);
+  }, [whitelist, whitelistLoading, user]);
 
   const handleLinkClick = () => {
     setIsOpen(false);
@@ -67,6 +82,20 @@ export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ 
             <Bell className="h-5 w-5 mr-3 text-gray-600" />
             Notifications
           </Link>
+
+          {/* --- THE FIX: Conditionally render based on the correct logic -- */}
+          {whitelistLoading ? (
+            <div className="flex items-center p-2">
+              <Skeleton className="h-5 w-5 mr-3 rounded" />
+              <Skeleton className="h-4 w-32 rounded" />
+            </div>
+          ) : isUserWhitelisted && (
+            <Link to="/admin/co-founder-private-repository" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
+              <Lock className="h-5 w-5 mr-3 text-gray-600" />
+                Private Repository
+            </Link>
+          )}
+
           {user?.email === 'alireza.zareidowlatabadi@gmail.com' && (
             <Link to="/admin/bi-dashboard" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
               <Briefcase className="h-5 w-5 mr-3 text-gray-600" />

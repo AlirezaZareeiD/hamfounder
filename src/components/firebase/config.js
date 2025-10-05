@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
+// This configuration is correct as it points to the correct Firebase project.
 const firebaseConfig = {
   apiKey: "AIzaSyBTsycr4yok1M6iOGdfO98mr_cTOKhoLbY",
   authDomain: "hamfounder-demo-2025.firebaseapp.com",
@@ -15,5 +16,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+
+// CORRECTLY connect to the NAMED database instead of the default one.
+const db = getFirestore(app, "hamfounderdatabase");
+
 export { db };

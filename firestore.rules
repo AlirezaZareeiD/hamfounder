@@ -1,10 +1,33 @@
-firestore
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // این تابع برای اعتبارسنجی فایل‌ها در آینده مفید خواهد بود. فعلاً غیرفعال است.
+    // RULE ADDED: Allow any authenticated user to read from the config collection.
+    // This is necessary for the whitelist functionality to work.
+    match /config/{docId} {
+      allow read: if request.auth != null;
+    }
+
+    // ===================================================================
+    // START: NEW RULE FOR CONFIDENTIAL DOCUMENTS
+    // This is the fix for the "Failed to Load Documents" error.
+    // ===================================================================
+    match /confidentialDocuments/{docId} {
+      // Allow read access ONLY if the user is authenticated AND their user profile
+      // document has the 'ndaAccepted' field set to true.
+      allow read: if request.auth != null &&
+                     get(/databases/$(database)/documents/userProfiles/$(request.auth.uid)).data.ndaAccepted == true;
+
+      // No one should be able to write from the client side. This should be managed by an admin panel/backend.
+      allow write: if false;
+    }
+    // ===================================================================
+    // END: NEW RULE
+    // ===================================================================
+
+    // This function might be useful for future document validation. It's currently disabled.
     // function isValidDocumentMetadata(docData) { ... }
 
     match /userProfiles/{userId} {
@@ -12,23 +35,23 @@ service cloud.firestore {
     }
 
     match /projects/{projectId} {
-      // ✅ قانون create اصلاح و کامل شده
-      // این قانون تضمین می‌کند که تمام فیلدهای لازم هنگام ایجاد پروژه جدید ارسال شوند.
+      // ✅ create rule is revised and complete
+      // This rule ensures that all necessary fields are sent when creating a new project.
       allow create: if request.auth != null
         && request.auth.uid == request.resource.data.ownerId
-        // -- اعتبارسنجی فیلدهای اصلی که از فرم می‌آیند
+        // -- Validate main fields from the form
         && request.resource.data.name is string && request.resource.data.name.size() > 0
         && request.resource.data.description is string
         && request.resource.data.stage is string
         && request.resource.data.isPrivate is bool
         && request.resource.data.milestones is string
         && request.resource.data.fundingStage is string
-        // -- اعتبارسنجی مقادیر اولیه
+        // -- Validate initial values
         && request.resource.data.progress == 0
         && request.resource.data.documents is list && request.resource.data.documents.size() == 0
         && request.resource.data.tags is list
-        // -- اعتبارسنجی مهرهای زمانی (بسیار مهم)
-        // کد شما باید هر دو فیلد createdAt و updatedAt را با مقدار serverTimestamp() ارسال کند
+        // -- Validate timestamps (very important)
+        // Your code must send both createdAt and updatedAt with the serverTimestamp() value
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
 
@@ -38,7 +61,7 @@ service cloud.firestore {
         // || (resource.data.isPrivate == true && exists(/databases/$(database)/documents/projects/$(projectId)/teamMembers/$(request.auth.uid)))
       );
 
-      // ✅ قانون update تقویت شده
+      // ✅ update rule is strengthened
       allow update: if request.auth != null
         && request.auth.uid == resource.data.ownerId
         && request.resource.data.ownerId == resource.data.ownerId
@@ -48,7 +71,7 @@ service cloud.firestore {
 
       allow delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
 
-      // زیرمجموعه teamMembers بدون تغییر
+      // teamMembers subcollection remains unchanged
       match /teamMembers/{teamMemberId} {
         function isProjectOwner() {
           return request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId;
@@ -86,7 +109,7 @@ service cloud.firestore {
       }
     }
 
-    // کالکشن‌های فقط خواندنی بدون تغییر
+    // Read-only collections remain unchanged
     match /projectStages/{stageId} {
       allow read: if request.auth != null;
     }

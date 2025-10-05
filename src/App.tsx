@@ -12,6 +12,7 @@ import PricingPage from "./pages/PricingPage";
 import { UserProvider } from "./contexts/UserProvider";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import CoFounderPrivateRepository from "./pages/AdminConsole/Co-FounderPrivateRepository";
 
 // Dashboard components
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -21,6 +22,7 @@ import NotificationsPage from "./pages/dashboard/NotificationsPage";
 import ProjectDetailsPage from './components/dashboard/ProjectDetailsPage';
 import BIDashboard from "./pages/AdminConsole/BI-Dashboard";
 import AdminRoute from "./components/auth/AdminRoute";
+import WhitelistRoute from "./components/auth/WhitelistRoute"; // Import the new guard
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,16 @@ const App = () => (
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/pricing" element={<PricingPage />} />
+
+            {/* Whitelisted Route */}
+            <Route 
+              path="/admin/co-founder-private-repository"
+              element={
+                <WhitelistRoute>
+                  <CoFounderPrivateRepository />
+                </WhitelistRoute>
+              }
+            />
 
             {/* Dashboard routes */}
             <Route path="/dashboard" element={<Dashboard />} />

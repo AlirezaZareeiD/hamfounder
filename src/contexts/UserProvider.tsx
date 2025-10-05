@@ -1,4 +1,5 @@
-import React, { useEffect, useState, ReactNode } from 'react';
+
+import React, { useEffect, useState, ReactNode, useCallback } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth, getUserProfile } from '@/lib/firebase'; // Assuming Firebase init and getUserProfile
 import { UserContext, UserContextType } from './UserContext'; // Import UserContext and UserContextType
@@ -8,6 +9,25 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true); // Start in loading state
   const [userProfileImage, setUserProfileImage] = useState<string | undefined>(undefined);
+
+  // ===================================================================
+  // START: ADDED FUNCTION TO FORCE TOKEN REFRESH
+  // ===================================================================
+  const forceTokenRefresh = useCallback(async () => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      try {
+        // The 'true' argument forces a token refresh.
+        await currentUser.getIdToken(true);
+        console.log("User token has been refreshed.");
+      } catch (error) {
+        console.error("Error refreshing user token:", error);
+      }
+    }
+  }, []);
+  // ===================================================================
+  // END: ADDED FUNCTION
+  // ===================================================================
 
   useEffect(() => {
     // Subscribe to authentication state changes
@@ -43,6 +63,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     user,
     loading,
     userProfileImage,
+    forceTokenRefresh, // Expose the new function through the context
   };
 
   // Provide the value to the UserContext

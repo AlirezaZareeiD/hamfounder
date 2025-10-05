@@ -3,17 +3,138 @@ import * as admin from 'firebase-admin';
 import { onDocumentUpdated, Change, QueryDocumentSnapshot, FirestoreEvent } from 'firebase-functions/v2/firestore';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 
-// Simplified and more robust initialization, done only once.
 if (admin.apps.length === 0) {
   admin.initializeApp();
 }
 
-// Initialize DB connection once and reuse across function invocations.
 const db = admin.firestore();
 db.settings({
     databaseId: 'hamfounderdatabase',
     ignoreUndefinedProperties: true,
 });
+
+
+// ===================================================================
+// START: WHITELIST CLAIM SYNC FUNCTION (PATH CORRECTED)
+// ===================================================================
+
+/**
+ * This function triggers on any update to the access control document.
+ * It syncs the `whitelisted` custom claim for all users listed in the document.
+ */
+export const syncWhitelistClaims = onDocumentUpdated(
+    { 
+        // CORRECTED PATH:
+        document: 'config/access_control', 
+        database: 'hamfounderdatabase',
+        region: 'us-central1',
+        memory: '256MiB'
+    },
+    async (event: FirestoreEvent<Change<QueryDocumentSnapshot> | undefined>) => {
+        if (!event.data) {
+            console.log("No data associated with the event. Exiting.");
+            return;
+        }
+
+        const beforeData = event.data.before.data();
+        const afterData = event.data.after.data();
+
+        // The field containing the UIDs is named 'whitelisted_cofounder_uids'
+        const uidsBefore = new Set(beforeData?.whitelisted_cofounder_uids || []);
+        const uidsAfter = new Set(afterData?.whitelisted_cofounder_uids || []);
+
+        const promises: Promise<any>[] = [];
+
+        // Process users added to the whitelist
+        for (const uid of uidsAfter) {
+            if (!uidsBefore.has(uid)) {
+                console.log(`User ${uid} added to whitelist. Setting claim via config/access_control.`);
+                promises.push(setWhitelistClaim(uid as string, true));
+            }
+        }
+
+        // Process users removed from the whitelist
+        for (const uid of uidsBefore) {
+            if (!uidsAfter.has(uid)) {
+                console.log(`User ${uid} removed from whitelist. Removing claim via config/access_control.`);
+                promises.push(setWhitelistClaim(uid as string, false));
+            }
+        }
+
+        await Promise.all(promises);
+        console.log("Whitelist claims sync from config/access_control completed.");
+    }
+);
+
+/**
+ * Helper function to set or remove the 'whitelisted' custom claim for a user.
+ */
+async function setWhitelistClaim(uid: string, isWhitelisted: boolean) {
+    try {
+        const user = await admin.auth().getUser(uid);
+        const existingClaims = user.customClaims || {};
+
+        const newClaims = { ...existingClaims, whitelisted: isWhitelisted };
+        
+        // To ensure a claim is removed, we might need to set it to null or remove the key.
+        // For simplicity and to match the logic, we set it to false if not whitelisted.
+        if (!isWhitelisted) {
+            newClaims.whitelisted = false;
+        }
+
+        await admin.auth().setCustomUserClaims(uid, newClaims);
+        console.log(`Successfully set custom claim 'whitelisted: ${newClaims.whitelisted}' for user ${uid}.`);
+
+    } catch (error) {
+        console.error(`Failed to set whitelist claim for user ${uid}:`, error);
+    }
+}
+
+// ===================================================================
+// END: WHITELIST CLAIM SYNC FUNCTION
+// ===================================================================
+
+
+export const acceptNdaAndSetClaim = onCall(
+    { 
+        region: 'us-central1', 
+        timeoutSeconds: 60,
+        memory: '256MiB' 
+    },
+    async (request) => {
+        if (!request.auth) {
+            throw new HttpsError('unauthenticated', 'The function must be called while authenticated.');
+        }
+
+        const uid = request.auth.uid;
+
+        try {
+            const user = await admin.auth().getUser(uid);
+            const existingClaims = user.customClaims || {};
+            const newClaims = { ...existingClaims, ndaAccepted: true };
+
+            await admin.auth().setCustomUserClaims(uid, newClaims);
+            console.log(`Successfully set custom claims for user: ${uid}`, newClaims);
+
+            const userProfileRef = db.collection('userProfiles').doc(uid);
+            await userProfileRef.update({
+                ndaAccepted: true,
+                ndaAcceptedTimestamp: admin.firestore.FieldValue.serverTimestamp(),
+            });
+            console.log(`Successfully updated Firestore profile for user: ${uid}`);
+
+            return { 
+                status: 'success', 
+                message: 'NDA accepted and access granted.' 
+            };
+
+        } catch (error) {
+            console.error(`Error in acceptNdaAndSetClaim for user ${uid}:`, error);
+            throw new HttpsError('internal', 'An error occurred while processing the NDA acceptance.', error);
+        }
+    }
+);
+
 
 // Recursive function to deeply sanitize data for JSON serialization
 const sanitizeForJSON = (data: any): any => {
