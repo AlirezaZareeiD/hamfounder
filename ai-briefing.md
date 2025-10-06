@@ -1,7 +1,23 @@
 
-*   **Authentication:** Firebase Authentication manages user identity.
-*   **Authorization for Storage:** Access to \`/confidential-kb/\` in Firebase Storage is governed by Security Rules requiring the user's auth token to have two custom claims: \`whitelisted: true\` AND \`ndaAccepted: true\`.
-*   **Content Security Policy (CSP):** To prevent cross-site scripting (XSS) and other injection attacks, a strict CSP is enforced via a `<meta>` tag in `index.html`. This policy was updated to include a `media-src` directive, specifically allowing audio streaming from `https://firebasestorage.googleapis.com`, which resolved a critical playback issue.
-*   **Custom Claims Management (Dual-Function Approach):**
-    1.  **NDA Acceptance (\`ndaAccepted\`):** Set via a **Callable** Cloud Function (\`acceptNdaAndSetClaim\`). This is a direct, user-initiated action.
-    2.  **Whitelisting (\`whitelisted\`):** Set via a **Firestore-triggered** Cloud Function (\`syncWhitelistClaims\`). This is an automated, backend process that listens for changes to the canonical whitelist document (\`config/access_control\`).
+### Co-founder Private Repository Enhancements (Day 3)
+
+**Objective:** Finalize the features for the secure co-founder repository page.
+
+**Key Implementations & Bug Fixes:**
+
+1.  **Trust Framework Viewer:**
+    *   Created `TrustFrameworkViewer.tsx`, a new read-only component to display the NDA content.
+    *   Integrated it into `Co-FounderPrivateRepository.tsx` using a `Collapsible` component from shadcn/ui.
+    *   This allows users who have already accepted the NDA to review the terms without seeing the acceptance form again, improving the user experience.
+
+2.  **Embedded YouTube Video Player:**
+    *   Created a new, responsive `EmbeddedVideoPlayer.tsx` component to display a YouTube video.
+    *   The component was placed at the end of the page, visible only after NDA acceptance.
+
+3.  **Troubleshooting & Bug Fixes:**
+    *   **CSP Violation:** The initial implementation was blocked by the Content Security Policy (CSP). The error was `Refused to frame 'https://www.youtube.com/'`.
+    *   **Solution:** We correctly identified that the CSP was defined in a `<meta>` tag within `index.html`. We updated the `frame-src` and `media-src` directives to include `https://www.youtube.com`.
+    *   **Connection Error:** After fixing the CSP, a new error "youtube.com closed the connection" appeared.
+    *   **Solution:** We diagnosed that the embed URL contained an unnecessary `?si=` parameter. We corrected the `videoSrc` in `EmbeddedVideoPlayer.tsx` to use the clean `https://www.youtube.com/embed/VIDEO_ID` format, which resolved the final issue.
+
+**Outcome:** The co-founder private repository is now feature-complete, providing a secure and rich user experience for potential partners, including document access, NDA review, and a video presentation. The collaboration was highly successful, demonstrating effective pair-programming and problem-solving.

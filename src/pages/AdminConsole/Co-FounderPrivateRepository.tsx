@@ -6,29 +6,35 @@ import { useUser } from '@/contexts/UserContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { NdaAcceptanceForm } from '@/components/dashboard/confidential/NdaAcceptanceForm';
 import { ConfidentialKnowledgeBase } from '@/components/dashboard/confidential/ConfidentialKnowledgeBase';
-import { Loader2, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { TrustFrameworkViewer } from '@/components/dashboard/confidential/TrustFrameworkViewer';
+import { EmbeddedVideoPlayer } from '@/components/dashboard/confidential/EmbeddedVideoPlayer'; // Import the new video player
+import { Loader2, ShieldCheck, AlertTriangle, Eye } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const CoFounderPrivateRepository = () => {
-  const { user } = useUser(); 
-  const { userProfile, loading: profileLoading } = useUserProfile(); // Corrected: Removed argument
+  const { user } = useUser();
+  const { userProfile, loading: profileLoading } = useUserProfile();
   const [isAccepting, setIsAccepting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ndaJustAccepted, setNdaJustAccepted] = useState(false);
+  const [isFrameworkOpen, setIsFrameworkOpen] = useState(false);
+  const YOUTUBE_VIDEO_ID = "IBgL6Qvv6hs"; // Centralized video ID
 
   const handleAcceptNDA = async () => {
     if (!user) return;
-
     setIsAccepting(true);
     setError(null);
-
     try {
       const functions = getFunctions();
       const acceptNda = httpsCallable(functions, 'acceptNdaAndSetClaim');
       await acceptNda();
-      
       setNdaJustAccepted(true);
-
     } catch (err: any) {
       console.error("Error accepting NDA: ", err);
       setError(err.message || 'An unexpected error occurred. Please try again.');
@@ -42,7 +48,7 @@ const CoFounderPrivateRepository = () => {
       setTimeout(() => window.location.reload(), 1000);
     }
   }, [ndaJustAccepted, isAccepting]);
-  
+
   const renderContent = () => {
     if (profileLoading || isAccepting) {
       return (
@@ -54,13 +60,13 @@ const CoFounderPrivateRepository = () => {
     }
 
     if (ndaJustAccepted) {
-        return (
-            <div className="flex flex-col items-center justify-center h-48 text-center">
-                <ShieldCheck className="h-10 w-10 text-green-500 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-800">Access Granted!</h3>
-                <p className="text-gray-600 mt-2">The page will now refresh to load the confidential documents.</p>
-            </div>
-        );
+      return (
+          <div className="flex flex-col items-center justify-center h-48 text-center">
+              <ShieldCheck className="h-10 w-10 text-green-500 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-800">Access Granted!</h3>
+              <p className="text-gray-600 mt-2">The page will now refresh to load the confidential documents.</p>
+          </div>
+      );
     }
 
     if (error) {
@@ -73,8 +79,40 @@ const CoFounderPrivateRepository = () => {
       );
     }
 
+    // Main logic: Show NDA form or the Confidential Knowledge Base
     if (userProfile?.ndaAccepted) {
-      return <ConfidentialKnowledgeBase />;
+      return (
+        // Use React Fragment for better structure
+        <>
+          <Collapsible open={isFrameworkOpen} onOpenChange={setIsFrameworkOpen} className="mb-8">
+            <div className='p-4 border rounded-lg bg-white shadow-sm'>
+                <div className='flex items-center justify-between'>
+                    <div>
+                        <h3 className='font-semibold text-gray-800'>Professional Trust Framework</h3>
+                        <p className='text-sm text-muted-foreground mt-1'>Review the agreement you accepted.</p>
+                    </div>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="icon" className='rounded-full'>
+                            <Eye className="h-5 w-5" />
+                            <span className="sr-only">Toggle Framework View</span>
+                        </Button>
+                    </CollapsibleTrigger>
+                </div>
+                <CollapsibleContent className="mt-4 pt-4 border-t">
+                    <TrustFrameworkViewer />
+                </CollapsibleContent>
+            </div>
+          </Collapsible>
+          
+          <ConfidentialKnowledgeBase />
+
+          <EmbeddedVideoPlayer 
+            videoId={YOUTUBE_VIDEO_ID}
+            title="Our Vision in Motion"
+            description="A message from our founder on the mission and opportunity ahead."
+          />
+        </>
+      );
     } else {
       return <NdaAcceptanceForm onAccept={handleAcceptNDA} />;
     }
