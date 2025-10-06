@@ -10,14 +10,14 @@ import { Loader2, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const CoFounderPrivateRepository = () => {
-  const { user, forceTokenRefresh } = useUser();
-  const { userProfile, loading: profileLoading, refetchUserProfile } = useUserProfile(user?.uid);
+  const { user } = useUser(); 
+  const { userProfile, loading: profileLoading } = useUserProfile(); // Corrected: Removed argument
   const [isAccepting, setIsAccepting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ndaJustAccepted, setNdaJustAccepted] = useState(false);
 
   const handleAcceptNDA = async () => {
-    if (!user || !forceTokenRefresh) return;
+    if (!user) return;
 
     setIsAccepting(true);
     setError(null);
@@ -26,9 +26,7 @@ const CoFounderPrivateRepository = () => {
       const functions = getFunctions();
       const acceptNda = httpsCallable(functions, 'acceptNdaAndSetClaim');
       await acceptNda();
-      await forceTokenRefresh();
       
-      // Instead of refetching, set a flag to trigger a full page reload effect
       setNdaJustAccepted(true);
 
     } catch (err: any) {
@@ -40,9 +38,7 @@ const CoFounderPrivateRepository = () => {
   };
 
   useEffect(() => {
-    // When the flag is set and the acceptance process is complete, reload the page.
     if (ndaJustAccepted && !isAccepting) {
-      // A small delay can make the UX smoother
       setTimeout(() => window.location.reload(), 1000);
     }
   }, [ndaJustAccepted, isAccepting]);
@@ -57,7 +53,6 @@ const CoFounderPrivateRepository = () => {
       );
     }
 
-    // If the NDA was just accepted, show a success message before reload
     if (ndaJustAccepted) {
         return (
             <div className="flex flex-col items-center justify-center h-48 text-center">
@@ -81,7 +76,7 @@ const CoFounderPrivateRepository = () => {
     if (userProfile?.ndaAccepted) {
       return <ConfidentialKnowledgeBase />;
     } else {
-      return <NdaAcceptanceForm onAccept={handleAcceptNDA} loading={isAccepting} />;
+      return <NdaAcceptanceForm onAccept={handleAcceptNDA} />;
     }
   };
 

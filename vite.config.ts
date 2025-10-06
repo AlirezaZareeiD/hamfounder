@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    headers: {
+      "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.google.com https://www.gstatic.com; frame-src 'self' https://firebasestorage.googleapis.com; media-src 'self' https://firebasestorage.googleapis.com; object-src 'none'; img-src 'self' data: https://firebasestorage.googleapis.com;"
+    }
   },
   plugins: [
     react(),
@@ -17,7 +20,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@/dashboard/find-cofounder/": path.resolve(__dirname, "./src/components/dashboard/find-cofounder"), // <-- این خط اضافه شده است
+      "@/dashboard/find-cofounder/": path.resolve(__dirname, "./src/components/dashboard/find-cofounder"), // <-- This line was added
     },
   },
 }));

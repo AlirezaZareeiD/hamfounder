@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { useConfidentialDocuments } from '@/hooks/useConfidentialDocuments'; // Our new hook
-import { SecurePDFViewer } from './SecurePDFViewer'; // Our new viewer
+import { useConfidentialDocuments } from '@/hooks/useConfidentialDocuments';
+import { SecurePDFViewer } from './SecurePDFViewer';
+import { AudioPlayer } from './AudioPlayer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, AlertTriangle, FileText } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,7 +41,6 @@ export const ConfidentialKnowledgeBase: React.FC = () => {
     )
   }
 
-  // Get the default tab value, which is the ID of the first document
   const defaultValue = documents[0]?.id;
 
   return (
@@ -57,7 +57,6 @@ export const ConfidentialKnowledgeBase: React.FC = () => {
                             <div>
                                 <p className="font-semibold">{doc.title}</p>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    {/* FIX: Removed the unnecessary new Date() wrapper */}
                                     Version: {doc.version} | Last Updated: {format(doc.lastUpdated, 'dd MMM yyyy')}
                                 </p>
                             </div>
@@ -66,15 +65,25 @@ export const ConfidentialKnowledgeBase: React.FC = () => {
                 </TabsList>
 
                 <div className="w-full md:w-3/4">
-                    {documents.map(doc => (
-                        <TabsContent key={doc.id} value={doc.id} className="m-0">
-                            <div className="p-4">
-                                <h3 className="font-bold text-xl">{doc.title}</h3>
-                                <p className="text-muted-foreground mb-4">{doc.description}</p>
-                            </div>
-                            <SecurePDFViewer storagePath={doc.storagePath} />
-                        </TabsContent>
-                    ))}
+                    {documents.map(doc => {
+                        // FINAL & ROBUST CHECK: Identify audio files by their file extension.
+                        const isAudio = doc.storagePath && (doc.storagePath.toLowerCase().endsWith('.wav') || doc.storagePath.toLowerCase().endsWith('.mp3'));
+
+                        return (
+                            <TabsContent key={doc.id} value={doc.id} className="m-0">
+                                <div className="p-6 border-b">
+                                    <h3 className="font-bold text-xl mb-1">{doc.title}</h3>
+                                    <p className="text-muted-foreground text-sm">{doc.description}</p>
+                                </div>
+                                
+                                {isAudio ? (
+                                    <AudioPlayer storagePath={doc.storagePath} />
+                                ) : (
+                                    <SecurePDFViewer storagePath={doc.storagePath} />
+                                )}
+                            </TabsContent>
+                        );
+                    })}
                 </div>
             </Tabs>
         </CardContent>
