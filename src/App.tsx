@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword"; // Import the new page
 import PricingPage from "./pages/PricingPage";
 import { UserProvider } from "./contexts/UserProvider";
 import TermsOfService from "./pages/TermsOfService";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} /> {/* Add the new route */}
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/pricing" element={<PricingPage />} />

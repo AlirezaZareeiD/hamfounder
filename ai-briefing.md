@@ -17,7 +17,26 @@
 3.  **Troubleshooting & Bug Fixes:**
     *   **CSP Violation:** The initial implementation was blocked by the Content Security Policy (CSP). The error was `Refused to frame 'https://www.youtube.com/'`.
     *   **Solution:** We correctly identified that the CSP was defined in a `<meta>` tag within `index.html`. We updated the `frame-src` and `media-src` directives to include `https://www.youtube.com`.
-    *   **Connection Error:** After fixing the CSP, a new error "youtube.com closed the connection" appeared.
-    *   **Solution:** We diagnosed that the embed URL contained an unnecessary `?si=` parameter. We corrected the `videoSrc` in `EmbeddedVideoPlayer.tsx` to use the clean `https://www.youtube.com/embed/VIDEO_ID` format, which resolved the final issue.
 
-**Outcome:** The co-founder private repository is now feature-complete, providing a secure and rich user experience for potential partners, including document access, NDA review, and a video presentation. The collaboration was highly successful, demonstrating effective pair-programming and problem-solving.
+### Forgot Password Feature Implementation (Day 4)
+
+**Objective:** To implement a secure and user-friendly "Forgot Password" flow for users.
+
+**Key Implementations:**
+
+1.  **Backend & SMTP Configuration:**
+    *   Configured Firebase Authentication to use a custom SMTP server (Gmail) for sending password reset emails.
+    *   Navigated the complexities of the Google Workspace Admin console to enable the necessary settings for generating an "App Password". This involved enabling "Less secure app access" for the user.
+    *   Generated a 16-digit App Password from the user's Google Account security settings.
+    *   Successfully configured and saved the SMTP credentials (`smtp.gmail.com`, port `587`, `STARTTLS`) in the Firebase console.
+
+2.  **Frontend Page Creation & Logic:**
+    *   Created a new page component `src/pages/ForgotPassword.tsx`.
+    *   Designed a UI consistent with the project's theme using `shadcn/ui` components (`Card`, `Input`, `Button`).
+    *   Implemented the core logic using the `sendPasswordResetEmail` function from the `firebase/auth` SDK.
+
+3.  **User Experience & Routing:**
+    *   Integrated the project's `toast` notification system (`sonner`) to provide clear, non-blocking feedback for success and error states (e.g., "email sent" or "user not found").
+    *   Added a loading state to the submit button to give the user visual feedback during the request.
+    *   Added a new route for `/forgot-password` in the main `App.tsx` router.
+    *   Verified that the link to the new "Forgot Password" page was already correctly implemented in the `LoginForm.tsx` component, completing the user flow.
