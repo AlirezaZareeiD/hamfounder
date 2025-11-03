@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.denormalizeUserProfileOnUpdate = exports.getUserReport = exports.acceptNdaAndSetClaim = exports.syncWhitelistClaims = void 0;
+exports.handleConnectionRequest = exports.denormalizeUserProfileOnUpdate = exports.getUserReport = exports.getAllUserProfiles = exports.acceptNdaAndSetClaim = exports.syncWhitelistClaims = void 0;
 const admin = __importStar(require("firebase-admin"));
 const firestore_1 = require("firebase-functions/v2/firestore");
 const https_1 = require("firebase-functions/v2/https");
@@ -94,8 +94,6 @@ async function setWhitelistClaim(uid, isWhitelisted) {
         const user = await admin.auth().getUser(uid);
         const existingClaims = user.customClaims || {};
         const newClaims = Object.assign(Object.assign({}, existingClaims), { whitelisted: isWhitelisted });
-        // To ensure a claim is removed, we might need to set it to null or remove the key.
-        // For simplicity and to match the logic, we set it to false if not whitelisted.
         if (!isWhitelisted) {
             newClaims.whitelisted = false;
         }
@@ -167,6 +165,40 @@ const sanitizeForJSON = (data) => {
     // Primitives (string, number, boolean)
     return data;
 };
+// ===================================================================
+// START: GET ALL USER PROFILES FOR FIND CO-FOUNDER PAGE
+// ===================================================================
+exports.getAllUserProfiles = (0, https_1.onCall)({
+    region: 'us-central1',
+    timeoutSeconds: 60,
+    memory: '512MiB'
+}, async (request) => {
+    // 1. Check if the user is authenticated.
+    if (!request.auth) {
+        throw new https_1.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+    }
+    // 2. Fetch all documents from the 'userProfiles' collection.
+    try {
+        const userProfilesSnapshot = await db.collection('userProfiles').get();
+        // 3. Map the documents to an array of objects.
+        const profiles = userProfilesSnapshot.docs.map(doc => {
+            // Sanitize each profile to handle non-serializable data like Timestamps
+            const sanitizedData = sanitizeForJSON(doc.data());
+            return Object.assign(Object.assign({}, sanitizedData), { uid: doc.id // Explicitly include the document ID as 'uid'
+             });
+        });
+        // 4. Return the array of profiles.
+        return profiles;
+    }
+    catch (error) {
+        console.error("Error fetching all user profiles:", error);
+        // Throw a generic error to the client.
+        throw new https_1.HttpsError('internal', 'An error occurred while fetching user profiles.');
+    }
+});
+// ===================================================================
+// END: GET ALL USER PROFILES
+// ===================================================================
 const getProfileCompletionPercentage = (profile) => {
     if (!profile)
         return 0;
@@ -296,4 +328,77 @@ exports.denormalizeUserProfileOnUpdate = (0, firestore_1.onDocumentUpdated)({
     console.log(`Denormalized user profile for user ${userId} in ${updatePromises.length} projects.`);
     return null;
 });
+// ===================================================================
+// START: CO-FOUNDER CONNECTION LOGIC
+// ===================================================================
+/**
+ * Handles the logic when a connection request is accepted.
+ *
+ * This function triggers when a document in the 'connection_requests' collection is updated.
+ * If the status is changed to 'accepted', it atomically:
+ * 1. Creates a new document in the 'matches' collection.
+ * 2. Creates a new chat room in the 'chats' collection with a deterministic ID.
+ * 3. Deletes the original connection request document.
+ */
+exports.handleConnectionRequest = (0, firestore_1.onDocumentUpdated)({
+    document: 'connection_requests/{requestId}',
+    database: 'hamfounderdatabase',
+    region: 'us-central1',
+    memory: '256MiB'
+}, async (event) => {
+    if (!event.data) {
+        console.log("No data associated with the event. Exiting.");
+        return;
+    }
+    const beforeData = event.data.before.data();
+    const afterData = event.data.after.data();
+    const requestId = event.params.requestId;
+    // Ensure data exists and status has changed to 'accepted'
+    if (!beforeData || !afterData || (beforeData.status === 'accepted' && afterData.status === 'accepted')) {
+        console.log(`Event for ${requestId} did not meet criteria: status not changed to 'accepted'. Before: ${beforeData === null || beforeData === void 0 ? void 0 : beforeData.status}, After: ${afterData === null || afterData === void 0 ? void 0 : afterData.status}`);
+        return;
+    }
+    if (afterData.status === 'accepted') {
+        const senderId = afterData.senderId;
+        const receiverId = afterData.receiverId;
+        if (!senderId || !receiverId) {
+            console.error("Missing senderId or receiverId in connection request.", { requestId, senderId, receiverId });
+            return;
+        }
+        console.log(`Connection request ${requestId} accepted between ${senderId} and ${receiverId}. Processing transaction.`);
+        // Define document references
+        const matchRef = db.collection('matches').doc(); // Auto-generate ID
+        // Create a deterministic chat ID by sorting UIDs and joining them.
+        const chatDocId = [senderId, receiverId].sort().join('_');
+        const chatRef = db.collection('chats').doc(chatDocId);
+        const requestRef = db.collection('connection_requests').doc(requestId);
+        // Use a transaction to ensure atomicity
+        try {
+            await db.runTransaction(async (transaction) => {
+                // 1. Create the match document
+                transaction.set(matchRef, {
+                    userIds: [senderId, receiverId],
+                    createdAt: admin.firestore.FieldValue.serverTimestamp()
+                });
+                // 2. Create the chat document
+                transaction.set(chatRef, {
+                    userIds: [senderId, receiverId],
+                    lastMessage: 'Connection established! You can now chat.',
+                    lastMessageSenderId: null, // No sender for the initial message
+                    lastMessageTimestamp: admin.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                });
+                // 3. Delete the original connection request
+                transaction.delete(requestRef);
+            });
+            console.log(`Successfully created match and chat for users ${senderId} and ${receiverId}.`);
+        }
+        catch (error) {
+            console.error(`Transaction for request ${requestId} failed: `, error);
+        }
+    }
+});
+// ===================================================================
+// END: CO-FOUNDER CONNECTION LOGIC
+// ===================================================================
 //# sourceMappingURL=index.js.map

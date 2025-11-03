@@ -1,77 +1,67 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // RULE ADDED: Allow any authenticated user to read from the config collection.
-    // This is necessary for the whitelist functionality to work.
+    // Helper function to check if a user is part of a 2-party document (match or chat)
+    function isParticipant(doc) {
+      return request.auth.uid in doc.data.userIds;
+    }
+
     match /config/{docId} {
       allow read: if request.auth != null;
     }
-
-    // ===================================================================
-    // START: NEW RULE FOR CONFIDENTIAL DOCUMENTS
-    // This is the fix for the "Failed to Load Documents" error.
-    // ===================================================================
+    
     match /confidentialDocuments/{docId} {
-      // Allow read access ONLY if the user is authenticated AND their user profile
-      // document has the 'ndaAccepted' field set to true.
       allow read: if request.auth != null &&
                      get(/databases/$(database)/documents/userProfiles/$(request.auth.uid)).data.ndaAccepted == true;
-
-      // No one should be able to write from the client side. This should be managed by an admin panel/backend.
       allow write: if false;
     }
-    // ===================================================================
-    // END: NEW RULE
-    // ===================================================================
 
-    // This function might be useful for future document validation. It's currently disabled.
-    // function isValidDocumentMetadata(docData) { ... }
-
+    // ===================================================================
+    // START: THE FIX FOR "FAILED TO LOAD MEMBERS"
+    // This rule now allows any authenticated user to read profiles,
+    // but only allows a user to write to their own profile.
+    // ===================================================================
     match /userProfiles/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Allow any authenticated user to read all profiles (needed for find-cofounder page).
+      allow read: if request.auth != null;
+
+      // Only allow a user to create, update, or delete their own profile.
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
+    // ===================================================================
+    // END: THE FIX
+    // ===================================================================
 
     match /projects/{projectId} {
-      // ✅ create rule is revised and complete
-      // This rule ensures that all necessary fields are sent when creating a new project.
       allow create: if request.auth != null
         && request.auth.uid == request.resource.data.ownerId
-        // -- Validate main fields from the form
         && request.resource.data.name is string && request.resource.data.name.size() > 0
         && request.resource.data.description is string
         && request.resource.data.stage is string
         && request.resource.data.isPrivate is bool
         && request.resource.data.milestones is string
         && request.resource.data.fundingStage is string
-        // -- Validate initial values
         && request.resource.data.progress == 0
         && request.resource.data.documents is list && request.resource.data.documents.size() == 0
         && request.resource.data.tags is list
-        // -- Validate timestamps (very important)
-        // Your code must send both createdAt and updatedAt with the serverTimestamp() value
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
 
       allow read: if request.auth != null && (
         resource.data.isPrivate == false ||
         request.auth.uid == resource.data.ownerId
-        // || (resource.data.isPrivate == true && exists(/databases/$(database)/documents/projects/$(projectId)/teamMembers/$(request.auth.uid)))
       );
 
-      // ✅ update rule is strengthened
       allow update: if request.auth != null
         && request.auth.uid == resource.data.ownerId
         && request.resource.data.ownerId == resource.data.ownerId
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.updatedAt == request.time;
 
-
       allow delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
 
-      // teamMembers subcollection remains unchanged
       match /teamMembers/{teamMemberId} {
         function isProjectOwner() {
           return request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId;
@@ -109,7 +99,42 @@ service cloud.firestore {
       }
     }
 
-    // Read-only collections remain unchanged
+    match /connection_requests/{requestId} {
+      allow read: if request.auth != null && (request.auth.uid == resource.data.senderId || request.auth.uid == resource.data.receiverId);
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.senderId
+        && 'receiverId' in request.resource.data
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time;
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.receiverId
+        && request.resource.data.status in ['accepted', 'declined']
+        && request.resource.data.senderId == resource.data.senderId
+        && request.resource.data.receiverId == resource.data.receiverId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if request.auth != null && (request.auth.uid == resource.data.senderId || request.auth.uid == resource.data.receiverId);
+    }
+
+    match /matches/{matchId} {
+      allow read: if request.auth != null && isParticipant(resource);
+      allow delete: if request.auth != null && isParticipant(resource);
+      allow create, update: if false;
+    }
+
+    match /chats/{chatId} {
+      allow read, write: if request.auth != null && isParticipant(resource);
+      match /messages/{messageId} {
+        allow read: if request.auth != null && isParticipant(get(/databases/$(database)/documents/chats/$(chatId)));
+        allow create: if request.auth != null
+          && isParticipant(get(/databases/$(database)/documents/chats/$(chatId)))
+          && request.auth.uid == request.resource.data.senderId
+          && 'text' in request.resource.data
+          && request.resource.data.createdAt == request.time;
+        allow update, delete: if false;
+      }
+    }
+
     match /projectStages/{stageId} {
       allow read: if request.auth != null;
     }

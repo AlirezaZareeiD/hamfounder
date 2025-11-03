@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, User, Search, Bell, LogOut, Edit, Home, Briefcase, Lock } from 'lucide-react';
+import { Menu, User, Search, Bell, LogOut, Edit, Home, Briefcase, Lock, MessageSquare } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { useWhitelist } from '@/hooks/useWhitelist';
@@ -81,6 +81,10 @@ export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ 
           <Link to="/dashboard/notifications" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
             <Bell className="h-5 w-5 mr-3 text-gray-600" />
             Notifications
+          </Link>
+          <Link to="/dashboard/messages" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
+            <MessageSquare className="h-5 w-5 mr-3 text-gray-600" />
+            Messages
           </Link>
 
           {/* --- THE FIX: Conditionally render based on the correct logic -- */}

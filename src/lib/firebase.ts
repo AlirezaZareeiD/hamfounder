@@ -4,6 +4,7 @@ import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, Auth, getAuth,
 import { getStorage, ref, uploadBytes, getDownloadURL, StorageReference, uploadBytesResumable, deleteObject, UploadTaskSnapshot } from "firebase/storage";
 import { initializeAppCheck, ReCaptchaV3Provider, AppCheck } from "firebase/app-check"; // Import AppCheck type
 import { getFirestore, Firestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getFunctions, Functions } from 'firebase/functions'; // Import Functions services
 
 const firebaseConfig = {
   apiKey: "AIzaSyBTsycr4yok1M6iOGdfO98mr_cTOKhoLbY",
@@ -46,6 +47,7 @@ setPersistence(getAuth(app), browserLocalPersistence);
 console.log("Firebase Auth persistence set to local.");
 export const auth: Auth = getAuth(app); // Export auth
 export const db: Firestore = getFirestore(app, 'hamfounderdatabase');
+export const functions: Functions = getFunctions(app); // Initialize and export Functions
 
 // Export appCheck if needed elsewhere (optional)
 // export { appCheck };

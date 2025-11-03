@@ -4,21 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { MapPin, Briefcase, MessageCircle, Star } from 'lucide-react';
-
-interface Member {
-  id: string;
-  name: string;
-  avatar: string;
-  role: string;
-  skills: string[];
-  location: string;
-  isOnline: boolean;
-  bio: string;
-  experience: string;
-  industry: string;
-  rating: number;
-  projectsCompleted: number;
-}
+import type { Member } from '@/types';
 
 interface MemberCardProps {
   member: Member;
@@ -28,7 +14,7 @@ interface MemberCardProps {
 
 const MemberCard: React.FC<MemberCardProps> = ({ member, onViewProfile, onConnect }) => {
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow">
+    <Card className="h-full hover:shadow-lg transition-shadow flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-start space-x-3">
           <div className="relative">
@@ -43,14 +29,16 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, onViewProfile, onConnec
           
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-base truncate">{member.name}</h3>
-            <p className="text-sm text-muted-foreground flex items-center">
-              <Briefcase className="h-3 w-3 mr-1" />
-              {member.role}
-            </p>
-            <p className="text-sm text-muted-foreground flex items-center mt-1">
-              <MapPin className="h-3 w-3 mr-1" />
-              {member.location}
-            </p>
+            <div className="min-h-[40px]">
+                <p className="text-sm text-muted-foreground flex items-center">
+                <Briefcase className="h-3 w-3 mr-1 flex-shrink-0" />
+                <span className="line-clamp-2">{member.role}</span>
+                </p>
+                <p className="text-sm text-muted-foreground flex items-center mt-1">
+                <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                {member.location}
+                </p>
+            </div>
           </div>
           
           <div className="flex items-center space-x-1">
@@ -60,8 +48,8 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, onViewProfile, onConnec
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
-        <p className="text-sm text-muted-foreground line-clamp-2">{member.bio}</p>
+      <CardContent className="space-y-3 flex-grow">
+        <p className="text-sm text-muted-foreground line-clamp-3">{member.bio}</p>
         
         <div className="space-y-2">
           <Badge variant="outline" className="text-xs">
@@ -82,7 +70,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, onViewProfile, onConnec
           </div>
         </div>
         
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-muted-foreground pt-2">
           {member.projectsCompleted} projects completed
         </div>
       </CardContent>
