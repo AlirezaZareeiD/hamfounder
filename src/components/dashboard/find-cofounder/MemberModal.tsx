@@ -1,217 +1,127 @@
-import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
-import { MapPin, Briefcase, Star, MessageCircle, Calendar, Globe, Award, Linkedin, Twitter } from 'lucide-react';
-
-interface Member {
-  id: string;
-  name: string;
-  avatar: string;
-  role: string;
-  skills: string[];
-  location: string;
-  isOnline?: boolean;
-  bio: string;
-  experience: string;
-  industry: string;
-  rating?: number;
-  projectsCompleted?: number;
-  joinedDate?: string;
-  website?: string;
-  linkedinUrl?: string;
-  twitterUrl?: string;
-  achievements?: string[];
-  lookingFor: string;
-}
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Briefcase, MapPin, Lightbulb, BarChart2, Star, MessageSquare, UserPlus, Check } from "lucide-react";
+import { Member } from '@/types';
+import { ConnectionStatus } from '@/pages/dashboard/find-cofounder/FindCofounderPage';
 
 interface MemberModalProps {
-  member: Member | null;
+  member: Member;
   isOpen: boolean;
   onClose: () => void;
-  onConnect?: (member: Member, message: string) => void;
-  isMyProfile?: boolean;
+  onConnect: (member: Member, message?: string) => void;
+  connectionStatus: ConnectionStatus;
 }
 
-const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onConnect, isMyProfile = false }) => {
-  const [message, setMessage] = React.useState('');
-
-  if (!member) return null;
-
-  const handleConnect = () => {
-    if (onConnect) {
-        onConnect(member, message);
-        setMessage('');
-        onClose();
+const ConnectionButton: React.FC<{ status: ConnectionStatus; onClick: () => void }> = ({ status, onClick }) => {
+    switch (status) {
+      case 'connected':
+        return (
+          <Button onClick={onClick} className="w-full bg-blue-600 hover:bg-blue-700">
+            <MessageSquare className="mr-2 h-4 w-4" /> Message
+          </Button>
+        );
+      case 'pending_sent':
+        return (
+          <Button disabled className="w-full">
+            <Check className="mr-2 h-4 w-4" /> Request Sent
+          </Button>
+        );
+      case 'pending_received':
+          return (
+            <Button onClick={onClick} className="w-full bg-green-600 hover:bg-green-700">
+               Accept Request
+            </Button>
+          );
+      default:
+        return (
+          <Button onClick={onClick} className="w-full">
+            <UserPlus className="mr-2 h-4 w-4" /> Send Connection Request
+          </Button>
+        );
     }
+  };
+
+const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onConnect, connectionStatus }) => {
+  const [message, setMessage] = useState('');
+
+  if (!isOpen) return null;
+
+  const handleConnectClick = () => {
+    onConnect(member, message);
+    setMessage(''); // Clear message after sending
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>{isMyProfile ? "My Profile Preview" : "Co-Founder Profile"}</DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-start space-x-4">
-            <div className="relative">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={member.avatar} alt={member.name} />
-                <AvatarFallback className="text-lg">{member.name ? member.name.slice(0, 2).toUpperCase() : '??'}</AvatarFallback>
-              </Avatar>
-              {member.isOnline && (
-                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-background"></div>
-              )}
-            </div>
-            
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold">{member.name}</h2>
-              <p className="text-muted-foreground flex items-center mt-1">
-                <Briefcase className="h-4 w-4 mr-2" />
-                {member.role}
-              </p>
-              <p className="text-muted-foreground flex items-center mt-1">
-                <MapPin className="h-4 w-4 mr-2" />
-                {member.location}
-              </p>
-              <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-2">
-                {member.rating !== undefined && (
-                    <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{member.rating}</span>
-                    </div>
-                )}
-                {member.projectsCompleted !== undefined && (
-                    <div className="flex items-center space-x-1">
-                    <Award className="h-4 w-4 text-primary" />
-                    <span className="text-sm">{member.projectsCompleted} projects</span>
-                    </div>
-                )}
-                {member.joinedDate && (
-                    <div className="flex items-center space-x-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">Joined {member.joinedDate}</span>
-                    </div>
-                )}
+          <div className="flex items-start space-x-6">
+            <Avatar className="h-28 w-28 border-4 border-transparent group-hover:border-primary transition-colors">
+              <AvatarImage src={member.avatar} alt={member.name} />
+              <AvatarFallback>{member.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-grow pt-2">
+              <DialogTitle className="text-3xl font-bold">{member.name}</DialogTitle>
+              <p className="text-lg text-muted-foreground">{member.role}</p>
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-2">
+                <MapPin className="h-4 w-4" />
+                <span>{member.location}</span>
               </div>
             </div>
           </div>
-
-          <Separator />
-
-          {/* Bio */}
-          <div>
-            <h3 className="font-semibold mb-2">About</h3>
-            <p className="text-muted-foreground whitespace-pre-wrap">{member.bio}</p>
-          </div>
-
-          {/* Looking For */}
-          <div>
-            <h3 className="font-semibold mb-2">Looking For</h3>
-            <p className="text-muted-foreground">{member.lookingFor}</p>
-          </div>
-
-          {/* Industry & Experience */}
-          <div className="grid grid-cols-2 gap-4">
-            {member.industry && <div>
-              <h3 className="font-semibold mb-2">Industry</h3>
-              <Badge variant="outline">{member.industry}</Badge>
-            </div>}
-            {member.experience && <div>
-              <h3 className="font-semibold mb-2">Experience</h3>
-              <Badge variant="outline">{member.experience}</Badge>
-            </div>}
-          </div>
-
-          {/* Skills */}
-          {member.skills && member.skills.length > 0 && (
-            <div>
-                <h3 className="font-semibold mb-2">Skills & Expertise</h3>
-                <div className="flex flex-wrap gap-2">
-                {member.skills.map((skill) => (
-                    <Badge key={skill} variant="secondary">
-                    {skill}
-                    </Badge>
-                ))}
+        </DialogHeader>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 my-6">
+            <div className="space-y-4">
+                <div>
+                    <h3 className="font-semibold text-lg mb-2 flex items-center"><Briefcase className="mr-2 h-5 w-5 text-primary" />Professional Bio</h3>
+                    <p className="text-sm text-muted-foreground">{member.bio}</p>
+                </div>
+                <div>
+                    <h3 className="font-semibold text-lg mb-2 flex items-center"><Lightbulb className="mr-2 h-5 w-5 text-primary" />Skills</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {member.skills.map((skill: string, index: number) => (
+                            <Badge key={index} variant="secondary">{skill}</Badge>
+                        ))}
+                    </div>
                 </div>
             </div>
-          )}
-
-          {/* Achievements */}
-          {member.achievements && member.achievements.length > 0 && (
-            <div>
-              <h3 className="font-semibold mb-2">Achievements</h3>
-              <ul className="space-y-1">
-                {member.achievements.map((achievement, index) => (
-                  <li key={index} className="text-sm text-muted-foreground flex items-start">
-                    <Award className="h-4 w-4 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                    {achievement}
-                  </li>
-                ))}
-              </ul>
+            <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
+                 <h3 className="font-semibold text-lg mb-2 flex items-center"><BarChart2 className="mr-2 h-5 w-5 text-primary" />Professional Details</h3>
+                 <ul className="text-sm space-y-2">
+                    <li className="flex justify-between"><strong>Industry:</strong> <span>{member.industry}</span></li>
+                    <li className="flex justify-between"><strong>Business Stage:</strong> <span>{member.experience}</span></li>
+                    <li className="flex justify-between"><strong>Looking For:</strong> <span>{member.lookingFor}</span></li>
+                    <li className="flex justify-between"><strong>Projects Completed:</strong> <span className="font-semibold">{member.projectsCompleted}</span></li>
+                 </ul>
+                  <h3 className="font-semibold text-lg mb-2 mt-4 flex items-center"><Star className="mr-2 h-5 w-5 text-primary" />Key Achievements</h3>
+                   <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
+                      {member.achievements?.map((ach: string, index: number) => <li key={index}>{ach}</li>)}
+                      {!member.achievements?.length && <li>No achievements listed.</li>}
+                  </ul>
             </div>
-          )}
+        </div>
 
-          {/* Social Links */}
-          <div className="flex space-x-3 pt-2">
-            {member.website && (
-              <Button variant="outline" asChild>
-                <a href={member.website} target="_blank" rel="noopener noreferrer">
-                  <Globe className="h-4 w-4 mr-2" />
-                  Website
-                </a>
-              </Button>)
-            }
-            {member.linkedinUrl && (
-              <Button variant="outline" asChild>
-                <a href={member.linkedinUrl} target="_blank" rel="noopener noreferrer">
-                  <Linkedin className="h-4 w-4 mr-2" />
-                  LinkedIn
-                </a>
-              </Button>)
-            }
-             {member.twitterUrl && (
-              <Button variant="outline" asChild>
-                <a href={member.twitterUrl} target="_blank" rel="noopener noreferrer">
-                  <Twitter className="h-4 w-4 mr-2" />
-                  Twitter
-                </a>
-              </Button>)
-            }
-          </div>
-
-          {/* Connect Section - Hidden for own profile view */}
-          {!isMyProfile && onConnect && (
-            <>
-                <Separator />
-                <div>
-                    <h3 className="font-semibold mb-2">Send Connection Request</h3>
-                    <Textarea
-                    placeholder={`Write a personalized message to introduce yourself to ${member.name}...`}
+        {connectionStatus === 'none' && (
+             <div className="space-y-2">
+                <label htmlFor="connect-message" className="font-semibold">Include a message (optional)</label>
+                <Textarea 
+                    id="connect-message"
+                    placeholder={`Hi ${member.name.split(' ')[0]}, I'd love to connect...`}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="min-h-[100px]"
-                    />
-                </div>
-                <div className="flex">
-                    <Button onClick={handleConnect} className="flex-1">
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Send Connection Request
-                    </Button>
-                </div>
-            </>
-          )}
-        </div>
+                />
+             </div>
+        )}
+
+        <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={onClose}>Close</Button>
+            <ConnectionButton status={connectionStatus} onClick={handleConnectClick} />
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

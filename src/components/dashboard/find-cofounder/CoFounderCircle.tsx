@@ -1,169 +1,159 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { useMediaQuery } from '@/hooks/use-media-query';
+
+import React, { useEffect, useRef, useState } from 'react';
+import * as d3 from 'd3-force';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 import type { Member } from '@/types';
 
-interface CurrentUser {
-    name: string;
-    avatar: string;
-}
+// Helper to generate initials from a name
+const getInitials = (name: string = '') => {
+  if (!name) return '';
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+};
+
 
 interface CoFounderCircleProps {
   members: Member[];
-  currentUser: CurrentUser;
+  currentUser: { name: string; avatar: string; id: string };
   onMemberClick: (member: Member) => void;
+  onMoreMembersClick: () => void;
   title: string;
 }
 
-interface Planet extends Member {
-    x: number;
-    y: number;
-    size: number;
-    animationDelay: string;
-    animationDuration: string;
+interface SimulationNode extends d3.SimulationNodeDatum {
+  id: string;
+  name: string;
+  avatar: string;
+  size: number;
 }
 
-const CoFounderCircle: React.FC<CoFounderCircleProps> = ({ members, currentUser, onMemberClick, title }) => {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [layout, setLayout] = useState<Planet[]>([]);
+const CoFounderCircle: React.FC<CoFounderCircleProps> = ({ members, currentUser, onMemberClick, onMoreMembersClick, title }) => {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [nodes, setNodes] = useState<SimulationNode[]>([]);
+
+  const width = 500;
+  const height = 400;
+  const center = { x: width / 2, y: height / 2 };
+  const centralAvatarRadius = 40; // FINAL FIX: Increased size for emphasis
+  const baseSatelliteRadius = 28;
+  const safeZoneRadius = centralAvatarRadius + baseSatelliteRadius + 30;
 
   useEffect(() => {
-    const generateLayout = () => {
-        const containerSize = isDesktop ? 500 : 300;
-
-        let positions: { x: number, y: number, size: number, id: string }[] = [];
-
-        const iterations = 100;
-        const repulsionForce = isDesktop ? 1.2 : 0.8;
-        const centerAttraction = 0.01;
-
-        members.slice(0, 9).forEach(member => {
-            const angle = Math.random() * 2 * Math.PI;
-            const distance = (containerSize / 4) + Math.random() * (containerSize / 4);
-            positions.push({
-                x: distance * Math.cos(angle),
-                y: distance * Math.sin(angle) * 0.8,
-                size: 40 + Math.random() * (isDesktop ? 24 : 16),
-                id: member.id
-            });
-        });
-
-        for (let i = 0; i < iterations; i++) {
-            for (let j = 0; j < positions.length; j++) {
-                for (let k = j + 1; k < positions.length; k++) {
-                    const pos1 = positions[j];
-                    const pos2 = positions[k];
-                    const dx = pos1.x - pos2.x;
-                    const dy = pos1.y - pos2.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    const minDistance = (pos1.size / 2) + (pos2.size / 2) + (isDesktop ? 20 : 10);
-
-                    if (distance < minDistance) {
-                        const force = (minDistance - distance) * repulsionForce;
-                        const angle = Math.atan2(dy, dx);
-                        const fx = Math.cos(angle) * force;
-                        const fy = Math.sin(angle) * force;
-                        positions[j].x += fx;
-                        positions[j].y += fy;
-                        positions[k].x -= fx;
-                        positions[k].y -= fy;
-                    }
-                }
-
-                const centerDx = positions[j].x;
-                const centerDy = positions[j].y;
-                positions[j].x -= centerDx * centerAttraction;
-                positions[j].y -= centerDy * centerAttraction;
-            }
-        }
-
-        const finalLayout = members.slice(0, 9).map((member) => {
-            const pos = positions.find(p => p.id === member.id)!;
-            return {
-                ...member,
-                x: pos.x,
-                y: pos.y,
-                size: pos.size,
-                animationDelay: `${(Math.random() * 3).toFixed(2)}s`,
-                animationDuration: `${(10 + Math.random() * 10).toFixed(2)}s`,
-            };
-        });
-
-        setLayout(finalLayout);
-    };
-
-    if (members.length > 0) {
-        generateLayout();
+    if (!svgRef.current || members.length === 0) {
+        setNodes([]);
+        return;
     }
-  }, [members, isDesktop]);
+
+    const satelliteNodes: SimulationNode[] = members.slice(0, 18).map((m, i) => {
+      const angle = (i / members.slice(0, 18).length) * 2 * Math.PI;
+      const radius = safeZoneRadius + 10 + Math.random() * 50;
+      const size = baseSatelliteRadius * (0.9 + Math.random() * 0.3);
+      return {
+        ...m,
+        x: center.x + radius * Math.cos(angle) + (Math.random() - 0.5) * 40,
+        y: center.y + radius * Math.sin(angle) + (Math.random() - 0.5) * 40,
+        size: size,
+      };
+    });
+
+    const simulation = d3.forceSimulation(satelliteNodes)
+      .force('collide', d3.forceCollide<SimulationNode>().radius(d => d.size + 8).strength(1).iterations(2))
+      .on('tick', () => {
+        setNodes([...simulation.nodes()]);
+      });
+
+    return () => {
+      simulation.stop();
+    };
+  }, [members, currentUser]);
+
+  const clipPathId = (id: string) => `clip-path-id-${id}`.replace(/[^a-zA-Z0-9]/g, '-');
+
+  const AvatarComponent = ({ id, avatar, name, radius }: { id: string, avatar?: string, name: string, radius: number }) => (
+    <g>
+      {avatar ? (
+        <image
+          href={avatar}
+          x={-radius}
+          y={-radius}
+          height={radius * 2}
+          width={radius * 2}
+          clipPath={`url(#${clipPathId(id)})`} // FINAL FIX: Using stable ID for clip-path
+        />
+      ) : (
+        <>
+          <circle r={radius} fill="hsl(var(--muted))" />
+          <text
+            textAnchor="middle"
+            dy=".3em"
+            fill="hsl(var(--muted-foreground))"
+            fontSize={radius * 0.8}
+            fontFamily="sans-serif"
+            fontWeight="bold"
+          >
+            {getInitials(name)}
+          </text>
+        </>
+      )}
+      <circle r={radius} fill="transparent" stroke={avatar ? "hsl(var(--primary) / 0.7)" : "hsl(var(--border))"} strokeWidth={avatar ? "2" : "1.5"}/>
+    </g>
+  );
 
   return (
-    <div className="flex flex-col items-center space-y-4 md:space-y-6 w-full">
-        <h3 className="text-xl font-semibold text-center">{title}</h3>
-      
-        <div 
-            className="relative w-full flex items-center justify-center"
-            style={{ minHeight: isDesktop ? '500px' : '350px' }}
-        >
-            <div className="relative z-20 group cursor-pointer" onClick={() => alert('This is you!')}>
-                <Avatar className={`border-4 border-primary shadow-2xl transition-all`} style={{height: isDesktop ? 96: 80, width: isDesktop ? 96: 80}}>
-                    <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
-                    <AvatarFallback>{currentUser.name?.slice(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                 <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-popover text-popover-foreground px-3 py-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-30">
-                    <p className="font-bold text-sm">You</p>
-                </div>
-            </div>
-
-            {layout.map((member) => (
-                <div
-                    key={member.id}
-                    className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group animate-float z-10"
-                    style={{
-                        left: `calc(50% + ${member.x}px)`,
-                        top: `calc(50% + ${member.y}px)`,
-                        animationDelay: member.animationDelay,
-                        animationDuration: member.animationDuration,
-                    }}
-                    onClick={() => onMemberClick(member)}
-                >
-                    <div className="relative">
-                        <Avatar style={{ width: member.size, height: member.size }} className={`border-2 border-background shadow-lg group-hover:scale-110 transition-transform`}>
-                            <AvatarImage src={member.avatar} alt={member.name} />
-                            <FallbackWithThreeDots name={member.name} />
-                        </Avatar>
-                        <div className="absolute -top-14 left-1/2 transform -translate-x-1/2 bg-popover text-popover-foreground px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-30 whitespace-nowrap">
-                            <p className="font-medium text-sm">{member.name}</p>
-                            <p className="text-xs text-muted-foreground">{member.role}</p>
-                        </div>
-                    </div>
-                </div>
+    <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm w-full">
+      <h3 className="text-lg font-semibold text-center mb-4">{title}</h3>
+      <div className="relative w-full h-[400px] overflow-hidden">
+        <svg ref={svgRef} width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
+          <defs>
+            {/* FINAL FIX: Using stable IDs for all clip paths */}
+            <clipPath id={clipPathId(currentUser.id)}><circle r={centralAvatarRadius} /></clipPath>
+            {nodes.map(node => (
+              <clipPath key={`clip-${node.id}`} id={clipPathId(node.id)}><circle r={node.size} /></clipPath>
             ))}
-        </div>
+          </defs>
 
-        {members.length > 9 && (
-            <Badge variant="secondary">
-            +{members.length - 9} more members
-            </Badge>
+          {nodes.map(node => (
+            <g
+              key={node.id}
+              transform={`translate(${node.x || center.x}, ${node.y || center.y})`}
+              className="cursor-pointer group animate-fade-in"
+              onClick={() => onMemberClick(node as Member)}
+            >
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AvatarComponent id={node.id} avatar={node.avatar} name={node.name} radius={node.size} />
+                  </TooltipTrigger>
+                  <TooltipContent><p>{node.name}</p></TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </g>
+          ))}
+
+          <g transform={`translate(${center.x}, ${center.y})`} className="group">
+             <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                   <AvatarComponent id={currentUser.id} avatar={currentUser.avatar} name={currentUser.name} radius={centralAvatarRadius} />
+                </TooltipTrigger>
+                 <TooltipContent><p>{currentUser.name} (You)</p></TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </g>
+        </svg>
+      </div>
+       <div className="text-center mt-4">
+        {members.length > 18 && (
+             <Button onClick={onMoreMembersClick} variant="ghost">+ {members.length - 18} more members</Button>
         )}
+       </div>
     </div>
   );
 };
-
-const FallbackWithThreeDots: React.FC<{name: string}> = ({name}) => {
-    const fallback = name.slice(0,2).toUpperCase();
-    return (
-        <AvatarFallback>
-            {fallback}
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex space-x-0.5">
-                <span className="h-0.5 w-0.5 bg-muted-foreground rounded-full"></span>
-                <span className="h-0.5 w-0.5 bg-muted-foreground rounded-full"></span>
-                <span className="h-0.5 w-0.5 bg-muted-foreground rounded-full"></span>
-            </div>
-        </AvatarFallback>
-    )
-}
-
 
 export default CoFounderCircle;
