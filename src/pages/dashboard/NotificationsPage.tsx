@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Bell, Check, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { auth, db } from '@/lib/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { collection, query, where, onSnapshot, doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '@/lib/firebase'; // Make sure functions is exported from firebase config
+import { collection, query, where, onSnapshot, doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore'; // Import serverTimestamp
 
 interface ConnectionRequest {
   id: string;
@@ -34,7 +32,6 @@ const NotificationsPage: React.FC = () => {
 
     setLoading(true);
 
-    // Query for connection requests where the current user is the receiver
     const requestsQuery = query(
       collection(db, 'connection_requests'),
       where('receiverId', '==', user.uid),
@@ -58,13 +55,11 @@ const NotificationsPage: React.FC = () => {
               createdAt: requestData.createdAt?.toDate(),
             };
           } else {
-            // Handle case where sender profile might not exist
             return null;
           }
         })
       );
 
-      // Filter out any null results and set the state
       setRequests(newRequests.filter(Boolean) as ConnectionRequest[]);
       setLoading(false);
     }, (error) => {
@@ -77,22 +72,27 @@ const NotificationsPage: React.FC = () => {
       setLoading(false);
     });
 
-    // Cleanup subscription on component unmount
     return () => unsubscribe();
   }, [user, toast]);
 
-  const handleRequest = async (requestId: string, senderId: string, action: 'accept' | 'decline') => {
+  const handleRequest = async (requestId: string, action: 'accept' | 'decline') => {
     if (!user) return;
 
-    try {
-      const acceptConnection = httpsCallable(functions, 'acceptConnection');
-      await acceptConnection({ requestId, senderId });
+    const requestDocRef = doc(db, 'connection_requests', requestId);
+    const newStatus = action === 'accept' ? 'accepted' : 'rejected'; // Changed 'decline' to 'rejected' for consistency
 
+    try {
+      // CORRECTED: Now we also send the updatedAt field with the server's timestamp
+      await updateDoc(requestDocRef, { 
+        status: newStatus,
+        updatedAt: serverTimestamp() 
+      });
+      
       toast({
-        title: action === 'accept' ? 'Connection Accepted' : 'Connection Declined',
+        title: action === 'accept' ? 'Connection Accepted' : 'Request Declined',
         description: action === 'accept' ? 'You are now connected!' : 'The request has been removed.',
       });
-      // The onSnapshot listener will automatically update the UI by removing the handled request.
+      // The onSnapshot listener will automatically handle the UI update.
     } catch (error) {
       console.error(`Error ${action}ing connection:`, error);
       toast({
@@ -102,7 +102,6 @@ const NotificationsPage: React.FC = () => {
       });
     }
   };
-
 
   return (
     <DashboardLayout>
@@ -136,11 +135,11 @@ const NotificationsPage: React.FC = () => {
                       </div>
                       <div className="flex items-center space-x-2">
                         <Button size="icon" variant="outline" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
-                          onClick={() => handleRequest(req.id, req.senderId, 'accept')}>
+                          onClick={() => handleRequest(req.id, 'accept')}>
                           <Check className="h-4 w-4" />
                         </Button>
                         <Button size="icon" variant="outline" className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                          onClick={() => handleRequest(req.id, req.senderId, 'decline')}>
+                          onClick={() => handleRequest(req.id, 'decline')}>
                           <X className="h-4 w-4" />
                         </Button>
                       </div>

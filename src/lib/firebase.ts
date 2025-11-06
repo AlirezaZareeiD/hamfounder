@@ -1,7 +1,7 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, Auth, getAuth, OAuthProvider, User, setPersistence, browserLocalPersistence, getIdTokenResult } from "firebase/auth";
+import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, Auth, getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 // Import ref as well
-import { getStorage, ref, uploadBytes, getDownloadURL, StorageReference, uploadBytesResumable, deleteObject, UploadTaskSnapshot } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, StorageReference } from "firebase/storage";
 import { initializeAppCheck, ReCaptchaV3Provider, AppCheck } from "firebase/app-check"; // Import AppCheck type
 import { getFirestore, Firestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { getFunctions, Functions } from 'firebase/functions'; // Import Functions services
@@ -53,7 +53,7 @@ export const functions: Functions = getFunctions(app); // Initialize and export 
 // export { appCheck };
 
 
-// Function to force refresh the user\'s ID token
+// Function to force refresh the user's ID token
 export const forceRefreshToken = async () => {
   const user = auth.currentUser;
   if (user) {
@@ -144,7 +144,7 @@ export const updateUserProfile = async (userId: string, profileData: {
   companyLogoUrl?: string;
   companyWebsiteUrl?: string;
 }) => {
-  // Get a reference to the user\'s profile document
+  // Get a reference to the user's profile document
   const userDocRef = doc(db, 'userProfiles', userId);
   // Update the document with the provided profile data, merging with existing fields
   await setDoc(userDocRef, profileData, { merge: true });
