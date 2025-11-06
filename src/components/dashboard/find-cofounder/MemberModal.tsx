@@ -57,16 +57,16 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
+      <DialogContent className="max-w-3xl w-[95vw] h-[90vh] max-h-[800px] flex flex-col p-0">
+        <DialogHeader className="p-6 pb-4 flex-shrink-0 border-b">
           <div className="flex items-start space-x-6">
-            <Avatar className="h-28 w-28 border-4 border-transparent group-hover:border-primary transition-colors">
+            <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-transparent">
               <AvatarImage src={member.avatar} alt={member.name} />
               <AvatarFallback>{member.name.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex-grow pt-2">
-              <DialogTitle className="text-3xl font-bold">{member.name}</DialogTitle>
-              <p className="text-lg text-muted-foreground">{member.role}</p>
+              <DialogTitle className="text-2xl sm:text-3xl font-bold">{member.name}</DialogTitle>
+              <p className="text-md sm:text-lg text-muted-foreground">{member.role}</p>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-2">
                 <MapPin className="h-4 w-4" />
                 <span>{member.location}</span>
@@ -75,50 +75,52 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
           </div>
         </DialogHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 my-6">
-            <div className="space-y-4">
-                <div>
-                    <h3 className="font-semibold text-lg mb-2 flex items-center"><Briefcase className="mr-2 h-5 w-5 text-primary" />Professional Bio</h3>
-                    <p className="text-sm text-muted-foreground">{member.bio}</p>
-                </div>
-                <div>
-                    <h3 className="font-semibold text-lg mb-2 flex items-center"><Lightbulb className="mr-2 h-5 w-5 text-primary" />Skills</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {member.skills.map((skill: string, index: number) => (
-                            <Badge key={index} variant="secondary">{skill}</Badge>
-                        ))}
+        <div className="flex-grow overflow-y-auto p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div className="space-y-6">
+                    <div>
+                        <h3 className="font-semibold text-lg mb-2 flex items-center"><Briefcase className="mr-2 h-5 w-5 text-primary" />Professional Bio</h3>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{member.bio}</p>
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-lg mb-2 flex items-center"><Lightbulb className="mr-2 h-5 w-5 text-primary" />Skills</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {member.skills.map((skill: string, index: number) => (
+                                <Badge key={index} variant="secondary">{skill}</Badge>
+                            ))}
+                        </div>
                     </div>
                 </div>
+                <div className="space-y-4 bg-muted/50 p-4 rounded-lg h-fit">
+                     <h3 className="font-semibold text-lg mb-2 flex items-center"><BarChart2 className="mr-2 h-5 w-5 text-primary" />Professional Details</h3>
+                     <ul className="text-sm space-y-2">
+                        <li className="flex justify-between"><strong>Industry:</strong> <span>{member.industry}</span></li>
+                        <li className="flex justify-between"><strong>Business Stage:</strong> <span>{member.experience}</span></li>
+                        <li className="flex justify-between"><strong>Looking For:</strong> <span>{member.lookingFor}</span></li>
+                        <li className="flex justify-between"><strong>Projects Completed:</strong> <span className="font-semibold">{member.projectsCompleted}</span></li>
+                     </ul>
+                      <h3 className="font-semibold text-lg mb-2 mt-4 flex items-center"><Star className="mr-2 h-5 w-5 text-primary" />Key Achievements</h3>
+                       <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
+                          {member.achievements?.map((ach: string, index: number) => <li key={index}>{ach}</li>)}
+                          {!member.achievements?.length && <li>No achievements listed.</li>}
+                      </ul>
+                </div>
             </div>
-            <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
-                 <h3 className="font-semibold text-lg mb-2 flex items-center"><BarChart2 className="mr-2 h-5 w-5 text-primary" />Professional Details</h3>
-                 <ul className="text-sm space-y-2">
-                    <li className="flex justify-between"><strong>Industry:</strong> <span>{member.industry}</span></li>
-                    <li className="flex justify-between"><strong>Business Stage:</strong> <span>{member.experience}</span></li>
-                    <li className="flex justify-between"><strong>Looking For:</strong> <span>{member.lookingFor}</span></li>
-                    <li className="flex justify-between"><strong>Projects Completed:</strong> <span className="font-semibold">{member.projectsCompleted}</span></li>
-                 </ul>
-                  <h3 className="font-semibold text-lg mb-2 mt-4 flex items-center"><Star className="mr-2 h-5 w-5 text-primary" />Key Achievements</h3>
-                   <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
-                      {member.achievements?.map((ach: string, index: number) => <li key={index}>{ach}</li>)}
-                      {!member.achievements?.length && <li>No achievements listed.</li>}
-                  </ul>
-            </div>
+
+            {connectionStatus === 'none' && (
+                 <div className="space-y-2 mt-6">
+                    <label htmlFor="connect-message" className="font-semibold">Include a message (optional)</label>
+                    <Textarea 
+                        id="connect-message"
+                        placeholder={`Hi ${member.name.split(' ')[0]}, I'd love to connect...`}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                    />
+                 </div>
+            )}
         </div>
 
-        {connectionStatus === 'none' && (
-             <div className="space-y-2">
-                <label htmlFor="connect-message" className="font-semibold">Include a message (optional)</label>
-                <Textarea 
-                    id="connect-message"
-                    placeholder={`Hi ${member.name.split(' ')[0]}, I'd love to connect...`}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                />
-             </div>
-        )}
-
-        <DialogFooter className="mt-6">
+        <DialogFooter className="p-4 sm:p-6 flex-shrink-0 border-t bg-background">
             <Button variant="outline" onClick={onClose}>Close</Button>
             <ConnectionButton status={connectionStatus} onClick={handleConnectClick} />
         </DialogFooter>
