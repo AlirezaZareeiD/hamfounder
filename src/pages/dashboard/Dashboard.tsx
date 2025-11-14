@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"; 
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 // import { useNavigate } from "react-router-dom";
 // import { Button } from "@/components/ui/button";
@@ -6,19 +6,20 @@ import { Link } from "react-router-dom";
 // import { toast } from "@/hooks/use-toast";
 import MyProjects from "@/components/dashboard/MyProjects";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; 
-import { Edit, Users } from "lucide-react"; 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Edit, Users } from "lucide-react";
 // import LearningHub from "@/components/dashboard/LearningHub";
 // import EventsCommunity from "@/components/dashboard/EventsCommunity";
 import ConnectionRequests from "@/components/dashboard/ConnectionRequests";
-import FounderRoadmapSection from '@/components/FounderRoadmapSection';
-import DashboardLayout from '@/components/layouts/DashboardLayout'; 
+// import FounderRoadmapSection from '@/components/FounderRoadmapSection';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import ChatInterface from "@/components/dashboard/chat/ChatInterface";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("projects");
   const tabsListRef = useRef<HTMLDivElement>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
-  const [showRightFade, setShowRightFade] = useState(true); 
+  const [showRightFade, setShowRightFade] = useState(true);
 
   // const navigate = useNavigate();
 
@@ -118,6 +119,7 @@ const Dashboard = () => {
                onScroll={checkFadeEffects}
             >
              <TabsTrigger value="projects">My Projects</TabsTrigger>
+             <TabsTrigger value="messages">My Messages</TabsTrigger>
              {/* <TabsTrigger value="learning">Learning Hub</TabsTrigger> */}
              {/* <TabsTrigger value="events">Events & Community</TabsTrigger> */}
              <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -130,6 +132,10 @@ const Dashboard = () => {
 
           <TabsContent value="projects">
             <MyProjects />
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <ChatInterface />
           </TabsContent>
 
           {/*
@@ -150,7 +156,7 @@ const Dashboard = () => {
         </Tabs>
       </div>
       
-      <div className="mt-8"><FounderRoadmapSection /></div>
+      {/* <div className="mt-8"><FounderRoadmapSection /></div> */}
     </DashboardLayout>
   );
 };
