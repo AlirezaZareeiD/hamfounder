@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef } from "react"; 
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { signOut } from "firebase/auth";
-import { toast } from "@/hooks/use-toast";
+// import { useNavigate } from "react-router-dom";
+// import { Button } from "@/components/ui/button";
+// import { signOut } from "firebase/auth";
+// import { toast } from "@/hooks/use-toast";
 import MyProjects from "@/components/dashboard/MyProjects";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; 
 import { Edit, Users } from "lucide-react"; 
-import LearningHub from "@/components/dashboard/LearningHub";
-import EventsCommunity from "@/components/dashboard/EventsCommunity";
-import NotificationsPanel from "@/components/dashboard/NotificationsPanel";
+// import LearningHub from "@/components/dashboard/LearningHub";
+// import EventsCommunity from "@/components/dashboard/EventsCommunity";
+import ConnectionRequests from "@/components/dashboard/ConnectionRequests";
 import FounderRoadmapSection from '@/components/FounderRoadmapSection';
 import DashboardLayout from '@/components/layouts/DashboardLayout'; 
 
@@ -20,7 +20,7 @@ const Dashboard = () => {
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(true); 
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const checkFadeEffects = () => {
     if (tabsListRef.current) {
@@ -118,8 +118,8 @@ const Dashboard = () => {
                onScroll={checkFadeEffects}
             >
              <TabsTrigger value="projects">My Projects</TabsTrigger>
-             <TabsTrigger value="learning">Learning Hub</TabsTrigger>
-             <TabsTrigger value="events">Events & Community</TabsTrigger>
+             {/* <TabsTrigger value="learning">Learning Hub</TabsTrigger> */}
+             {/* <TabsTrigger value="events">Events & Community</TabsTrigger> */}
              <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
 
@@ -132,16 +132,20 @@ const Dashboard = () => {
             <MyProjects />
           </TabsContent>
 
+          {/*
           <TabsContent value="learning">
             <LearningHub />
           </TabsContent>
+          */}
 
+          {/*
           <TabsContent value="events">
             <EventsCommunity />
           </TabsContent>
+          */}
 
           <TabsContent value="notifications">
-            <NotificationsPanel />
+            <ConnectionRequests />
           </TabsContent>
         </Tabs>
       </div>
