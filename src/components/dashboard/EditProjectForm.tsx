@@ -132,7 +132,7 @@ const EditProjectForm: React.FC<EditProjectFormProps> = ({ onSuccess, initialDat
         }
     }, [formData.documents, isDocumentsUploading]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | React.HTMLTextAreaElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
     };
@@ -168,7 +168,7 @@ const EditProjectForm: React.FC<EditProjectFormProps> = ({ onSuccess, initialDat
         e.preventDefault();
 
         if (documentsInputRef.current && documentsInputRef.current.isUploading()) {
-            toast({ title: "Upload in Progress", description: "Please wait for document uploads to complete.", variant: "info" });
+            toast({ title: "Upload in Progress", description: "Please wait for document uploads to complete." });
             return;
         }
         if (!user || loading) {
@@ -228,7 +228,6 @@ const EditProjectForm: React.FC<EditProjectFormProps> = ({ onSuccess, initialDat
             toast({
                 title: initialData ? "Project Updated!" : "Project Created!",
                 description: "Your project has been successfully saved.",
-                variant: "success",
             });
             if (onSuccess) onSuccess();
 

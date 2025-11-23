@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -88,8 +88,8 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
        setIsSaving(false);
   }, []); // Empty dependency array ensures this runs only on mount and unmount
 
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | React.HTMLTextAreaElement>) => {
+  // FIX 1: Correct the event handler type. No 'React.' prefix is needed for HTMLTextAreaElement.
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
   };
@@ -203,11 +203,10 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
            await setDoc(newProjectRef, cleanedNewProjectData);
            console.log("New project document created successfully with ID:", currentProjectId);
 
-           // --- Final Success Handling ---
+           // FIX 2: Remove the invalid 'variant' property. The default toast style will be used.
            toast({
                title: "Project Created!",
                description: "Your new project has been successfully created.",
-               variant: "success",
            });
            if (onSuccess) onSuccess();
 
