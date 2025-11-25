@@ -4,9 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Briefcase, MapPin, Lightbulb, BarChart2, Star, MessageSquare, UserPlus, Check } from "lucide-react";
+import { Briefcase, MapPin, Lightbulb, BarChart2, Star, MessageSquare, UserPlus, Check, FolderKanban } from "lucide-react";
 import { Member } from '@/types';
 import { ConnectionStatus } from '@/pages/dashboard/find-cofounder/FindCofounderPage';
+import { Link } from 'react-router-dom';
+
 
 interface MemberModalProps {
   member: Member;
@@ -14,7 +16,9 @@ interface MemberModalProps {
   onClose: () => void;
   onConnect: (member: Member, message?: string) => void;
   connectionStatus: ConnectionStatus;
+  projectsCount: number;
 }
+
 
 const ConnectionButton: React.FC<{ status: ConnectionStatus; onClick: () => void }> = ({ status, onClick }) => {
     switch (status) {
@@ -45,19 +49,32 @@ const ConnectionButton: React.FC<{ status: ConnectionStatus; onClick: () => void
     }
   };
 
-const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onConnect, connectionStatus }) => {
+
+const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onConnect, connectionStatus, projectsCount }) => {
   const [message, setMessage] = useState('');
 
+
   if (!isOpen) return null;
+
 
   const handleConnectClick = () => {
     onConnect(member, message);
     setMessage(''); // Clear message after sending
   };
 
+
+  const projectCountDisplay = projectsCount > 0 ? (
+    <Link to={`/dashboard/user/${member.id}/projects`} className="font-semibold text-primary hover:underline">
+      {projectsCount}
+    </Link>
+  ) : (
+    <span className="font-semibold">{projectsCount}</span>
+  );
+
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl w-[95vw] h-[90vh] max-h-[800px] flex flex-col p-0">
+      <DialogContent className="max-w-3xl w-[95vw] h-[95vh] max-h-[800px] flex flex-col p-0">
         <DialogHeader className="p-6 pb-4 flex-shrink-0 border-b">
           <div className="flex items-start space-x-6">
             <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-transparent">
@@ -74,7 +91,7 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
             </div>
           </div>
         </DialogHeader>
-        
+       
         <div className="flex-grow overflow-y-auto p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="space-y-6">
@@ -97,7 +114,10 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
                         <li className="flex justify-between"><strong>Industry:</strong> <span>{member.industry}</span></li>
                         <li className="flex justify-between"><strong>Business Stage:</strong> <span>{member.experience}</span></li>
                         <li className="flex justify-between"><strong>Looking For:</strong> <span>{member.lookingFor}</span></li>
-                        <li className="flex justify-between"><strong>Projects Completed:</strong> <span className="font-semibold">{member.projectsCompleted}</span></li>
+                        <li className="flex justify-between items-center">
+                            <strong className="flex items-center"><FolderKanban className="mr-2 h-4 w-4" />Projects:</strong>
+                            {projectCountDisplay}
+                        </li>
                      </ul>
                       <h3 className="font-semibold text-lg mb-2 mt-4 flex items-center"><Star className="mr-2 h-5 w-5 text-primary" />Key Achievements</h3>
                        <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
@@ -107,10 +127,11 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
                 </div>
             </div>
 
+
             {connectionStatus === 'none' && (
                  <div className="space-y-2 mt-6">
                     <label htmlFor="connect-message" className="font-semibold">Include a message (optional)</label>
-                    <Textarea 
+                    <Textarea
                         id="connect-message"
                         placeholder={`Hi ${member.name.split(' ')[0]}, I'd love to connect...`}
                         value={message}
@@ -120,6 +141,7 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
             )}
         </div>
 
+
         <DialogFooter className="p-4 sm:p-6 flex-shrink-0 border-t bg-background">
             <Button variant="outline" onClick={onClose}>Close</Button>
             <ConnectionButton status={connectionStatus} onClick={handleConnectClick} />
@@ -128,5 +150,6 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
     </Dialog>
   );
 };
+
 
 export default MemberModal;

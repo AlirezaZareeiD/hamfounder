@@ -30,11 +30,13 @@ import TagsInput from 'react-tagsinput';
 import 'react-tagsinput/react-tagsinput.css';
 import MemberModal from '@/components/dashboard/find-cofounder/MemberModal';
 
+
 const EditProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("personal");
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+
 
   const [profileData, setProfileData] = useState({
     firstName: '',
@@ -57,8 +59,10 @@ const EditProfilePage: React.FC = () => {
     companyLogoUrl: ''
   });
 
+
   const { toast } = useToast();
   const urlPattern = /^(https?:\/\/).+$/;
+
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -102,13 +106,16 @@ const EditProfilePage: React.FC = () => {
     fetchUserProfile();
   }, []);
 
+
   const handleProfileImageUpdate = (imageUrl: string) => {
     setProfileData(prev => ({ ...prev, profileImageUrl: imageUrl }));
   };
 
+
   const handleCompanyLogoUpdate = (imageUrl: string) => {
     setProfileData(prev => ({ ...prev, companyLogoUrl: imageUrl }));
   };
+
 
   const handleInputChange = (field: keyof typeof profileData, value: string | string[]) => {
     setProfileData(prev => ({
@@ -116,6 +123,7 @@ const EditProfilePage: React.FC = () => {
       [field]: value
     }));
   };
+
 
   const handleSave = async (section: string) => {
     setIsSaving(true);
@@ -126,9 +134,11 @@ const EditProfilePage: React.FC = () => {
       return;
     }
 
+
     let dataToSave: Partial<typeof profileData> = {};
     let successMessage = "";
     let errorMessage = "";
+
 
     try {
         if (section === 'personal') {
@@ -175,6 +185,7 @@ const EditProfilePage: React.FC = () => {
             errorMessage = "Failed to save Professional Background.";
           }
 
+
       await updateUserProfile(userId, dataToSave);
       toast({ title: "Success", description: successMessage, variant: "default" });
     } catch (error) {
@@ -184,6 +195,7 @@ const EditProfilePage: React.FC = () => {
       setIsSaving(false);
     }
   };
+
 
   const getProfileCompletion = () => {
     const fields = [
@@ -196,10 +208,10 @@ const EditProfilePage: React.FC = () => {
     }).length;
     const skillsBonus = profileData.skills.length > 0 ? 1 : 0;
     const interestsBonus = profileData.interests.length > 0 ? 1 : 0;
-    
+   
     return Math.round(((completedFields + skillsBonus + interestsBonus) / (fields.length + 2)) * 100);
   };
-  
+ 
   const myProfileForPreview = {
     id: auth.currentUser?.uid || '',
     name: profileData.displayName || `${profileData.firstName} ${profileData.lastName}`,
@@ -214,9 +226,10 @@ const EditProfilePage: React.FC = () => {
     linkedinUrl: profileData.linkedinUrl,
     twitterUrl: profileData.twitterUrl,
     website: profileData.companyWebsiteUrl,
-    achievements: [], 
+    achievements: [],
     isOnline: true,
   };
+
 
   if (loading) {
     return (
@@ -229,11 +242,12 @@ const EditProfilePage: React.FC = () => {
     );
   }
 
+
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-purple-50/20">
         <div className="container mx-auto py-8 px-4 max-w-5xl">
-          
+         
           <div className="text-center mb-12">
             <div className="relative inline-block">
               <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent mb-4">
@@ -244,7 +258,7 @@ const EditProfilePage: React.FC = () => {
             <p className="text-xl text-muted-foreground mb-6">
               Tell your entrepreneurial story and connect with your ideal co-founders
             </p>
-            
+           
             <div className="max-w-md mx-auto">
               <div className="flex items-center gap-3 mb-2">
                 <Sparkles className="h-5 w-5 text-primary" />
@@ -254,6 +268,7 @@ const EditProfilePage: React.FC = () => {
               <Progress value={getProfileCompletion()} className="h-3" />
             </div>
           </div>
+
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="flex flex-wrap md:grid md:grid-cols-3 w-full mb-8 bg-gradient-to-r from-primary/10 to-purple-100/50 p-1">
@@ -274,6 +289,7 @@ const EditProfilePage: React.FC = () => {
               </TabsTrigger>
             </TabsList>
 
+
             <TabsContent value="personal" className="space-y-6">
               <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-primary">
                 <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
@@ -288,13 +304,14 @@ const EditProfilePage: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6">
-                  
+                 
                   <ProfileImageUploader
                     userProfileImage={profileData.profileImageUrl}
                     userId={auth.currentUser?.uid || ''}
                     onImageUpdate={handleProfileImageUpdate}
                     type="profile"
                   />
+
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -308,6 +325,7 @@ const EditProfilePage: React.FC = () => {
                       />
                     </div>
 
+
                     <div className="space-y-2">
                       <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
                       <Input
@@ -319,6 +337,7 @@ const EditProfilePage: React.FC = () => {
                       />
                     </div>
 
+
                     <div className="space-y-2 md:col-span-2">
                       <Label htmlFor="publicIdentity" className="text-sm font-medium">Your Public Identity</Label>
                       <Input
@@ -329,6 +348,7 @@ const EditProfilePage: React.FC = () => {
                         placeholder="e.g. John Doe or Your Startup Name"
                       />
                     </div>
+
 
                     <div className="space-y-2">
                       <Label htmlFor="pronouns" className="text-sm font-medium">Pronouns</Label>
@@ -348,6 +368,7 @@ const EditProfilePage: React.FC = () => {
                       </Select>
                     </div>
 
+
                     <div className="space-y-2">
                       <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
                         <MapPin className="h-4 w-4" />
@@ -361,6 +382,7 @@ const EditProfilePage: React.FC = () => {
                         placeholder="City, Country"
                       />
                     </div>
+
 
                     <div className="space-y-2 md:col-span-2">
                       <Label htmlFor="tagline" className="text-sm font-medium flex items-center gap-2">
@@ -376,6 +398,7 @@ const EditProfilePage: React.FC = () => {
                       />
                     </div>
 
+
                     <div className="space-y-2">
                       <Label htmlFor="linkedinUrl" className="text-sm font-medium flex items-center gap-2">
                         <Linkedin className="h-4 w-4" />
@@ -389,6 +412,7 @@ const EditProfilePage: React.FC = () => {
                         placeholder="https://linkedin.com/in/username"
                       />
                     </div>
+
 
                     <div className="space-y-2">
                       <Label htmlFor="twitterUrl" className="text-sm font-medium flex items-center gap-2">
@@ -404,6 +428,7 @@ const EditProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
+
 
                   <Button
                     onClick={() => handleSave('personal')}
@@ -425,6 +450,7 @@ const EditProfilePage: React.FC = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+
 
             <TabsContent value="journey" className="space-y-6">
               <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-orange-500">
@@ -457,6 +483,7 @@ const EditProfilePage: React.FC = () => {
                     </div>
                   </div>
 
+
                   <Button
                     onClick={() => handleSave('journey')}
                     disabled={isSaving}
@@ -478,6 +505,7 @@ const EditProfilePage: React.FC = () => {
               </Card>
             </TabsContent>
 
+
             <TabsContent value="professional" className="space-y-6">
               <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-green-500">
                 <CardHeader className="bg-gradient-to-r from-green-50 to-transparent">
@@ -492,13 +520,14 @@ const EditProfilePage: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6">
-                  
+                 
                   <ProfileImageUploader
                     userProfileImage={profileData.companyLogoUrl}
                     userId={auth.currentUser?.uid || ''}
                     onImageUpdate={handleCompanyLogoUpdate}
                     type="companyLogo"
                   />
+
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -511,6 +540,7 @@ const EditProfilePage: React.FC = () => {
                         placeholder="e.g. Founder, CEO, CTO"
                       />
                     </div>
+
 
                     <div className="space-y-2">
                       <Label htmlFor="lookingFor" className="text-sm font-medium">Looking For</Label>
@@ -534,6 +564,7 @@ const EditProfilePage: React.FC = () => {
                       </Select>
                     </div>
 
+
                     <div className="space-y-2">
                       <Label htmlFor="businessStage" className="text-sm font-medium">Business Stage</Label>
                       <Select
@@ -554,6 +585,7 @@ const EditProfilePage: React.FC = () => {
                       </Select>
                     </div>
 
+
                     <div className="space-y-2">
                       <Label htmlFor="companyName" className="text-sm font-medium">Startup Name</Label>
                       <Input
@@ -564,6 +596,7 @@ const EditProfilePage: React.FC = () => {
                         placeholder="Your startup name"
                       />
                     </div>
+
 
                     <div className="space-y-2 md:col-span-2">
                       <Label htmlFor="companyWebsiteUrl" className="text-sm font-medium flex items-center gap-2">
@@ -580,6 +613,7 @@ const EditProfilePage: React.FC = () => {
                     </div>
                   </div>
 
+
                   <div className="space-y-4">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Target className="h-4 w-4" />
@@ -594,6 +628,7 @@ const EditProfilePage: React.FC = () => {
                     />
                   </div>
 
+
                   <div className="space-y-4">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Lightbulb className="h-4 w-4" />
@@ -607,6 +642,7 @@ const EditProfilePage: React.FC = () => {
                       className="react-tags-input"
                     />
                   </div>
+
 
                   <Button
                     onClick={() => handleSave('professional')}
@@ -624,6 +660,7 @@ const EditProfilePage: React.FC = () => {
             </TabsContent>
           </Tabs>
 
+
           <div className="text-center mt-12 p-6 bg-gradient-to-r from-primary/10 to-purple-100/50 rounded-xl">
             <h3 className="text-xl font-bold mb-2">Your profile is {getProfileCompletion()}% complete!</h3>
             <p className="text-muted-foreground mb-4">
@@ -639,7 +676,7 @@ const EditProfilePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+     
       <MemberModal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
@@ -649,5 +686,6 @@ const EditProfilePage: React.FC = () => {
     </DashboardLayout>
   );
 };
+
 
 export default EditProfilePage;

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,19 +14,22 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CoFounderPrivateRepository from "./pages/AdminConsole/Co-FounderPrivateRepository";
 
+
 // Dashboard components
 import Dashboard from "./pages/dashboard/Dashboard";
 import EditProfilePage from "./pages/dashboard/EditProfilePage";
 import FindCofounderPage from "./pages/dashboard/find-cofounder/FindCofounderPage";
 import NotificationsPage from "./pages/dashboard/NotificationsPage";
-import MessagesPage from "./pages/dashboard/MessagesPage"; // Import the new MessagesPage
-import PublicProjectsPage from "./pages/dashboard/user/PublicProjectsPage"; // Import the new PublicProjectsPage
+import MessagesPage from "./pages/dashboard/MessagesPage";
+import PublicProjectsPage from "./pages/dashboard/user/PublicProjectsPage";
 import ProjectDetailsPage from './components/dashboard/ProjectDetailsPage';
 import BIDashboard from "./pages/AdminConsole/BI-Dashboard";
 import AdminRoute from "./components/auth/AdminRoute";
 import WhitelistRoute from "./components/auth/WhitelistRoute";
 
+
 const queryClient = new QueryClient();
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -46,8 +48,9 @@ const App = () => (
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/pricing" element={<PricingPage />} />
 
+
             {/* Whitelisted Route */}
-            <Route 
+            <Route
               path="/admin/co-founder-private-repository"
               element={
                 <WhitelistRoute>
@@ -56,15 +59,18 @@ const App = () => (
               }
             />
 
+
             {/* Dashboard routes */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/edit-profile" element={<EditProfilePage />} />
             <Route path="/dashboard/find-cofounder" element={<FindCofounderPage />} />
             <Route path="/dashboard/notifications" element={<NotificationsPage />} />
-            <Route path="/dashboard/messages" element={<MessagesPage />} /> {/* Add MessagesPage route */}
+            <Route path="/dashboard/messages" element={<MessagesPage />} />
             <Route path="/dashboard/projects/:projectId" element={<ProjectDetailsPage />} />
-            <Route path="/dashboard/user/:userId/projects" element={<PublicProjectsPage />} /> {/* Add PublicProjectsPage route */}
-            
+            <Route path="/dashboard/user/:userId/projects" element={<PublicProjectsPage />} />
+            {/* FIX: Added route for all public projects */}
+            <Route path="/dashboard/projects" element={<PublicProjectsPage />} />
+           
             {/* Admin route */}
             <Route
               path="/admin/bi-dashboard"
@@ -74,6 +80,7 @@ const App = () => (
                 </AdminRoute>
               }
             />
+
 
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

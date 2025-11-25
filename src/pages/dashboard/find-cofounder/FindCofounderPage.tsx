@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import CoFounderCircle from '@/components/dashboard/find-cofounder/CoFounderCircle';
@@ -9,15 +8,35 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Grid, Users, Loader2, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { auth, db, getUserProfile } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, query, getDocs, where } from 'firebase/firestore'; 
+import { collection, addDoc, serverTimestamp, query, getDocs, where } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
 import CompleteProfileDialog from '@/components/dashboard/find-cofounder/CompleteProfileDialog';
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from "@/components/ui/pagination";
-import { Member, UserProfile } from '@/types';
+import { Member } from '@/types';
 import { Input } from '@/components/ui/input';
 
-// Types
+export interface UserProfile {
+  firstName?: string;
+  lastName?: string;
+  tagline?: string;
+  location?: string;
+  personalSummary?: string;
+  role?: string;
+  lookingFor?: string;
+  businessStage?: string;
+  companyName?: string;
+  skills?: string[];
+  interests?: string[];
+  profileImageUrl?: string;
+  industry?: string;
+  projectsCompleted?: number;
+  isOnline?: boolean;
+  rating?: number;
+  joinedDate?: any;
+  achievements?: string[];
+}
+
 export type ConnectionStatus = 'connected' | 'pending_sent' | 'pending_received' | 'none';
 
 interface FilterState {
@@ -63,18 +82,17 @@ const FindCofounderPage: React.FC = () => {
       if (user) {
         const profile = await getUserProfile(user.uid);
         setCurrentUserProfile(profile as UserProfile);
+      } else if (!loadingAuth) {
+        setIsLoading(false);
       }
     };
-    if (!loadingAuth) {
-      checkCurrentUserProfile();
-    }
+    checkCurrentUserProfile();
   }, [user, loadingAuth]);
 
   useEffect(() => {
     if (!currentUserProfile || !user) return;
 
-    const isComplete = isProfile100PercentComplete(currentUserProfile);
-    if (!isComplete) {
+    if (!isProfile100PercentComplete(currentUserProfile)) {
       setIsLoading(false);
       return;
     }
@@ -82,33 +100,44 @@ const FindCofounderPage: React.FC = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        // FINAL, FINAL, FINAL FIX: Using the correct field 'isPrivate' based on user's feedback of the database schema.
+        const projectsQuery = query(collection(db, 'projects'), where("isPrivate", "==", false));
+        const projectsSnapshot = await getDocs(projectsQuery);
+        const projectCounts = new Map<string, number>();
+        projectsSnapshot.forEach(doc => {
+            const projectData = doc.data();
+            if (projectData.ownerId) {
+                projectCounts.set(projectData.ownerId, (projectCounts.get(projectData.ownerId) || 0) + 1);
+            }
+        });
+
         const profilesQuery = query(collection(db, 'userProfiles'));
         const profilesSnapshot = await getDocs(profilesQuery);
-        
+       
         const completeMembers = profilesSnapshot.docs
-          .filter(doc => doc.id !== user.uid) 
+          .filter(doc => doc.id !== user.uid)
           .filter(doc => isProfile100PercentComplete(doc.data() as UserProfile))
           .map(doc => {
             const data = doc.data() as UserProfile;
-            return { 
-              id: doc.id, 
-              name: `${data.firstName || ''} ${data.lastName || ''}`.trim(), 
-              avatar: data.profileImageUrl || '', // **FIXED**: Removed placeholder, ensuring fallback triggers correctly
-              role: data.role || '', 
-              skills: data.skills || [], 
-              location: data.location || '', 
-              bio: data.personalSummary || '', 
-              experience: data.businessStage || 'N/A', 
-              industry: data.industry || 'N/A', 
-              lookingFor: data.lookingFor || 'N/A', 
-              projectsCompleted: data.projectsCompleted || 0, 
-              isOnline: data.isOnline || false, 
-              rating: data.rating || 0, 
-              joinedDate: data.joinedDate ? new Date(data.joinedDate.seconds * 1000).toLocaleDateString() : 'N/A', 
-              achievements: data.achievements || [] 
+            return {
+              id: doc.id,
+              name: `${data.firstName || ''} ${data.lastName || ''}`.trim(),
+              avatar: data.profileImageUrl || '',
+              role: data.role || '',
+              skills: data.skills || [],
+              location: data.location || '',
+              bio: data.personalSummary || '',
+              experience: data.businessStage || 'N/A',
+              industry: data.industry || 'N/A',
+              lookingFor: data.lookingFor || 'N/A',
+              projectsCompleted: projectCounts.get(doc.id) || 0,
+              isOnline: data.isOnline || false,
+              rating: data.rating || 0,
+              joinedDate: data.joinedDate ? new Date(data.joinedDate.seconds * 1000).toLocaleDateString() : 'N/A',
+              achievements: data.achievements || []
             };
           });
-        
+       
         setMembers(completeMembers);
 
         const sentRequestsQuery = query(collection(db, 'connection_requests'), where('senderId', '==', user.uid));
@@ -177,10 +206,11 @@ const FindCofounderPage: React.FC = () => {
     }
   }, [user, connectionStatusMap, toast, navigate]);
 
-  if (loadingAuth || !currentUserProfile) {
+  if (loadingAuth || isLoading) {
     return <DashboardLayout><div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div></DashboardLayout>;
   }
-  if (!isProfile100PercentComplete(currentUserProfile) || !user) {
+
+  if (!user || !isProfile100PercentComplete(currentUserProfile)) {
     return <DashboardLayout><CompleteProfileDialog isOpen={true} onOpenChange={() => {}} /></DashboardLayout>;
   }
 
@@ -191,7 +221,7 @@ const FindCofounderPage: React.FC = () => {
           <h1 className="text-3xl font-bold tracking-tight">Find Your Perfect Co-Founder</h1>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
+            <Input
               placeholder="Search by name or keyword..."
               className="pl-9 w-full md:w-1/2 lg:w-1/3"
               value={filters.searchTerm}
@@ -201,10 +231,10 @@ const FindCofounderPage: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
-            <FilterPanel 
-              filters={filters} 
-              onFiltersChange={handleFilterChange} 
-              onClearFilters={handleClearFilters} 
+            <FilterPanel
+              filters={filters}
+              onFiltersChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
             />
           </div>
           <div className="lg:col-span-3 space-y-6">
@@ -218,10 +248,9 @@ const FindCofounderPage: React.FC = () => {
               </Tabs>
             </div>
 
-            {activeView === 'circles' && (
-                <CoFounderCircle 
-                    members={filteredMembers.slice(0, 18)} // Increased member count for circle view
-                    // **FIXED**: Using live, correct profile data for the current user
+            {activeView === 'circles' && currentUserProfile && (
+                <CoFounderCircle
+                    members={filteredMembers.slice(0, 18)}
                     currentUser={{
                       id: user.uid,
                       name: `${currentUserProfile.firstName} ${currentUserProfile.lastName}`,
@@ -236,10 +265,10 @@ const FindCofounderPage: React.FC = () => {
               <div className="space-y-6">
                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {paginatedMembers.map((member) => (
-                        <MemberCard 
-                            key={member.id} 
-                            member={member} 
-                            onViewProfile={handleSelectMember} 
+                        <MemberCard
+                            key={member.id}
+                            member={member}
+                            onViewProfile={handleSelectMember}
                             onConnect={handleConnect}
                             connectionStatus={connectionStatusMap.get(member.id) || 'none'}
                         />
@@ -260,12 +289,13 @@ const FindCofounderPage: React.FC = () => {
         </div>
 
         {selectedMember && (
-          <MemberModal 
-            member={selectedMember} 
-            isOpen={isModalOpen} 
-            onClose={() => setIsModalOpen(false)} 
+          <MemberModal
+            member={selectedMember}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
             onConnect={handleConnect}
             connectionStatus={connectionStatusMap.get(selectedMember.id) || 'none'}
+            projectsCount={selectedMember.projectsCompleted || 0}
           />
         )}
       </div>

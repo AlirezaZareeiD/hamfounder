@@ -1,96 +1,149 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import React, { useState, useEffect, useMemo } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, FolderKanban } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs, Query, DocumentData } from 'firebase/firestore';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Loader2, AlertCircle, Search, Users } from 'lucide-react';
+// FIX: Correctly import the reusable ProjectCard component and its associated Project interface
+import ProjectCard, { Project } from '@/components/dashboard/ProjectCard';
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  stage: string;
-  tags: string[];
-}
 
-const PublicProjectsPage = () => {
+const PublicProjectsPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
 
   useEffect(() => {
-    if (!userId) return;
-
     const fetchProjects = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        const userRef = doc(db, 'userProfiles', userId);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUserName(`${userData?.firstName || ''} ${userData?.lastName || ''}`.trim());
+        let projectsQuery: Query = query(collection(db, 'projects'), where("isPrivate", "==", false));
+
+
+        // If a userId is present in the URL, filter projects for that specific user
+        if (userId) {
+          projectsQuery = query(projectsQuery, where("ownerId", "==", userId));
         }
 
-        const projectsRef = collection(db, 'projects');
-        const q = query(projectsRef, where('ownerId', '==', userId), where('isPrivate', '==', false));
-        const querySnapshot = await getDocs(q);
-        
-        const userProjects = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Project[];
 
-        setProjects(userProjects);
-      } catch (error) {
-        console.error("Error fetching public projects: ", error);
+        const querySnapshot = await getDocs(projectsQuery);
+        const fetchedProjects = querySnapshot.docs.map(doc => {
+            const data = doc.data() as DocumentData;
+            // Map the Firestore data to the comprehensive Project interface
+            return {
+                id: doc.id,
+                name: data.name || 'Unnamed Project',
+                description: data.description || '',
+                stage: data.stage || 'Unknown',
+                progress: data.progress || 0,
+                isPrivate: data.isPrivate ?? false,
+                tasks: data.tasks || { completed: 0, total: 0 },
+                ownerId: data.ownerId,
+                ownerInfo: data.ownerInfo || {},
+                tags: Array.isArray(data.tags) ? data.tags : [],
+                fundingStage: data.fundingStage || '',
+                mvpStatus: data.mvpStatus || '',
+                milestones: Array.isArray(data.milestones) ? data.milestones.map(String) : [],
+            } as Project;
+        });
+       
+        setProjects(fetchedProjects);
+
+
+      } catch (err) {
+        console.error("Error fetching projects: ", err);
+        setError("Failed to load projects. A Firestore index might be required. Check the console for a link to create it.");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
+
 
     fetchProjects();
   }, [userId]);
 
-  if (loading) {
-    return <DashboardLayout><div className="flex justify-center items-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div></DashboardLayout>;
-  }
+
+  const filteredProjects = useMemo(() => {
+    if (!searchTerm) {
+      return projects;
+    }
+    const lowercasedTerm = searchTerm.toLowerCase();
+    return projects.filter(p =>
+      p.name.toLowerCase().includes(lowercasedTerm) ||
+      p.description.toLowerCase().includes(lowercasedTerm)
+    );
+  }, [projects, searchTerm]);
+
+
+  // Navigate to the detailed view of a specific project
+  const handleViewProject = (projectId: string) => {
+    navigate(`/dashboard/projects/${projectId}`);
+  };
+
+
+  const renderContent = () => {
+    if (isLoading) {
+      return <div className="flex justify-center items-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+    }
+    if (error) {
+      return <div className="flex flex-col items-center justify-center py-20 bg-destructive/10 text-destructive rounded-lg"><AlertCircle className="h-8 w-8 mb-2" /><p>{error}</p></div>;
+    }
+    if (filteredProjects.length === 0) {
+        return <p className="text-center text-muted-foreground py-20">{userId ? "This user has no public projects." : "No public projects found."}</p>;
+    }
+    return (
+      // Use the new grid layout for the cards
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* FIX: Use the new ProjectCard component and pass the correct props */}
+        {filteredProjects.map(project => (
+            <ProjectCard
+                key={project.id}
+                project={project}
+                onViewProject={handleViewProject}
+                showOwnerControls={false} // <-- Explicitly hide owner controls
+            />
+        ))}
+      </div>
+    );
+  };
+
 
   return (
     <DashboardLayout>
       <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-6">Public Projects by {userName || 'User'}</h1>
-        
-        {projects.length === 0 ? (
-          <div className="text-center py-12">
-            <FolderKanban className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-medium">No Public Projects Found</h3>
-            <p className="mt-2 text-sm text-muted-foreground">This user has not shared any public projects yet.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map(project => (
-              <Link to={`/dashboard/projects/${project.id}`} key={project.id} className="block">
-                <Card className="h-full hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="truncate">{project.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{project.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline">{project.stage}</Badge>
-                        {project.tags?.slice(0, 2).map(tag => <Badge key={tag} variant="secondary">{tag}</Badge>)}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+            <h1 className="text-3xl font-bold">{userId ? "User's Public Projects" : "All Public Projects"}</h1>
+             {/* This button is now correctly routed */}
+             {userId && (
+                <Button onClick={() => navigate('/dashboard/projects')} variant="outline">
+                    <Users className="mr-2 h-4 w-4"/> Show All Projects
+                </Button>
+            )}
+        </div>
+       
+        <div className="relative mb-6">
+           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name or description..."
+              className="pl-9 w-full md:w-1/2 lg:w-1/3"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+        </div>
+
+
+        {renderContent()}
       </div>
     </DashboardLayout>
   );
 };
+
 
 export default PublicProjectsPage;

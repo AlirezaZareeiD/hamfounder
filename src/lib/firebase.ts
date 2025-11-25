@@ -6,6 +6,7 @@ import { initializeAppCheck, ReCaptchaV3Provider, AppCheck } from "firebase/app-
 import { getFirestore, Firestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { getFunctions, Functions } from 'firebase/functions'; // Import Functions services
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyBTsycr4yok1M6iOGdfO98mr_cTOKhoLbY",
   authDomain: "hamfounder-demo-2025.firebaseapp.com",
@@ -15,15 +16,19 @@ const firebaseConfig = {
   appId: "1:571868985684:web:c13d8e1d736c66b08330c1"
 };
 
+
 const app: FirebaseApp = initializeApp(firebaseConfig);
 console.log("Firebase App initialized:", app);
+
 
 // Initialize App Check
 let appCheck: AppCheck | undefined; // Declare appCheck variable here
 
+
 try {
   console.log("Attempting to initialize Firebase App Check...");
   console.log("Firebase app object before initializeAppCheck:", app);
+
 
   // Pass your debug token in the isActivated field in debug builds
   if (process.env.NODE_ENV === 'development') {
@@ -31,17 +36,21 @@ try {
     console.log("Firebase App Check debug token set for development.");
   }
 
+
   appCheck = initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider('6LfRy0UrAAAAAGLYTGqCM2ITAk0OvKiCnQRYD0bk'), // Replace with your reCAPTCHA v3 site key
     isTokenAutoRefreshEnabled: true, // Set to true to enable auto refresh.
   });
 
+
   console.log("initializeAppCheck call finished.");
   console.log("Firebase App Check initialized successfully.");
+
 
 } catch (error) {
   console.error("Error initializing Firebase App Check:", error);
 }
+
 
 setPersistence(getAuth(app), browserLocalPersistence);
 console.log("Firebase Auth persistence set to local.");
@@ -49,8 +58,11 @@ export const auth: Auth = getAuth(app); // Export auth
 export const db: Firestore = getFirestore(app, 'hamfounderdatabase');
 export const functions: Functions = getFunctions(app); // Initialize and export Functions
 
+
 // Export appCheck if needed elsewhere (optional)
 // export { appCheck };
+
+
 
 
 // Function to force refresh the user's ID token
@@ -70,17 +82,21 @@ export const forceRefreshToken = async () => {
 };
 
 
+
+
 // اضافه شده برای Sign-in با گوگل
 const googleProvider = new GoogleAuthProvider();
 export const signInWithGoogle = () => {
   return signInWithPopup(auth, googleProvider);
 };
 
+
 // اضافه شده برای Sign-in با اپل (اگر نیاز دارید و پیکربندی در Firebase انجام شده است)
 // const appleProvider = new AppleAuthProvider();
 // export const signInWithApple = () => {
 //   return signInWithPopup(auth, appleProvider);
 // };
+
 
 // Added for Sign-in with GitHub
 const githubProvider = new GithubAuthProvider();
@@ -93,18 +109,23 @@ export const signInWithGitHub = async () => {
   }
 };
 
+
 export const signInWithLinkedInPlaceholder = () => {
   console.log("LinkedIn login feature coming soon.");
 };
+
 
 // Initialize and export storage AND ref
 export const storage = getStorage(app);
 export { ref }; // Export the ref function as well
 
 
+
+
 // Function to upload an image to Firebase Storage with a specified type
 export const uploadImage = async (file: File, userId: string, type: 'profile' | 'companyLogo'): Promise<string> => {
   let storagePath: string;
+
 
   // Determine the storage path based on the image type
   if (type === 'profile') {
@@ -116,13 +137,16 @@ export const uploadImage = async (file: File, userId: string, type: 'profile' | 
     throw new Error(`Unsupported image type: ${type}`);
   }
 
+
   const storageRef: StorageReference = ref(storage, storagePath);
+
 
   // Upload the file
   const snapshot = await uploadBytes(storageRef, file);
   // Get the download URL
   return getDownloadURL(snapshot.ref);
 };
+
 
 // Function to update user profile data in Firestore
 export const updateUserProfile = async (userId: string, profileData: {
@@ -150,10 +174,12 @@ export const updateUserProfile = async (userId: string, profileData: {
   await setDoc(userDocRef, profileData, { merge: true });
 };
 
+
 // Function to get user profile data from Firestore
 export const getUserProfile = async (userId: string) => {
   const userDocRef = doc(db, 'userProfiles', userId);
   const docSnap = await getDoc(userDocRef);
+
 
   if (docSnap.exists()) {
     return docSnap.data();
