@@ -30,6 +30,7 @@ export interface UserProfile {
   interests?: string[];
   profileImageUrl?: string;
   industry?: string;
+  Industry?: string; // For backwards compatibility
   projectsCompleted?: number;
   isOnline?: boolean;
   rating?: number;
@@ -100,7 +101,6 @@ const FindCofounderPage: React.FC = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // FINAL, FINAL, FINAL FIX: Using the correct field 'isPrivate' based on user's feedback of the database schema.
         const projectsQuery = query(collection(db, 'projects'), where("isPrivate", "==", false));
         const projectsSnapshot = await getDocs(projectsQuery);
         const projectCounts = new Map<string, number>();
@@ -128,7 +128,7 @@ const FindCofounderPage: React.FC = () => {
               location: data.location || '',
               bio: data.personalSummary || '',
               experience: data.businessStage || 'N/A',
-              industry: data.industry || 'N/A',
+              industry: data.industry || data.Industry || 'N/A',
               lookingFor: data.lookingFor || 'N/A',
               projectsCompleted: projectCounts.get(doc.id) || 0,
               isOnline: data.isOnline || false,

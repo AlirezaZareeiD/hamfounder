@@ -21,22 +21,23 @@ import {
   Sparkles,
   Rocket,
   TrendingUp,
-  Loader2
+  Loader2,
+  Building
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { getUserProfile, auth, updateUserProfile } from '@/lib/firebase';
+import { db, getUserProfile, auth, updateUserProfile } from '@/lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { ProfileImageUploader } from '@/components/dashboard/ProfileImageUploader';
 import TagsInput from 'react-tagsinput';
 import 'react-tagsinput/react-tagsinput.css';
 import MemberModal from '@/components/dashboard/find-cofounder/MemberModal';
-
 
 const EditProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("personal");
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-
+  const [projectsCount, setProjectsCount] = useState(0);
 
   const [profileData, setProfileData] = useState({
     firstName: '',
@@ -51,6 +52,7 @@ const EditProfilePage: React.FC = () => {
     role: '',
     lookingFor: '',
     businessStage: '',
+    industry: '',
     skills: [] as string[],
     interests: [] as string[],
     companyName: '',
@@ -59,19 +61,20 @@ const EditProfilePage: React.FC = () => {
     companyLogoUrl: ''
   });
 
-
   const { toast } = useToast();
   const urlPattern = /^(https?:\/\/).+$/;
 
-
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchUserData = async () => {
       setLoading(true);
       const userId = auth.currentUser?.uid;
       if (userId) {
         try {
           const profile = await getUserProfile(userId);
           if (profile) {
+            // Handle potential casing inconsistency for 'industry' field
+            const industryValue = profile.industry || profile.Industry || '';
+
             setProfileData({
               firstName: profile.firstName || '',
               lastName: profile.lastName || '',
@@ -85,6 +88,7 @@ const EditProfilePage: React.FC = () => {
               role: profile.role || '',
               lookingFor: profile.lookingFor || '',
               businessStage: profile.businessStage || '',
+              industry: industryValue,
               skills: profile.skills || [],
               interests: profile.interests || [],
               companyName: profile.companyName || '',
@@ -93,9 +97,14 @@ const EditProfilePage: React.FC = () => {
               companyLogoUrl: profile.companyLogoUrl || ''
             });
           }
+
+          const projectsQuery = query(collection(db, 'projects'), where('ownerId', '==', userId));
+          const projectsSnapshot = await getDocs(projectsQuery);
+          setProjectsCount(projectsSnapshot.size);
+
         } catch (error) {
-          console.error('Error fetching user profile:', error);
-          toast({ title: "Error", description: "Failed to fetch user profile.", variant: "destructive" });
+          console.error('Error fetching user data:', error);
+          toast({ title: "Error", description: "Failed to fetch your profile and projects.", variant: "destructive" });
         } finally {
           setLoading(false);
         }
@@ -103,19 +112,16 @@ const EditProfilePage: React.FC = () => {
         setLoading(false);
       }
     };
-    fetchUserProfile();
+    fetchUserData();
   }, []);
-
 
   const handleProfileImageUpdate = (imageUrl: string) => {
     setProfileData(prev => ({ ...prev, profileImageUrl: imageUrl }));
   };
 
-
   const handleCompanyLogoUpdate = (imageUrl: string) => {
     setProfileData(prev => ({ ...prev, companyLogoUrl: imageUrl }));
   };
-
 
   const handleInputChange = (field: keyof typeof profileData, value: string | string[]) => {
     setProfileData(prev => ({
@@ -123,7 +129,6 @@ const EditProfilePage: React.FC = () => {
       [field]: value
     }));
   };
-
 
   const handleSave = async (section: string) => {
     setIsSaving(true);
@@ -134,11 +139,9 @@ const EditProfilePage: React.FC = () => {
       return;
     }
 
-
     let dataToSave: Partial<typeof profileData> = {};
     let successMessage = "";
     let errorMessage = "";
-
 
     try {
         if (section === 'personal') {
@@ -176,6 +179,7 @@ const EditProfilePage: React.FC = () => {
               role: profileData.role,
               lookingFor: profileData.lookingFor,
               businessStage: profileData.businessStage,
+              industry: profileData.industry, // Always save as lowercase 'industry'
               skills: profileData.skills,
               interests: profileData.interests,
               companyName: profileData.companyName,
@@ -184,7 +188,6 @@ const EditProfilePage: React.FC = () => {
             successMessage = "Professional Background updated successfully.";
             errorMessage = "Failed to save Professional Background.";
           }
-
 
       await updateUserProfile(userId, dataToSave);
       toast({ title: "Success", description: successMessage, variant: "default" });
@@ -195,7 +198,6 @@ const EditProfilePage: React.FC = () => {
       setIsSaving(false);
     }
   };
-
 
   const getProfileCompletion = () => {
     const fields = [
@@ -221,15 +223,15 @@ const EditProfilePage: React.FC = () => {
     location: profileData.location,
     bio: profileData.personalSummary,
     experience: profileData.businessStage,
-    industry: 'N/A',
+    industry: profileData.industry,
     lookingFor: profileData.lookingFor,
     linkedinUrl: profileData.linkedinUrl,
     twitterUrl: profileData.twitterUrl,
     website: profileData.companyWebsiteUrl,
     achievements: [],
     isOnline: true,
+    projectsCompleted: projectsCount,
   };
-
 
   if (loading) {
     return (
@@ -241,7 +243,6 @@ const EditProfilePage: React.FC = () => {
       </DashboardLayout>
     );
   }
-
 
   return (
     <DashboardLayout>
@@ -269,7 +270,6 @@ const EditProfilePage: React.FC = () => {
             </div>
           </div>
 
-
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="flex flex-wrap md:grid md:grid-cols-3 w-full mb-8 bg-gradient-to-r from-primary/10 to-purple-100/50 p-1">
               <TabsTrigger value="personal" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md flex-1">
@@ -288,7 +288,6 @@ const EditProfilePage: React.FC = () => {
                 <span className="hidden md:inline">Professional Background</span>
               </TabsTrigger>
             </TabsList>
-
 
             <TabsContent value="personal" className="space-y-6">
               <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-primary">
@@ -312,7 +311,6 @@ const EditProfilePage: React.FC = () => {
                     type="profile"
                   />
 
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
@@ -325,7 +323,6 @@ const EditProfilePage: React.FC = () => {
                       />
                     </div>
 
-
                     <div className="space-y-2">
                       <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
                       <Input
@@ -337,7 +334,6 @@ const EditProfilePage: React.FC = () => {
                       />
                     </div>
 
-
                     <div className="space-y-2 md:col-span-2">
                       <Label htmlFor="publicIdentity" className="text-sm font-medium">Your Public Identity</Label>
                       <Input
@@ -348,7 +344,6 @@ const EditProfilePage: React.FC = () => {
                         placeholder="e.g. John Doe or Your Startup Name"
                       />
                     </div>
-
 
                     <div className="space-y-2">
                       <Label htmlFor="pronouns" className="text-sm font-medium">Pronouns</Label>
@@ -368,7 +363,6 @@ const EditProfilePage: React.FC = () => {
                       </Select>
                     </div>
 
-
                     <div className="space-y-2">
                       <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
                         <MapPin className="h-4 w-4" />
@@ -382,7 +376,6 @@ const EditProfilePage: React.FC = () => {
                         placeholder="City, Country"
                       />
                     </div>
-
 
                     <div className="space-y-2 md:col-span-2">
                       <Label htmlFor="tagline" className="text-sm font-medium flex items-center gap-2">
@@ -398,7 +391,6 @@ const EditProfilePage: React.FC = () => {
                       />
                     </div>
 
-
                     <div className="space-y-2">
                       <Label htmlFor="linkedinUrl" className="text-sm font-medium flex items-center gap-2">
                         <Linkedin className="h-4 w-4" />
@@ -412,7 +404,6 @@ const EditProfilePage: React.FC = () => {
                         placeholder="https://linkedin.com/in/username"
                       />
                     </div>
-
 
                     <div className="space-y-2">
                       <Label htmlFor="twitterUrl" className="text-sm font-medium flex items-center gap-2">
@@ -428,7 +419,6 @@ const EditProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
-
 
                   <Button
                     onClick={() => handleSave('personal')}
@@ -450,7 +440,6 @@ const EditProfilePage: React.FC = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-
 
             <TabsContent value="journey" className="space-y-6">
               <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-orange-500">
@@ -483,7 +472,6 @@ const EditProfilePage: React.FC = () => {
                     </div>
                   </div>
 
-
                   <Button
                     onClick={() => handleSave('journey')}
                     disabled={isSaving}
@@ -504,7 +492,6 @@ const EditProfilePage: React.FC = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-
 
             <TabsContent value="professional" className="space-y-6">
               <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-green-500">
@@ -528,7 +515,6 @@ const EditProfilePage: React.FC = () => {
                     type="companyLogo"
                   />
 
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="role" className="text-sm font-medium">Your Role</Label>
@@ -540,7 +526,6 @@ const EditProfilePage: React.FC = () => {
                         placeholder="e.g. Founder, CEO, CTO"
                       />
                     </div>
-
 
                     <div className="space-y-2">
                       <Label htmlFor="lookingFor" className="text-sm font-medium">Looking For</Label>
@@ -564,7 +549,6 @@ const EditProfilePage: React.FC = () => {
                       </Select>
                     </div>
 
-
                     <div className="space-y-2">
                       <Label htmlFor="businessStage" className="text-sm font-medium">Business Stage</Label>
                       <Select
@@ -585,8 +569,21 @@ const EditProfilePage: React.FC = () => {
                       </Select>
                     </div>
 
-
                     <div className="space-y-2">
+                      <Label htmlFor="industry" className="text-sm font-medium flex items-center gap-2">
+                        <Building className="h-4 w-4" />
+                        Industry
+                      </Label>
+                      <Input
+                        id="industry"
+                        value={profileData.industry}
+                        onChange={(e) => handleInputChange('industry', e.target.value)}
+                        className="transition-all duration-300 focus:scale-105"
+                        placeholder="e.g. Fintech, Healthtech, AI"
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
                       <Label htmlFor="companyName" className="text-sm font-medium">Startup Name</Label>
                       <Input
                         id="companyName"
@@ -596,7 +593,6 @@ const EditProfilePage: React.FC = () => {
                         placeholder="Your startup name"
                       />
                     </div>
-
 
                     <div className="space-y-2 md:col-span-2">
                       <Label htmlFor="companyWebsiteUrl" className="text-sm font-medium flex items-center gap-2">
@@ -613,7 +609,6 @@ const EditProfilePage: React.FC = () => {
                     </div>
                   </div>
 
-
                   <div className="space-y-4">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Target className="h-4 w-4" />
@@ -628,7 +623,6 @@ const EditProfilePage: React.FC = () => {
                     />
                   </div>
 
-
                   <div className="space-y-4">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Lightbulb className="h-4 w-4" />
@@ -642,7 +636,6 @@ const EditProfilePage: React.FC = () => {
                       className="react-tags-input"
                     />
                   </div>
-
 
                   <Button
                     onClick={() => handleSave('professional')}
@@ -659,7 +652,6 @@ const EditProfilePage: React.FC = () => {
               </Card>
             </TabsContent>
           </Tabs>
-
 
           <div className="text-center mt-12 p-6 bg-gradient-to-r from-primary/10 to-purple-100/50 rounded-xl">
             <h3 className="text-xl font-bold mb-2">Your profile is {getProfileCompletion()}% complete!</h3>
@@ -681,11 +673,14 @@ const EditProfilePage: React.FC = () => {
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
         member={myProfileForPreview}
+        // Since this is the user's own profile preview, they can't connect with themselves
+        onConnect={() => {}} 
+        connectionStatus="none"
+        projectsCount={projectsCount}
         isMyProfile={true}
       />
     </DashboardLayout>
   );
 };
-
 
 export default EditProfilePage;

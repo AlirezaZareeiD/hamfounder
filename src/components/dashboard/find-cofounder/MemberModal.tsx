@@ -9,7 +9,6 @@ import { Member } from '@/types';
 import { ConnectionStatus } from '@/pages/dashboard/find-cofounder/FindCofounderPage';
 import { Link } from 'react-router-dom';
 
-
 interface MemberModalProps {
   member: Member;
   isOpen: boolean;
@@ -17,8 +16,8 @@ interface MemberModalProps {
   onConnect: (member: Member, message?: string) => void;
   connectionStatus: ConnectionStatus;
   projectsCount: number;
+  isMyProfile?: boolean; // Make isMyProfile optional
 }
-
 
 const ConnectionButton: React.FC<{ status: ConnectionStatus; onClick: () => void }> = ({ status, onClick }) => {
     switch (status) {
@@ -49,19 +48,15 @@ const ConnectionButton: React.FC<{ status: ConnectionStatus; onClick: () => void
     }
   };
 
-
-const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onConnect, connectionStatus, projectsCount }) => {
+const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onConnect, connectionStatus, projectsCount, isMyProfile = false }) => {
   const [message, setMessage] = useState('');
 
-
   if (!isOpen) return null;
-
 
   const handleConnectClick = () => {
     onConnect(member, message);
     setMessage(''); // Clear message after sending
   };
-
 
   const projectCountDisplay = projectsCount > 0 ? (
     <Link to={`/dashboard/user/${member.id}/projects`} className="font-semibold text-primary hover:underline">
@@ -70,7 +65,6 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
   ) : (
     <span className="font-semibold">{projectsCount}</span>
   );
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -127,8 +121,7 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
                 </div>
             </div>
 
-
-            {connectionStatus === 'none' && (
+            {!isMyProfile && connectionStatus === 'none' && (
                  <div className="space-y-2 mt-6">
                     <label htmlFor="connect-message" className="font-semibold">Include a message (optional)</label>
                     <Textarea
@@ -141,15 +134,13 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
             )}
         </div>
 
-
         <DialogFooter className="p-4 sm:p-6 flex-shrink-0 border-t bg-background">
             <Button variant="outline" onClick={onClose}>Close</Button>
-            <ConnectionButton status={connectionStatus} onClick={handleConnectClick} />
+            {!isMyProfile && <ConnectionButton status={connectionStatus} onClick={handleConnectClick} />}
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
-
 
 export default MemberModal;
