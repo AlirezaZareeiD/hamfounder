@@ -6,7 +6,6 @@ import {
   Rocket,
   Lock,
   Briefcase,
-  Calendar,
   Trash2,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +21,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-// A comprehensive interface that covers all project details
 export interface Project {
   id: string;
   name: string;
@@ -43,6 +41,7 @@ export interface Project {
   mvpStatus: string;
   milestones: string[];
   tags: string[];
+  updatedAt?: Date;
 }
 
 interface ProjectCardProps {
@@ -50,9 +49,10 @@ interface ProjectCardProps {
   onViewProject: (id: string) => void;
   onDeleteProject?: (project: Project) => void;
   showOwnerControls: boolean;
+  isPublicView?: boolean;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewProject, onDeleteProject, showOwnerControls }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewProject, onDeleteProject, showOwnerControls, isPublicView }) => {
 
   return (
     <Card className="relative group hover:shadow-md transition-shadow flex flex-col">
@@ -85,28 +85,28 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewProject, onDel
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 flex flex-col flex-grow">
-        <p className="text-sm text-slate-600 line-clamp-2 flex-grow">{project.description}</p>
+      <CardContent className="space-y-3 flex flex-col flex-grow">
+        <p className="text-sm text-slate-600 line-clamp-2 h-[40px]">{project.description}</p>
 
-        {project.fundingStage && (
-          <div className="text-sm text-slate-600 flex items-center"><Briefcase className="h-4 w-4 mr-1 text-slate-500" /> Funding Stage: {project.fundingStage}</div>
-        )}
-        {project.mvpStatus && (
-          <div className="text-sm text-slate-600 flex items-center"><Rocket className="h-4 w-4 mr-1 text-slate-500" /> MVP Status: {project.mvpStatus}</div>
-        )}
-        {project.milestones && project.milestones.length > 0 && (
-          <div className="text-sm text-slate-600 flex items-center"><Calendar className="h-4 w-4 mr-1 text-slate-500" /> Milestone: {project.milestones[0]}</div>
-        )}
+        {/* Unconditionally display these fields */}
+        <div className="text-sm text-slate-600 flex items-center"><Briefcase className="h-4 w-4 mr-1.5 text-slate-500 flex-shrink-0" /> Funding Stage: <span className="font-medium ml-1">{project.fundingStage || 'N/A'}</span></div>
+        <div className="text-sm text-slate-600 flex items-center"><Rocket className="h-4 w-4 mr-1.5 text-slate-500 flex-shrink-0" /> MVP Status: <span className="font-medium ml-1">{project.mvpStatus || 'N/A'}</span></div>
+        
         {project.tags && project.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1 pt-1">
             {project.tags.map(tag => (
               <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
             ))}
           </div>
         )}
 
-        {showOwnerControls && (
-          <>
+        {/* Spacer to push content to bottom */}
+        <div className="flex-grow" /> 
+
+        {/* Progress and Owner Info Section */}
+        <div className="pt-2 space-y-3">
+
+          {(showOwnerControls || isPublicView) && (
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span>Project Progress</span>
@@ -114,23 +114,27 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewProject, onDel
               </div>
               <Progress value={project.progress || 0} className="h-1.5" />
             </div>
+          )}
+          
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Avatar key={project.ownerId} className="border-2 border-white h-8 w-8">
+                <AvatarImage src={project.ownerInfo?.profileImageUrl} />
+                <AvatarFallback className="text-xs">
+                  {project.ownerInfo?.displayName ? project.ownerInfo.displayName.slice(0, 2) : 'U'}
+                </AvatarFallback>
+              </Avatar>
+              {isPublicView && <span className="text-sm font-medium text-slate-700">{project.ownerInfo?.displayName || 'Unknown Owner'}</span>}
+            </div>
 
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex -space-x-2">
-                <Avatar key={project.ownerId} className="border-2 border-white h-8 w-8">
-                  <AvatarImage src={project.ownerInfo?.profileImageUrl} />
-                  <AvatarFallback className="text-xs">
-                    {project.ownerInfo?.displayName ? project.ownerInfo.displayName.charAt(0) : 'U'}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
+            {showOwnerControls && (
               <div className="text-xs text-slate-500 flex items-center">
                 <Briefcase className="h-3 w-3 mr-1" />
                 {(project.tasks?.completed || 0)}/{(project.tasks?.total || 0)} tasks
               </div>
-            </div>
-          </>
-        )}
+            )}
+          </div>
+        </div>
 
         <Button variant="outline" size="sm" className="w-full mt-auto" onClick={() => onViewProject(project.id)}>
           View Project <ChevronRight className="h-4 w-4 ml-1" />
