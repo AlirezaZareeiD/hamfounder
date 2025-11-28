@@ -29,4 +29,10 @@ export const navigation = [
     href: '/dashboard/find-cofounder',
     isInternalLink: false,
   },
+  {
+    id: 'projects-marketplace',
+    label: 'Projects Marketplace',
+    href: '/dashboard/projects',
+    isInternalLink: false,
+  },
   ];

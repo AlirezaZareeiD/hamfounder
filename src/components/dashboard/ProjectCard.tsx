@@ -55,7 +55,7 @@ interface ProjectCardProps {
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewProject, onDeleteProject, showOwnerControls, isPublicView }) => {
 
   return (
-    <Card className="relative group hover:shadow-md transition-shadow flex flex-col">
+    <Card className="relative group hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out flex flex-col">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-bold text-slate-800 flex items-start justify-between gap-2">
           <span className="flex items-center pt-2">

@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, User, Search, Bell, LogOut, Edit, Home, Briefcase, Lock, MessageSquare } from 'lucide-react';
+import { Menu, User, Search, Bell, LogOut, Edit, Home, Briefcase, Lock, MessageSquare, LayoutGrid } from 'lucide-react'; // Added LayoutGrid
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { useWhitelist } from '@/hooks/useWhitelist';
@@ -18,17 +18,12 @@ export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ 
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
-
-  // --- THE FIX: Correctly consume the useWhitelist hook ---
   const { whitelist, loading: whitelistLoading } = useWhitelist();
 
-  // Memoize the check to prevent re-calculation on every render
   const isUserWhitelisted = useMemo(() => {
-    // If it's loading or there is no user, they are not whitelisted
     if (whitelistLoading || !user) {
       return false;
     }
-    // Otherwise, check if the user's UID is in the array
     return whitelist.includes(user.uid);
   }, [whitelist, whitelistLoading, user]);
 
@@ -78,6 +73,11 @@ export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ 
             <Search className="h-5 w-5 mr-3 text-gray-600" />
             Find Co-founder
           </Link>
+          {/* --- New Marketplace Link --- */}
+          <Link to="/dashboard/projects" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
+            <LayoutGrid className="h-5 w-5 mr-3 text-gray-600" />
+            Projects Marketplace
+          </Link>
           <Link to="/dashboard/notifications" onClick={handleLinkClick} className="flex items-center p-2 rounded-md hover:bg-gray-100">
             <Bell className="h-5 w-5 mr-3 text-gray-600" />
             Notifications
@@ -87,7 +87,6 @@ export const DashboardHamburgerMenu: React.FC<DashboardHamburgerMenuProps> = ({ 
             Messages
           </Link>
 
-          {/* --- THE FIX: Conditionally render based on the correct logic -- */}
           {whitelistLoading ? (
             <div className="flex items-center p-2">
               <Skeleton className="h-5 w-5 mr-3 rounded" />
