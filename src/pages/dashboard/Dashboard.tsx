@@ -61,7 +61,7 @@ const Dashboard = () => {
             Every Founder’s Journey Begins Here!
           </h2>
            <p className="text-center text-slate-500 mb-6">
-             Discover, connect, and grow within the global Iranian innovation ecosystem.
+             Discover, connect, and grow with the global Iranian entrepreneurs ecosystem.
            </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1: Edit Profile */}
@@ -138,7 +138,7 @@ const Dashboard = () => {
             Explore the Visionary Builders' Marketplace
           </h2>
            <p className="text-center text-slate-500 mb-6">
-             Discover, connect, and grow within the global Iranian innovation ecosystem.
+             Discover, connect, and grow with the global Iranian entrepreneurs ecosystem. 
            </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link to="/dashboard/projects" className="hover:no-underline">
