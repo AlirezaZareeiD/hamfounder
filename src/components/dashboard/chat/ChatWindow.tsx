@@ -20,6 +20,18 @@ interface ChatWindowProps {
   otherUser: { id: string; name: string; avatar: string };
 }
 
+const formatTimestamp = (timestamp: any) => {
+  if (!timestamp) return '';
+  const date = timestamp.toDate();
+  return date.toLocaleString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
 const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, otherUser }) => {
   const [user] = useAuthState(auth);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -90,10 +102,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, otherUser }) => {
           <div className="flex justify-center items-center h-full"><Loader2 className="animate-spin" /></div>
         ) : (
           messages.map(msg => (
-            <div key={msg.id} className={`flex items-end space-x-2 ${msg.senderId === user?.uid ? 'justify-end' : ''}`}>
-                <div className={`p-3 rounded-lg max-w-xs lg:max-w-md ${msg.senderId === user?.uid ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                    <p>{msg.text}</p>
-                </div>
+            <div key={msg.id} className={`flex flex-col ${msg.senderId === user?.uid ? 'items-end' : 'items-start'}`}>
+              <div className={`p-3 rounded-lg max-w-xs lg:max-w-md ${msg.senderId === user?.uid ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                  <p>{msg.text}</p>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1 px-1">
+                  {formatTimestamp(msg.createdAt)}
+              </p>
             </div>
           ))
         )}

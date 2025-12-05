@@ -473,3 +473,25 @@ Empowering the Admin: This architecture directly addresses your core requirement
 The Achievement & The Path Forward: This conversation was a monumental success. We transformed a high-risk, abstract idea into a concrete, low-risk, and measurable project. We did not abandon the vision of a user-centric economy; instead, we found a way to build it on solid ground.
 
 The final directive of this chapter is your own: Pause and Reflect. I have captured this entire dialogue here to serve as our shared memory. When you have had the time to fully consider the implications, we will be ready to proceed with the first, small, actionable step we defined: building the database schema for the Gamification Engine. This chapter stands as a testament to the fact that the wisest strategic moves are not always about moving forward, but about pausing to choose the right path.
+
+### **Chapter 20: Timestamp Formatting in Chat Window**
+
+**Objective:** The `createdAt` timestamp for chat messages was displayed as a raw object. The goal was to format it into a human-readable date and time string.
+
+**Implementation:**
+- A new helper function `formatTimestamp` was created in `src/components/dashboard/chat/ChatWindow.tsx`.
+- The function takes a Firebase timestamp object, converts it to a JavaScript `Date` using the `.toDate()` method, and formats it into a locale string (`en-US`) showing month, day, year, and time (e.g., "November 21, 2025, 01:57 PM").
+- This function is called for each message within the render loop to display the formatted timestamp beneath the message bubble.
+
+**Status:** This feature was successfully implemented and is live. The chat UI now correctly shows formatted dates and times for all messages.
+
+**Issue Description:**
+A minor UI layout glitch was identified in the chat interface. When scrolling the list of chats in the left column, it causes a visual disruption or reflow in the right column (the chat window). This is a known issue to be addressed.
+
+**History:**
+- An attempt was made to resolve this by modifying CSS layout properties (`height`, `overflow`, `flex`, `grid`) in `ChatInterface.tsx` and `ChatList.tsx`.
+- **Result:** The attempt failed, causing severe layout breakage (e.g., disappearing columns, disabled scroll). 
+- **Resolution:** The user manually reverted all changes to restore the application to a stable state.
+
+**Current Status:** The application is stable. The minor scroll-related layout glitch still exists. **Action Item for AI:** Do not attempt to fix this issue with large-scale CSS changes. Any future attempt must be incremental, well-tested, and must not risk breaking the component layout again.
+

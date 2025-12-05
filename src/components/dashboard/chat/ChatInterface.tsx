@@ -4,6 +4,7 @@ import ChatWindow from '@/components/dashboard/chat/ChatWindow';
 import { Card } from '@/components/ui/card';
 import { MessageSquare } from 'lucide-react';
 
+
 interface SelectedChat {
   chatId: string;
   otherUser: {
@@ -13,12 +14,15 @@ interface SelectedChat {
   };
 }
 
+
 const ChatInterface: React.FC = () => {
   const [selectedChat, setSelectedChat] = useState<SelectedChat | null>(null);
+
 
   const handleSelectChat = (chatId: string, otherUser: { id: string; name: string; avatar: string }) => {
     setSelectedChat({ chatId, otherUser });
   };
+
 
   return (
     <Card className="h-[600px] grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
@@ -42,5 +46,6 @@ const ChatInterface: React.FC = () => {
     </Card>
   );
 };
+
 
 export default ChatInterface;

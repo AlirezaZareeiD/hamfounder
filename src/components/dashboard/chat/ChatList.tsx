@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
+
 interface ChatListItem {
   id: string; // The chat document ID
   otherUserId: string;
@@ -14,20 +15,25 @@ interface ChatListItem {
   lastMessage: string;
 }
 
+
 interface ChatListProps {
   onSelectChat: (chatId: string, otherUser: { id: string; name: string; avatar: string }) => void;
 }
+
 
 const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
   const [user] = useAuthState(auth);
   const [chats, setChats] = useState<ChatListItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     if (!user) return;
 
+
     setLoading(true);
     const chatsQuery = query(collection(db, 'chats'), where('userIds', 'array-contains', user.uid));
+
 
     const unsubscribe = onSnapshot(chatsQuery, async (snapshot) => {
       const chatListData = await Promise.all(
@@ -35,10 +41,13 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
           const chatData = chatDoc.data();
           const otherUserId = chatData.userIds.find((id: string) => id !== user.uid);
 
+
           if (!otherUserId) return null;
+
 
           const userProfileDoc = await getDoc(doc(db, 'userProfiles', otherUserId));
           if (!userProfileDoc.exists()) return null;
+
 
           const profileData = userProfileDoc.data();
           return {
@@ -51,6 +60,7 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
         })
       );
 
+
       setChats(chatListData.filter(Boolean) as ChatListItem[]);
       setLoading(false);
     }, (error) => {
@@ -58,19 +68,22 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
       setLoading(false);
     });
 
+
     return () => unsubscribe();
   }, [user]);
+
 
   if (loading) {
     return <div className="flex justify-center items-center py-8"><Loader2 className="animate-spin" /></div>;
   }
+
 
   return (
     <div className="h-full overflow-y-auto border-r">
         <h2 className="text-xl font-semibold p-4 border-b">Messages</h2>
         <div className="space-y-2 p-2">
             {chats.length > 0 ? chats.map((chat) => (
-                <Card 
+                <Card
                     key={chat.id}
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => onSelectChat(chat.id, { id: chat.otherUserId, name: chat.otherUserName, avatar: chat.otherUserAvatar })}
@@ -95,5 +108,6 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
     </div>
   );
 };
+
 
 export default ChatList;
