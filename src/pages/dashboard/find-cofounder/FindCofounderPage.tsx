@@ -118,11 +118,12 @@ const FindCofounderPage: React.FC = () => {
           .filter(doc => doc.id !== user.uid)
           .filter(doc => isProfile100PercentComplete(doc.data() as UserProfile))
           .map(doc => {
-            const data = doc.data() as UserProfile;
+            const data = doc.data() as any; // Use any to access all fields from firestore
             return {
               id: doc.id,
               name: `${data.firstName || ''} ${data.lastName || ''}`.trim(),
               avatar: data.profileImageUrl || '',
+              profileImageUrl: data.profileImageUrl || '',
               role: data.role || '',
               skills: data.skills || [],
               location: data.location || '',
@@ -134,7 +135,11 @@ const FindCofounderPage: React.FC = () => {
               isOnline: data.isOnline || false,
               rating: data.rating || 0,
               joinedDate: data.joinedDate ? new Date(data.joinedDate.seconds * 1000).toLocaleDateString() : 'N/A',
-              achievements: data.achievements || []
+              achievements: data.achievements || [],
+              interests: data.interests || [],
+              companyWebsiteUrl: data.companyWebsiteUrl || null,
+              linkedinUrl: data.linkedinUrl || null,
+              twitterUrl: data.twitterUrl || null
             };
           });
        

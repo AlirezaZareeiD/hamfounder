@@ -4,7 +4,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Briefcase, MapPin, Lightbulb, BarChart2, Star, MessageSquare, UserPlus, Check, FolderKanban } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Briefcase, MapPin, Lightbulb, BarChart2, Star, MessageSquare, UserPlus, Check, FolderKanban, Sparkles, Link as LinkIcon, Linkedin, Globe, Twitter } from "lucide-react";
 import { Member } from '@/types';
 import { ConnectionStatus } from '@/pages/dashboard/find-cofounder/FindCofounderPage';
 import { Link } from 'react-router-dom';
@@ -16,7 +17,7 @@ interface MemberModalProps {
   onConnect: (member: Member, message?: string) => void;
   connectionStatus: ConnectionStatus;
   projectsCount: number;
-  isMyProfile?: boolean; // Make isMyProfile optional
+  isMyProfile?: boolean;
 }
 
 const ConnectionButton: React.FC<{ status: ConnectionStatus; onClick: () => void }> = ({ status, onClick }) => {
@@ -55,7 +56,7 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
 
   const handleConnectClick = () => {
     onConnect(member, message);
-    setMessage(''); // Clear message after sending
+    setMessage('');
   };
 
   const projectCountDisplay = projectsCount > 0 ? (
@@ -72,7 +73,7 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
         <DialogHeader className="p-6 pb-4 flex-shrink-0 border-b">
           <div className="flex items-start space-x-6">
             <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-transparent">
-              <AvatarImage src={member.avatar} alt={member.name} />
+              <AvatarImage src={member.profileImageUrl || member.avatar} alt={member.name} />
               <AvatarFallback>{member.name.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex-grow pt-2">
@@ -120,6 +121,50 @@ const MemberModal: React.FC<MemberModalProps> = ({ member, isOpen, onClose, onCo
                       </ul>
                 </div>
             </div>
+
+            <div className="my-6">
+                <Separator />
+            </div>
+            
+            {member.interests && member.interests.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-semibold text-lg mb-3 flex items-center"><Sparkles className="mr-2 h-5 w-5 text-primary" />Interests</h3>
+                <div className="flex flex-wrap gap-2">
+                  {member.interests.map((interest: string, index: number) => (
+                    <Badge key={index} variant="outline" className="font-medium">{interest}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(member.companyWebsiteUrl || member.linkedinUrl || member.twitterUrl) && (
+                <div className="mb-6">
+                    <h3 className="font-semibold text-lg mb-3 flex items-center">
+                        <LinkIcon className="mr-2 h-5 w-5 text-primary" />
+                        Links
+                    </h3>
+                    <div className="flex items-center space-x-6">
+                        {member.companyWebsiteUrl && (
+                            <a href={member.companyWebsiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+                                <Globe className="mr-2 h-4 w-4" />
+                                Website
+                            </a>
+                        )}
+                        {member.linkedinUrl && (
+                            <a href={member.linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+                                <Linkedin className="mr-2 h-4 w-4" />
+                                LinkedIn
+                            </a>
+                        )}
+                        {member.twitterUrl && (
+                            <a href={member.twitterUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+                                <Twitter className="mr-2 h-4 w-4" />
+                                Twitter
+                            </a>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {!isMyProfile && connectionStatus === 'none' && (
                  <div className="space-y-2 mt-6">
